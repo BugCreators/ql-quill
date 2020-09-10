@@ -4,14 +4,6 @@
 
 ### 🏠 [Homepage](https://github.com/Array-Huang/javascript-library-boilerplate)
 
-## Install
+# ql-quill V0.0.1
 
-```sh
-npm install
-```
-
-## Run build
-
-```sh
-npm run build
-```
+Public configuration wrappers for Quill.js

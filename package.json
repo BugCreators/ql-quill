@@ -1,7 +1,7 @@
 {
   "name": "ql-quill",
   "version": "0.0.1",
-  "description": "<Your Lib's Description>",
+  "description": "A wrapper for quill",
   "main": "./dist/ql-quill.js",
   "files": [
     "dist/",
@@ -12,7 +12,9 @@
   "scripts": {
     "build": "webpack --mode=production"
   },
-  "keywords": [],
+  "keywords": [
+    "ql-quill"
+  ],
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.6.4",
