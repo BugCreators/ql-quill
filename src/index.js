@@ -1,6 +1,6 @@
 import Quill from "quill";
 import ImageResize from "quill-image-resize-module";
-import isEqual from "lodash/isEqual";
+import isEqual from "lodash.isequal";
 
 import "../assets/index.styl";
 

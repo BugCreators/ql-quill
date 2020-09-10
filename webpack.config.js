@@ -18,7 +18,7 @@ const plugins = [
 
 module.exports = {
   entry: {
-    "ql-quill": dir("src/index.js"),
+    "ql-quill": dir("index.js"),
   },
   // devtool: "source-map",
   output: {
