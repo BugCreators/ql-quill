@@ -2,6 +2,8 @@ import Quill from "quill";
 import isEqual from "lodash.isequal";
 
 import ImageResize from "quill-image-resize-module";
+import Toolbar from "./components/toolbar";
+import WordLimit from "./components/wordLimit";
 import InsertImage from "./modules/image";
 
 import "../assets/index.styl";
@@ -20,14 +22,12 @@ class QlQuill {
     this.container = container;
     // 阻止谷歌翻译输入框
     this.container.classList.add("notranslate");
-    this.options = options;
-    this.value = this.options.value;
-    this.limit = 1000;
+    this.value = options.value;
 
     this.replaceIcon();
     this.instantiateEditor(options);
     this.setEditorContents(this.value);
-    this.insertCount();
+    this.instantiateWordLimit(options, this.editor.getLength() - 1);
 
     this.setContent = this.setEditorContents.bind(this);
     this.insertImage = this.insertImage.bind(this);
@@ -48,46 +48,36 @@ class QlQuill {
     );
   }
 
-  // 字数显示
-  insertCount() {
-    if (!this.options.limit) return;
-    this.limit = Number(this.options.limit) || this.limit;
-    this.limitEl = document.createElement("span");
-    this.limitEl.classList.add("ql-word-count");
-    this.uploadCount(0);
-    this.container.appendChild(this.limitEl);
+  instantiateWordLimit(options, wordLens) {
+    if (!options.limit) return;
+
+    const wordLimit = new WordLimit(options.limit, wordLens);
+
+    this.container.appendChild(wordLimit.container);
+    this.updateLimit = wordLimit.update;
   }
 
-  // 更新字数
-  uploadCount(count) {
-    if (!this.limitEl) return;
-    count = count >= 0 ? count : 0;
+  instantiateToolbar(options) {
+    const toolbar = new Toolbar(options);
 
-    if (!this.limitEl.innerHTML) {
-      this.limitEl.innerHTML = `<span class="ql-word-entered">${count}</span>/${this.limit}`;
-    } else {
-      const enteredEl = this.limitEl.querySelector(".ql-word-entered");
-      enteredEl.innerText = count;
-    }
+    this.container.parentElement.insertBefore(
+      toolbar.container,
+      this.container
+    );
+
+    return toolbar;
   }
 
   // 实例化编辑器
   instantiateEditor(options) {
     if (this.editor) return;
+    const toolbar = this.instantiateToolbar(options);
+
     const editorOption = {
       theme: "snow",
       modules: {
         toolbar: {
-          container: [
-            "bold", // 加粗
-            "italic", // 斜体
-            "underline", // 下划线
-            { script: "sub" }, // 上标
-            { script: "super" }, // 下标
-            "clean", // 清除格式
-            "image", // 插入图片
-            // 'import'               // 插入重点
-          ],
+          container: `#${toolbar.id}`,
           handlers: {},
         },
         imageResize: {
@@ -123,14 +113,12 @@ class QlQuill {
       } else if (typeof options.image === "object") {
         if (options.image.action) {
           editorOption.modules.toolbar.handlers.image = () =>
-            this.uploadImages(options.image.action);
+            this.uploadImages(options);
         }
       }
     }
 
     this.editor = new Quill(this.container, editorOption);
-
-    this.toolbar = document.querySelector(".ql-toolbar");
 
     this.editor.on(
       "editor-change",
@@ -139,7 +127,8 @@ class QlQuill {
           this.onEditorChangeText(
             this.editor.root.innerHTML,
             rangeOrDelta,
-            source
+            source,
+            options
           );
         } else if (eventName === "selection-change") {
           this.onEditorChangeSelection(rangeOrDelta, source);
@@ -172,17 +161,17 @@ class QlQuill {
     }
   }
 
-  onEditorChangeText(value, delta, source) {
+  onEditorChangeText(value, delta, source, options) {
     if (!this.editor) return;
 
-    if (this.options.limit) {
+    if (options.limit) {
       const wordLens = this.editor.getLength() - 1;
-      if (wordLens > this.limit) {
+      if (wordLens > options.limit) {
         this.editor.history.undo();
       } else {
         this.editor.history.cutoff();
-        this.options.onChange && this.options.onChange(value);
-        this.uploadCount(wordLens);
+        options.onChange && options.onChange(value);
+        this.updateLimit && this.updateLimit(wordLens);
       }
     }
   }
@@ -197,29 +186,31 @@ class QlQuill {
 
     this.selection = nextSelection;
 
+    const toolbar = document.querySelector(".ql-toolbar");
+
     if (hasGainedFocus) {
       this.container.classList.add("on-focus");
-      this.toolbar.classList.add("on-focus");
+      toolbar.classList.add("on-focus");
     } else if (hasLostFocus) {
       this.container.classList.remove("on-focus");
-      this.toolbar.classList.remove("on-focus");
+      toolbar.classList.remove("on-focus");
     }
   }
 
   // 自定义上传图片
-  uploadImages(action) {
+  uploadImages(options) {
     const input = document.createElement("input");
     input.setAttribute("type", "file");
     input.setAttribute("hidden", true);
-    if (this.options.image.accept) {
-      input.setAttribute("accept", this.options.image.accept);
+    if (options.image.accept) {
+      input.setAttribute("accept", options.image.accept);
     }
 
     input.addEventListener(
       "change",
       e => {
         const file = e.target.files[0];
-        action(file, this.insertImage.bind(this));
+        options.image.action(file, this.insertImage.bind(this));
       },
       false
     );
