@@ -22,27 +22,27 @@
   const editor = new QlQuill("#editor", {
     limit: 1000,
     placeholder: "请输入作业内容...",
-    image: {
-      accept: ['jpg', 'jpeg', 'bmp'].map(i => `.${i}`).join(','),
-      customHandlers: callback => {
-        console.log('custom')
-        callback("http://192.168.4.119/group1/M00/01/57/wKgBF19YPz6AEfqrAABTEqBfftU969.jpg")
-      },
-      action: (file, cb) => {
-        const formData = new FormData();
-        formData.append('file', file)
-        axios({
-          method: "post",
-          url: "http://192.168.4.119:10013/webservice/file/saveOne",
-          headers: {
-            'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
-            token: '5327C5E33DD9478EAC858A69179CC79D'
-          },
-          data: formData
-        }).then(res => {
-          cb(res.data.data.fullUrl);
-        })
-      }
+    // image: {
+    //   accept: ['jpg', 'jpeg', 'bmp'].map(i => `.${i}`).join(','),
+    //   action: (file, cb) => {
+    //     const formData = new FormData();
+    //     formData.append('file', file)
+    //     axios({
+    //       method: "post",
+    //       url: "http://192.168.4.119:10013/webservice/file/saveOne",
+    //       headers: {
+    //         'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+    //         token: '5327C5E33DD9478EAC858A69179CC79D'
+    //       },
+    //       data: formData
+    //     }).then(res => {
+    //       cb(res.data.data.fullUrl);
+    //     })
+    //   }
+    // },
+    image: cb => {
+      console.log('custom')
+      cb("http://192.168.4.119/group1/M00/01/57/wKgBF19YPz6AEfqrAABTEqBfftU969.jpg")
     },
     value,
     onChange: v => {

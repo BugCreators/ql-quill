@@ -1,11 +1,14 @@
 import Quill from "quill";
-import ImageResize from "quill-image-resize-module";
 import isEqual from "lodash.isequal";
+
+import ImageResize from "quill-image-resize-module";
+import InsertImage from "./modules/image";
 
 import "../assets/index.styl";
 
 Quill.register({
   "modules/imageResize": ImageResize,
+  "modules/image": InsertImage,
 });
 
 class QlQuill {
@@ -95,17 +98,12 @@ class QlQuill {
             [
               "IMG",
               (node, delta) => {
-                const imageTypeList = this.options.image.accept;
-                if (imageTypeList && imageTypeList.length) {
-                  const base64Reg = new RegExp(
-                    `^data:image/(${imageTypeList.join("|")});base64`,
-                    "ig"
-                  );
-                  const isBase64 = base64Reg.test(node.src);
-                  if (isBase64) {
-                    const Delta = Quill.import("delta");
-                    return new Delta();
-                  }
+                const isBase64OrLocal = /^(data:image|file:\/\/)/.test(
+                  node.src
+                );
+                if (isBase64OrLocal) {
+                  const Delta = Quill.import("delta");
+                  return new Delta();
                 }
 
                 return delta;
@@ -118,15 +116,15 @@ class QlQuill {
       readOnly: false,
     };
 
-    if ("image" in options && options.image.action) {
-      const { customHandlers, action } = options.image;
-
-      if (customHandlers) {
+    if (options.image) {
+      if (typeof options.image === "function") {
         editorOption.modules.toolbar.handlers.image = () =>
-          customHandlers(this.insertImage.bind(this));
-      } else if (action) {
-        editorOption.modules.toolbar.handlers.image = () =>
-          this.uploadImages(action);
+          options.image(this.insertImage.bind(this));
+      } else if (typeof options.image === "object") {
+        if (options.image.action) {
+          editorOption.modules.toolbar.handlers.image = () =>
+            this.uploadImages(options.image.action);
+        }
       }
     }
 
@@ -234,7 +232,9 @@ class QlQuill {
   insertImage(src) {
     this.editor.focus();
     const currentRange = this.editor.getSelection().index;
-    this.editor.insertEmbed(currentRange, "image", src);
+    this.editor.insertEmbed(currentRange, "image", {
+      url: src,
+    });
     this.editor.setSelection(currentRange + 1);
   }
 }
