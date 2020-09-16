@@ -4,13 +4,19 @@ import isEqual from "lodash.isequal";
 import ImageResize from "quill-image-resize-module";
 import Toolbar from "./components/toolbar";
 import WordLimit from "./components/wordLimit";
-import InsertImage from "./modules/image";
+import ImportDialog from "./components/importDialog";
+
+import Image from "./modules/image";
+import Import from "./modules/import";
+import Question from "./modules/question";
 
 import "../assets/index.styl";
 
 Quill.register({
   "modules/imageResize": ImageResize,
-  "modules/image": InsertImage,
+  "modules/image": Image,
+  "modules/import": Import,
+  "modules/question": Question,
 });
 
 class QlQuill {
@@ -78,7 +84,17 @@ class QlQuill {
       modules: {
         toolbar: {
           container: `#${toolbar.id}`,
-          handlers: {},
+          handlers: {
+            import: () => {
+              new ImportDialog(this.editor);
+            },
+            question: () => {
+              this.insertQuestion("question");
+            },
+            option: () => {
+              this.insertQuestion("option");
+            },
+          },
         },
         imageResize: {
           modules: ["Resize", "DisplaySize"],
@@ -124,6 +140,9 @@ class QlQuill {
       "editor-change",
       (eventName, rangeOrDelta, oldRangeOrDelta, source) => {
         if (eventName === "text-change") {
+          this.formatQuestion(options, "question");
+          this.formatQuestion(options, "option");
+
           this.onEditorChangeText(
             this.editor.root.innerHTML,
             rangeOrDelta,
@@ -220,13 +239,33 @@ class QlQuill {
     this.container.removeChild(input);
   }
 
+  // 插入图片
   insertImage(src) {
-    this.editor.focus();
-    const currentRange = this.editor.getSelection().index;
-    this.editor.insertEmbed(currentRange, "image", {
+    !this.editor.hasFocus() && this.editor.focus();
+    const index = this.editor.getSelection().index;
+    this.editor.insertEmbed(index, "image", {
       url: src,
     });
-    this.editor.setSelection(currentRange + 1);
+    this.editor.setSelection(index + 1);
+  }
+
+  // 插入小题
+  insertQuestion(type) {
+    !this.editor.hasFocus() && this.editor.focus();
+    const index = this.editor.getSelection().index;
+    this.editor.insertEmbed(index, "question", type);
+    this.editor.setSelection(index + 1);
+  }
+
+  formatQuestion(options, type) {
+    if (!options[type]) return;
+
+    const nodes = this.editor.root.querySelectorAll(`sub-${type}`);
+    if (!nodes.length) return;
+
+    nodes.forEach((node, index) => {
+      node.innerHTML = `(${index + 1})`;
+    });
   }
 }
 

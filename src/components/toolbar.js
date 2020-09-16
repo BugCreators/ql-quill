@@ -22,6 +22,8 @@ class Toolbar {
   }
 }
 
+Toolbar.CUSTOM = ["import", "option", "question"];
+
 Toolbar.DEFAULT = [
   "bold", // 加粗
   "italic", // 斜体
@@ -35,6 +37,12 @@ Toolbar.DEFAULT = [
 
 function expandConfig(userConfig) {
   const config = Toolbar.DEFAULT;
+
+  Toolbar.CUSTOM.forEach(label => {
+    if (userConfig[label]) {
+      config.push(label);
+    }
+  });
 
   return config;
 }

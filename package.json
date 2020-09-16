@@ -1,6 +1,6 @@
 {
   "name": "ql-quill",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A wrapper for quill",
   "main": "./dist/ql-quill.js",
   "files": [
@@ -36,6 +36,7 @@
     "stylus": "^0.54.8",
     "stylus-loader": "^3.0.2",
     "uglifyjs-webpack-plugin": "^2.2.0",
+    "url-loader": "^4.1.0",
     "webpack": "^4.40.3",
     "webpack-cli": "^3.3.12"
   },

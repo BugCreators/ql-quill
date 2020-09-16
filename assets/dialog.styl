@@ -1,0 +1,229 @@
+.ql-dialog-mask
+  position fixed
+  top 0
+  right 0
+  bottom 0
+  left 0
+  z-index 1000
+  height 100%
+  background-color rgba(0, 0, 0, 0.45)
+
+  &-hidden
+    display none
+
+.ql-dialog-wrap
+  position fixed
+  top 0
+  right 0
+  bottom 0
+  left 0
+  z-index 1000
+  overflow auto
+  outline 0
+  -webkit-overflow-scrolling touch
+  text-align center
+
+  &:before 
+    display inline-block
+    width 0
+    height 100%
+    vertical-align middle
+    content ''
+
+.ql-dialog
+  -webkit-box-sizing border-box
+  box-sizing border-box
+  margin 0
+  padding 0
+  color rgba(0, 0, 0, 0.65)
+  font-size 14px
+  font-variant tabular-nums
+  line-height 1.5715
+  list-style none
+  -webkit-font-feature-settings 'tnum'
+  font-feature-settings 'tnum'
+  position relative
+  top 100px
+  width auto
+  margin 0 auto
+  padding-bottom 24px
+  pointer-events none
+  top 0
+  display inline-block
+  text-align left
+  vertical-align middle
+
+.ql-dialog-content
+  border-radius 8px
+  overflow hidden
+  position relative
+  background-color #fff
+  background-clip padding-box
+  border 0
+  -webkit-box-shadow 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05)
+  box-shadow 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05)
+  pointer-events auto
+
+.ql-dialog-close
+  position absolute
+  top 0
+  right 0
+  z-index 10
+  padding 0
+  color rgba(0, 0, 0, 0.45)
+  font-weight 700
+  line-height 1
+  text-decoration none
+  background transparent
+  border 0
+  outline 0
+  cursor pointer
+  -webkit-transition color 0.3s
+  transition color 0.3s
+
+  &:hover
+    color rgba(0, 0, 0, 0.75)
+    text-decoration none
+  
+  &-x 
+    display block
+    width 56px
+    height 56px
+    font-size 16px
+    font-style normal
+    line-height 56px
+    text-align center
+    text-transform none
+    text-rendering auto
+
+.ql-anticon
+  display inline-block
+  color inherit
+  font-style normal
+  line-height 0
+  text-align center
+  text-transform none
+  vertical-align -0.125em
+  text-rendering optimizeLegibility
+  -webkit-font-smoothing antialiased
+  -moz-osx-font-smoothing grayscale
+
+.ql-dialog-header
+  padding 24px
+  color rgba(0, 0, 0, 0.65)
+  background #fff
+
+.ql-dialog-title
+  font-size 18px
+  font-weight bold
+  color #333
+  margin 0
+  line-height 22px
+  word-wrap break-word
+
+.ql-dialog-body
+  padding 24px 32px
+  font-size 14px
+  line-height 1.5715
+  word-wrap break-word
+
+.ql-dialog-footer
+  padding 16px 24px
+  text-align right
+  background transparent
+  border-top 1px solid #f0f0f0
+  border-radius 0 0 4px 4px
+
+  & button + button
+    margin-bottom 0
+    margin-left 8px
+
+.ql-input
+  padding 0
+  outline none
+  -webkit-box-sizing border-box
+  box-sizing border-box
+  margin 0
+  padding 0
+  font-variant tabular-nums
+  list-style none
+  -webkit-font-feature-settings 'tnum'
+  font-feature-settings 'tnum'
+  position relative
+  display inline-block
+  width 100%
+  min-width 0
+  padding 4px 11px
+  color rgba(0, 0, 0, 0.65)
+  font-size 14px
+  line-height 1.5715
+  background-color #fff
+  background-image none
+  border 1px solid #d9d9d9
+  border-radius 4px
+  -webkit-transition all 0.3s
+  transition all 0.3s
+
+  &:placeholder-shown
+    text-overflow ellipsis
+
+  &:focus,
+  &:hover
+    border-color #5dcfae
+    border-right-width 1px !important
+
+  &:focus
+    outline 0
+    -webkit-box-shadow 0 0 0 2px rgba(56, 195, 161, 0.2)
+    box-shadow 0 0 0 2px rgba(56, 195, 161, 0.2)
+
+.ql-btn
+  min-width 110px
+  line-height 1.5715
+  position relative
+  display inline-block
+  font-weight 400
+  white-space nowrap
+  text-align center
+  background-image none
+  border 1px solid transparent
+  -webkit-box-shadow 0 2px 0 rgba(0, 0, 0, 0.015)
+  box-shadow 0 2px 0 rgba(0, 0, 0, 0.015)
+  cursor pointer
+  -webkit-transition all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1)
+  transition all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1)
+  -webkit-user-select none
+  -moz-user-select none
+  -ms-user-select none
+  user-select none
+  -ms-touch-action manipulation
+  touch-action manipulation
+  height 34px
+  padding 5px 15px
+  font-size 14px
+  border-radius 4px
+  color rgba(0, 0, 0, 0.65)
+  background #fff
+  border-color #d9d9d9
+  outline none
+
+  > span
+    display inline-block
+
+  &:hover
+    color #5dcfae
+    background #fff
+    border-color #5dcfae
+
+  &-primary
+    color #fff
+    background #38c3a1
+    border-color #38c3a1
+    text-shadow 0 -1px 0 rgba(0, 0, 0, 0.12)
+    -webkit-box-shadow 0 2px 0 rgba(0, 0, 0, 0.045)
+    box-shadow 0 2px 0 rgba(0, 0, 0, 0.045)
+
+    &:hover
+      color #fff
+      background #259c82
+      border-color #259c82

@@ -17,10 +17,10 @@ class ImageBlot extends Image {
   }
 }
 
-class InsertImage extends Module {
+class ImageModule extends Module {
   static register() {
     Quill.register(ImageBlot, true);
   }
 }
 
-export { ImageBlot, InsertImage as default };
+export { ImageBlot, ImageModule as default };
