@@ -1,21 +1,22 @@
-class ImportDialog {
-  constructor(editor) {
+class QlDialog {
+  constructor(options) {
     const root = document.querySelector(".ql-dialog-root");
 
     if (!root || !root.parentElement) {
-      this.createContainer(editor);
+      this.createContainer(options);
     } else {
       this.container = root.parentElement;
     }
 
+    this.replaceBody(options);
+
     this.mask = this.container.querySelector(".ql-dialog-mask");
     this.wrap = this.container.querySelector(".ql-dialog-wrap");
-    this.input = this.container.querySelector(".ql-import-input");
 
     this.show();
   }
 
-  createContainer(editor) {
+  createContainer(options) {
     this.container = document.createElement("div");
 
     const dialogTemp = `
@@ -37,12 +38,10 @@ class ImportDialog {
               <div class="ql-dialog-header">
                 <div class="ql-dialog-title">插入重点</div>
               </div>
-              <div class="ql-dialog-body" style="padding-top: 0px;">
-                <input class="ql-input ql-import-input" type="text" value="">
-              </div>
+              <div class="ql-dialog-body" style="padding-top: 0px;"></div>
               <div class="ql-dialog-footer">
-                <button type="button" class="ql-btn ql-dialog-cancel"><span>取 消</span></button>
-                <button type="button" class="ql-btn ql-btn-primary ql-dialog-confrim"><span>邀 请</span></button>
+                <button type="button" class="ql-btn ql-dialog-cancel"><span>取消</span></button>
+                <button type="button" class="ql-btn ql-btn-primary ql-dialog-confrim"><span>确定</span></button>
               </div>
             </div>
           </div>
@@ -56,7 +55,7 @@ class ImportDialog {
     confrimBtn.addEventListener(
       "click",
       _ => {
-        this.insertImport(editor, this.input.value);
+        options.onOk && options.onOk(this.body);
         this.close();
       },
       true
@@ -65,21 +64,17 @@ class ImportDialog {
     const closeBtn = this.container.querySelector(".ql-dialog-close");
     const cancelBtn = this.container.querySelector(".ql-dialog-cancel");
     closeBtn.onclick = cancelBtn.onclick = _ => {
+      options.onCancel && options.onCancel();
       this.close();
     };
 
     document.body.appendChild(this.container);
   }
 
-  insertImport(editor, text) {
-    !editor.hasFocus() && editor.focus();
-    let currentRange = editor.getSelection().index;
+  replaceBody(options) {
+    this.body = this.container.querySelector(".ql-dialog-body");
 
-    text.split("").forEach(item => {
-      editor.insertEmbed(currentRange, "import", item);
-      currentRange++;
-    });
-    editor.setSelection(currentRange);
+    this.body.innerHTML = options.content || "";
   }
 
   show() {
@@ -90,9 +85,7 @@ class ImportDialog {
   close() {
     this.mask.classList.add("ql-dialog-mask-hidden");
     this.wrap.style.display = "none";
-
-    this.input.value = "";
   }
 }
 
-export default ImportDialog;
+export default QlDialog;

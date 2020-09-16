@@ -4,7 +4,7 @@ import isEqual from "lodash.isequal";
 import ImageResize from "quill-image-resize-module";
 import Toolbar from "./components/toolbar";
 import WordLimit from "./components/wordLimit";
-import ImportDialog from "./components/importDialog";
+import QlDialog from "./components/qlDialog";
 
 import Image from "./modules/image";
 import Import from "./modules/import";
@@ -86,13 +86,32 @@ class QlQuill {
           container: `#${toolbar.id}`,
           handlers: {
             import: () => {
-              new ImportDialog(this.editor);
+              new QlDialog({
+                content:
+                  '<input class="ql-input ql-import-input" type="text" value="">',
+                onOk: container => {
+                  !this.editor.hasFocus() && this.editor.focus();
+                  let currentRange = this.editor.getSelection().index;
+
+                  container
+                    .querySelector(".ql-import-input")
+                    .value.split("")
+                    .forEach(item => {
+                      this.editor.insertEmbed(currentRange, "import", item);
+                      currentRange++;
+                    });
+                  this.editor.setSelection(currentRange);
+                },
+              });
             },
             question: () => {
               this.insertQuestion("question");
             },
             option: () => {
               this.insertQuestion("option");
+            },
+            formula: () => {
+              console.log("formula");
             },
           },
         },
