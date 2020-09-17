@@ -35,6 +35,14 @@ module.exports = {
         exclude: /(node_modules|bower_components)/,
       },
       {
+        test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
+        loader: "url-loader",
+        options: {
+          limit: 10000,
+          name: "images/[name].[hash:8].[ext]",
+        },
+      },
+      {
         test: /\.styl$/,
         include: [dir("assets")],
         use: [MiniCssExtractPlugin.loader, "css-loader", "stylus-loader"],
