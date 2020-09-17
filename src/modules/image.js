@@ -6,6 +6,9 @@ const Module = Quill.import("core/module");
 class ImageBlot extends Image {
   static create(value) {
     let node = super.create(value.url);
+    if (value.latex) {
+      node.dataset.latex = value.latex;
+    }
 
     return node;
   }
@@ -13,6 +16,7 @@ class ImageBlot extends Image {
   static value(node) {
     return {
       url: node.getAttribute("src"),
+      latex: node.dataset.latex,
     };
   }
 }

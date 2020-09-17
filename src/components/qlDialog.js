@@ -8,7 +8,8 @@ class QlDialog {
       this.container = root.parentElement;
     }
 
-    this.replaceBody(options);
+    this.setOptions(options);
+    this.registerListener(options);
 
     this.mask = this.container.querySelector(".ql-dialog-mask");
     this.wrap = this.container.querySelector(".ql-dialog-wrap");
@@ -23,7 +24,7 @@ class QlDialog {
       <div class="ql-dialog-root">
         <div class="ql-dialog-mask"></div>
         <div tabindex="-1" class="ql-dialog-wrap">
-          <div class="ql-dialog" style="width: 640px;">
+          <div class="ql-dialog">
             <div tabindex="0" style="width: 0px; height: 0px; overflow: hidden; outline: none;"></div>
             <div class="ql-dialog-content">
               <button type="button" class="ql-dialog-close">
@@ -36,7 +37,7 @@ class QlDialog {
                 </span>
               </button>
               <div class="ql-dialog-header">
-                <div class="ql-dialog-title">插入重点</div>
+                <div class="ql-dialog-title"></div>
               </div>
               <div class="ql-dialog-body" style="padding-top: 0px;"></div>
               <div class="ql-dialog-footer">
@@ -51,15 +52,46 @@ class QlDialog {
 
     this.container.innerHTML = dialogTemp;
 
+    document.body.appendChild(this.container);
+  }
+
+  setOptions(options) {
+    this.setTitle(options);
+
+    this.renderBody(options);
+
+    this.setBounds(options);
+  }
+
+  renderBody(options) {
+    this.body = this.container.querySelector(".ql-dialog-body");
+
+    this.body.innerHTML = options.content || "";
+  }
+
+  setTitle(options) {
+    const header = this.container.querySelector(".ql-dialog-header");
+    if (options.title) {
+      header.querySelector(".ql-dialog-title").innerText = options.title;
+    } else {
+      this.container.removeChild(header);
+    }
+  }
+
+  setBounds(options) {
+    const width = Number(options.width) || "";
+    const height = Number(options.height) || "";
+
+    this.body.style.width = width ? `${width}px` : "";
+    this.body.style.height = height ? `${height}px` : "";
+  }
+
+  registerListener(options) {
     const confrimBtn = this.container.querySelector(".ql-dialog-confrim");
-    confrimBtn.addEventListener(
-      "click",
-      _ => {
-        options.onOk && options.onOk(this.body);
-        this.close();
-      },
-      true
-    );
+    confrimBtn.onclick = _ => {
+      options.onOk && options.onOk(this.body);
+      this.close();
+    };
 
     const closeBtn = this.container.querySelector(".ql-dialog-close");
     const cancelBtn = this.container.querySelector(".ql-dialog-cancel");
@@ -67,14 +99,6 @@ class QlDialog {
       options.onCancel && options.onCancel();
       this.close();
     };
-
-    document.body.appendChild(this.container);
-  }
-
-  replaceBody(options) {
-    this.body = this.container.querySelector(".ql-dialog-body");
-
-    this.body.innerHTML = options.content || "";
   }
 
   show() {

@@ -1,3 +1,3 @@
-# ql-quill V0.0.4
+# ql-quill V0.0.5
 
 Public configuration wrappers for Quill.js

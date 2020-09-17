@@ -22,7 +22,7 @@ class Toolbar {
   }
 }
 
-Toolbar.CUSTOM = ["import", "option", "question"];
+Toolbar.CUSTOM = ["import", "option", "formula", "question"];
 
 Toolbar.DEFAULT = [
   "bold", // 加粗

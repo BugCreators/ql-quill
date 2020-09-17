@@ -1,14 +1,15 @@
 import Quill from "quill";
 import isEqual from "lodash.isequal";
 
-import ImageResize from "quill-image-resize-module";
 import Toolbar from "./components/toolbar";
 import WordLimit from "./components/wordLimit";
 import QlDialog from "./components/qlDialog";
 
+import ImageResize from "quill-image-resize-module";
 import Image from "./modules/image";
 import Import from "./modules/import";
 import Question from "./modules/question";
+import formulaReEdit from "./modules/formulaReEdit";
 
 import "../assets/index.styl";
 
@@ -17,6 +18,7 @@ Quill.register({
   "modules/image": Image,
   "modules/import": Import,
   "modules/question": Question,
+  "modules/formulaReEdit": formulaReEdit,
 });
 
 class QlQuill {
@@ -79,7 +81,7 @@ class QlQuill {
     if (this.editor) return;
     const toolbar = this.instantiateToolbar(options);
 
-    const editorOption = {
+    let editorOption = {
       theme: "snow",
       modules: {
         toolbar: {
@@ -87,6 +89,8 @@ class QlQuill {
           handlers: {
             import: () => {
               new QlDialog({
+                width: 640,
+                title: "插入重点",
                 content:
                   '<input class="ql-input ql-import-input" type="text" value="">',
                 onOk: container => {
@@ -111,12 +115,9 @@ class QlQuill {
               this.insertQuestion("option");
             },
             formula: () => {
-              console.log("formula");
+              this.openFormulaDialog(options);
             },
           },
-        },
-        imageResize: {
-          modules: ["Resize", "DisplaySize"],
         },
         clipboard: {
           matchers: [
@@ -136,10 +137,23 @@ class QlQuill {
             ],
           ],
         },
+        formulaReEdit: latex => {
+          this.openFormulaDialog(options, latex || "");
+        },
       },
       placeholder: options.placeholder || "",
       readOnly: false,
     };
+
+    if (options.imageResize) {
+      editorOption.modules.imageResize = {};
+
+      if (typeof options.imageResize === "boolean") {
+        editorOption.modules.imageResize.modules = ["Resize", "DisplaySize"];
+      } else if (typeof options.imageResize === "object") {
+        editorOption.modules.imageResize = imageResize;
+      }
+    }
 
     if (options.image) {
       if (typeof options.image === "function") {
@@ -259,11 +273,16 @@ class QlQuill {
   }
 
   // 插入图片
-  insertImage(src) {
+  insertImage(src, latex = "") {
     !this.editor.hasFocus() && this.editor.focus();
-    const index = this.editor.getSelection().index;
+    const selection = this.editor.getSelection();
+    if (selection && selection.length) {
+      this.editor.deleteText(selection.index, selection.length);
+    }
+    const index = selection.index || 0;
     this.editor.insertEmbed(index, "image", {
       url: src,
+      latex,
     });
     this.editor.setSelection(index + 1);
   }
@@ -271,11 +290,16 @@ class QlQuill {
   // 插入小题
   insertQuestion(type) {
     !this.editor.hasFocus() && this.editor.focus();
-    const index = this.editor.getSelection().index;
+    const selection = this.editor.getSelection();
+    if (selection && selection.length) {
+      this.editor.deleteText(selection.index, selection.length);
+    }
+    const index = selection.index || 0;
     this.editor.insertEmbed(index, "question", type);
     this.editor.setSelection(index + 1);
   }
 
+  // 小题序号
   formatQuestion(options, type) {
     if (!options[type]) return;
 
@@ -286,6 +310,70 @@ class QlQuill {
       node.innerHTML = `(${index + 1})`;
     });
   }
+
+  // 插入公式弹窗
+  openFormulaDialog(options, latex = "") {
+    const time = new Date().getTime();
+
+    new QlDialog({
+      width: 840,
+      height: 400,
+      title: "插入公式",
+      content: `
+        <iframe
+          id="kfEditorContainer-${time}"
+          src="${options.formula}?=${time}"
+          ${latex ? `data-latex="${latex}"` : ""}
+          style="border:none;height:100%;width:100%;"
+        ></iframe>
+      `,
+      onOk: _ => {
+        // 再编辑时 将选区定位到编辑的图片
+        // 用于编辑后将原图片删除
+        if (latex) {
+          !this.editor.hasFocus() && this.editor.focus();
+          const selection = this.editor.getSelection();
+          if (!selection.length) {
+            this.editor.setSelection({
+              index: selection.index - 1,
+              length: 1,
+            });
+          }
+        }
+
+        kfe.execCommand("get.image.data", data => {
+          const latex = kfe.execCommand("get.source");
+
+          if (!options.image.action) {
+            this.insertImage.call(this, data.img, latex);
+          } else {
+            const file = dataURLtoFile(data.img, `latex-formula-${time}.png`);
+
+            options.image.action(file, src => {
+              this.insertImage(src, latex);
+            });
+          }
+        });
+      },
+    });
+  }
+}
+
+function dataURLtoFile(dataurl, filename) {
+  const arr = dataurl.split(","),
+    mime = arr[0].match(/:(.*?);/)[1],
+    bstr = atob(arr[1]);
+
+  let n = bstr.length,
+    u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+
+  const file = new Blob([u8arr], { type: mime });
+  file.lastModifiedDate = new Date();
+  file.name = filename;
+  return file;
 }
 
 function postpone(fn) {
