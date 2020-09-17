@@ -6,10 +6,11 @@ import WordLimit from "./components/wordLimit";
 import QlDialog from "./components/qlDialog";
 
 import ImageResize from "quill-image-resize-module";
+import FormulaReEdit from "./extends/formulaReEdit";
+
 import Image from "./modules/image";
 import Import from "./modules/import";
 import Question from "./modules/question";
-import formulaReEdit from "./modules/formulaReEdit";
 
 import "../assets/index.styl";
 
@@ -18,7 +19,6 @@ Quill.register({
   "modules/image": Image,
   "modules/import": Import,
   "modules/question": Question,
-  "modules/formulaReEdit": formulaReEdit,
 });
 
 class QlQuill {
@@ -38,7 +38,6 @@ class QlQuill {
     this.instantiateWordLimit(options, this.editor.getLength() - 1);
 
     this.setContent = this.setEditorContents.bind(this);
-    this.insertImage = this.insertImage.bind(this);
   }
 
   // 替换图标
@@ -119,6 +118,12 @@ class QlQuill {
             },
           },
         },
+        imageResize: {
+          modules: [FormulaReEdit],
+          onFormulaReEdit: latex => {
+            this.openFormulaDialog(options, latex || "");
+          },
+        },
         clipboard: {
           matchers: [
             [
@@ -137,19 +142,16 @@ class QlQuill {
             ],
           ],
         },
-        formulaReEdit: latex => {
-          this.openFormulaDialog(options, latex || "");
-        },
       },
       placeholder: options.placeholder || "",
       readOnly: false,
     };
 
     if (options.imageResize) {
-      editorOption.modules.imageResize = {};
-
       if (typeof options.imageResize === "boolean") {
-        editorOption.modules.imageResize.modules = ["Resize", "DisplaySize"];
+        editorOption.modules.imageResize.modules = editorOption.modules.imageResize.modules.concat(
+          ["Resize", "DisplaySize"]
+        );
       } else if (typeof options.imageResize === "object") {
         editorOption.modules.imageResize = imageResize;
       }
@@ -158,7 +160,7 @@ class QlQuill {
     if (options.image) {
       if (typeof options.image === "function") {
         editorOption.modules.toolbar.handlers.image = () =>
-          options.image(this.insertImage.bind(this));
+          options.image(this.insertImage);
       } else if (typeof options.image === "object") {
         if (options.image.action) {
           editorOption.modules.toolbar.handlers.image = () =>
@@ -262,7 +264,7 @@ class QlQuill {
       "change",
       e => {
         const file = e.target.files[0];
-        options.image.action(file, this.insertImage.bind(this));
+        options.image.action(file, this.insertImage);
       },
       false
     );
@@ -273,7 +275,7 @@ class QlQuill {
   }
 
   // 插入图片
-  insertImage(src, latex = "") {
+  insertImage = (src, latex = "") => {
     !this.editor.hasFocus() && this.editor.focus();
     const selection = this.editor.getSelection();
     if (selection && selection.length) {
@@ -285,7 +287,7 @@ class QlQuill {
       latex,
     });
     this.editor.setSelection(index + 1);
-  }
+  };
 
   // 插入小题
   insertQuestion(type) {
@@ -341,11 +343,13 @@ class QlQuill {
           }
         }
 
-        kfe.execCommand("get.image.data", data => {
-          const latex = kfe.execCommand("get.source");
+        if (!window.kfe) return;
+
+        window.kfe.execCommand("get.image.data", data => {
+          const latex = window.kfe.execCommand("get.source");
 
           if (!options.image.action) {
-            this.insertImage.call(this, data.img, latex);
+            this.insertImage(data.img, latex);
           } else {
             const file = dataURLtoFile(data.img, `latex-formula-${time}.png`);
 
