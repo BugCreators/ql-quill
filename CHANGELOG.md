@@ -8,6 +8,7 @@
   - formulaReEdit 减少点击事件触发频率
   - quill-image-resize-module 模块本地化 减少打包后的体积
 - webpack 配置
+  - 添加环境区分
   - 添加 banner
   - 打包压缩配置优化
 

@@ -3,17 +3,20 @@ const path = require("path");
 const pkg = require("./package.json");
 const dir = (...args) => path.resolve(__dirname, ...args);
 
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 
+const isEnvProduction = process.env.NODE_ENV === "production";
+
 const bannerPack = new webpack.BannerPlugin({
-  banner:
-    "Ql Quill v" + pkg.version + "\n" + "Copyright (c) 2020, Huang",
+  banner: "Ql Quill v" + pkg.version + "\n" + "Copyright (c) 2020, Huang",
   entryOnly: true,
 });
 
 const plugins = [
   bannerPack,
+  new CleanWebpackPlugin(),
   new webpack.ProvidePlugin({
     "window.Quill": "quill",
   }),
@@ -27,7 +30,7 @@ module.exports = {
   entry: {
     "ql-quill": dir("index.js"),
   },
-  // devtool: "source-map",
+  devtool: isEnvProduction ? false : "source-map",
   output: {
     path: dir("dist"),
     filename: "[name].js",
@@ -65,9 +68,10 @@ module.exports = {
     minimizer: [
       new UglifyJsPlugin({
         parallel: true,
+        sourceMap: !isEnvProduction,
         uglifyOptions: {
           compress: {
-            drop_console: true,
+            drop_console: isEnvProduction,
           },
         },
       }),
