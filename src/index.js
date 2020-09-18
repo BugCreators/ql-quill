@@ -14,12 +14,15 @@ import Question from "./modules/question";
 
 import "../assets/index.styl";
 
-Quill.register({
-  "modules/imageResize": ImageResize,
-  "modules/image": Image,
-  "modules/import": Import,
-  "modules/question": Question,
-});
+Quill.register(
+  {
+    "modules/imageResize": ImageResize,
+    "modules/image": Image,
+    "modules/import": Import,
+    "modules/question": Question,
+  },
+  true
+);
 
 class QlQuill {
   constructor(container, options = {}) {
@@ -227,6 +230,8 @@ class QlQuill {
         options.onChange && options.onChange(value);
         this.updateLimit && this.updateLimit(wordLens);
       }
+    } else {
+      options.onChange && options.onChange(value);
     }
   }
 

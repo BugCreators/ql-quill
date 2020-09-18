@@ -5,7 +5,7 @@ const Module = Quill.import("core/module");
 
 class ImageBlot extends Image {
   static create(value) {
-    let node = super.create(value.url);
+    let node = super.create(typeof value === "string" ? value : value.url);
     if (value.latex) {
       node.dataset.latex = value.latex;
     }

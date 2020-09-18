@@ -1,14 +1,21 @@
 const webpack = require("webpack");
 const path = require("path");
+const pkg = require("./package.json");
 const dir = (...args) => path.resolve(__dirname, ...args);
 
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 
+const bannerPack = new webpack.BannerPlugin({
+  banner:
+    "Ql Quill v" + pkg.version + "\n" + "Copyright (c) 2020, Huang",
+  entryOnly: true,
+});
+
 const plugins = [
+  bannerPack,
   new webpack.ProvidePlugin({
-    "window.Quill": "quill/dist/quill.js",
-    Quill: "quill/dist/quill.js",
+    "window.Quill": "quill",
   }),
   new MiniCssExtractPlugin({
     filename: "[name].snow.css",
@@ -27,12 +34,17 @@ module.exports = {
     library: "QlQuill",
     libraryTarget: "umd",
   },
+  resolve: {
+    alias: {
+      "quill-image-resize-module": dir("assets/js/image-resize.min.js"),
+    },
+  },
   module: {
     rules: [
       {
         test: /(\.jsx|\.js)$/,
         loader: "babel-loader",
-        exclude: /(node_modules|bower_components)/,
+        exclude: /node_modules/,
       },
       {
         test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
@@ -50,7 +62,16 @@ module.exports = {
     ],
   },
   optimization: {
-    minimizer: [new UglifyJsPlugin()],
+    minimizer: [
+      new UglifyJsPlugin({
+        parallel: true,
+        uglifyOptions: {
+          compress: {
+            drop_console: true,
+          },
+        },
+      }),
+    ],
   },
   plugins: plugins,
 };

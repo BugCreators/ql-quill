@@ -17,7 +17,7 @@ class QlDialog {
     this.show();
   }
 
-  createContainer(options) {
+  createContainer() {
     this.container = document.createElement("div");
 
     const dialogTemp = `
@@ -70,12 +70,8 @@ class QlDialog {
   }
 
   setTitle(options) {
-    const header = this.container.querySelector(".ql-dialog-header");
-    if (options.title) {
-      header.querySelector(".ql-dialog-title").innerText = options.title;
-    } else {
-      this.container.removeChild(header);
-    }
+    this.container.querySelector(".ql-dialog-title").innerText =
+      options.title || "";
   }
 
   setBounds(options) {

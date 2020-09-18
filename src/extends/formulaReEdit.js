@@ -14,10 +14,12 @@ class FormulaReEdit {
 
   // 单击图片后再单击overlay 通过时间间隔长短模拟双击事件
   handleOverlayClick = () => {
+    if (!this.timer) return;
     const time = new Date().getTime();
     if (time - this.createTime < this.timer) {
       this.options.onFormulaReEdit && this.options.onFormulaReEdit(this.latex);
     }
+    this.timer = 0;
   };
 
   handleOverlaydblclick = () => {
