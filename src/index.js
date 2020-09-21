@@ -123,8 +123,8 @@ class QlQuill {
         },
         imageResize: {
           modules: [FormulaReEdit],
-          onFormulaReEdit: latex => {
-            this.openFormulaDialog(options, latex || "");
+          onFormulaReEdit: img => {
+            this.openFormulaDialog(options, img);
           },
         },
         clipboard: {
@@ -188,7 +188,7 @@ class QlQuill {
             options
           );
         } else if (eventName === "selection-change") {
-          this.onEditorChangeSelection(rangeOrDelta, source);
+          this.onEditorChangeSelection(rangeOrDelta, toolbar, source);
         }
       }
     );
@@ -235,7 +235,7 @@ class QlQuill {
     }
   }
 
-  onEditorChangeSelection(nextSelection, source, editor) {
+  onEditorChangeSelection(nextSelection, toolbar, source) {
     if (!this.editor) return;
     const currentSelection = this.selection;
     const hasGainedFocus = !currentSelection && nextSelection;
@@ -245,14 +245,14 @@ class QlQuill {
 
     this.selection = nextSelection;
 
-    const toolbar = document.querySelector(".ql-toolbar");
+    const toolbarEl = document.querySelector(`#${toolbar.id}`);
 
     if (hasGainedFocus) {
       this.container.classList.add("on-focus");
-      toolbar.classList.add("on-focus");
+      toolbarEl.classList.add("on-focus");
     } else if (hasLostFocus) {
       this.container.classList.remove("on-focus");
-      toolbar.classList.remove("on-focus");
+      toolbarEl.classList.remove("on-focus");
     }
   }
 
@@ -319,8 +319,9 @@ class QlQuill {
   }
 
   // 插入公式弹窗
-  openFormulaDialog(options, latex = "") {
+  openFormulaDialog(options, img = null) {
     const time = new Date().getTime();
+    const latex = img ? img.dataset.latex || "" : "";
 
     new QlDialog({
       width: 840,
@@ -335,33 +336,33 @@ class QlQuill {
         ></iframe>
       `,
       onOk: _ => {
-        // 再编辑时 将选区定位到编辑的图片
-        // 用于编辑后将原图片删除
-        if (latex) {
-          !this.editor.hasFocus() && this.editor.focus();
-          const selection = this.editor.getSelection();
-          if (!selection.length) {
-            this.editor.setSelection({
-              index: selection.index - 1,
-              length: 1,
-            });
-          }
-        }
-
         if (!window.kfe) return;
 
         window.kfe.execCommand("get.image.data", data => {
-          const latex = window.kfe.execCommand("get.source");
+          const sLatex = window.kfe.execCommand("get.source");
 
           if (!options.image.action) {
-            this.insertImage(data.img, latex);
-          } else {
-            const file = dataURLtoFile(data.img, `latex-formula-${time}.png`);
+            if (img) {
+              img.setAttribute("src", data.img);
+              if (sLatex) img.dataset.latex = sLatex;
+              return;
+            }
 
-            options.image.action(file, src => {
-              this.insertImage(src, latex);
-            });
+            this.insertImage(data.img, sLatex);
+            return;
           }
+
+          const file = dataURLtoFile(data.img, `latex-formula-${time}.png`);
+
+          options.image.action(file, src => {
+            if (img) {
+              img.setAttribute("src", src);
+              if (sLatex) img.dataset.latex = sLatex;
+              return;
+            }
+
+            this.insertImage(src, sLatex);
+          });
         });
       },
     });

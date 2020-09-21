@@ -17,13 +17,13 @@ class FormulaReEdit {
     if (!this.timer) return;
     const time = new Date().getTime();
     if (time - this.createTime < this.timer) {
-      this.options.onFormulaReEdit && this.options.onFormulaReEdit(this.latex);
+      this.options.onFormulaReEdit && this.options.onFormulaReEdit(this.img);
     }
     this.timer = 0;
   };
 
   handleOverlaydblclick = () => {
-    this.options.onFormulaReEdit && this.options.onFormulaReEdit(this.latex);
+    this.options.onFormulaReEdit && this.options.onFormulaReEdit(this.img);
   };
 
   onCreate = () => {

@@ -3,8 +3,10 @@
 - dialog
   - 修复没有传 title 时 header 消失问题
 - editor
+  - 修复多实例时 toolbar 节点取值错误问题
   - 修复默认 image 事件插入图片标签时 src 没有值的问题
   - 修复没有字数限制 limit 时 onChange 没有触发的问题
+  - 修复公式编辑后有时没有删除原图片的问题
   - formulaReEdit 减少点击事件触发频率
   - quill-image-resize-module 模块本地化 减少打包后的体积
 - webpack 配置
