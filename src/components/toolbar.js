@@ -39,7 +39,7 @@ function expandConfig(userConfig) {
   const config = Toolbar.DEFAULT;
 
   Toolbar.CUSTOM.forEach(label => {
-    if (userConfig[label]) {
+    if (!config.includes(label) && userConfig[label]) {
       config.push(label);
     }
   });

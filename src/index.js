@@ -33,11 +33,10 @@ class QlQuill {
     this.container = container;
     // 阻止谷歌翻译输入框
     this.container.classList.add("notranslate");
-    this.value = options.value;
 
     this.replaceIcon();
     this.instantiateEditor(options);
-    this.setEditorContents(this.value);
+    this.setEditorContents(options.value);
     this.instantiateWordLimit(options, this.editor.getLength() - 1);
 
     this.setContent = this.setEditorContents.bind(this);
@@ -68,6 +67,16 @@ class QlQuill {
   }
 
   instantiateToolbar(options) {
+    const previousSibling = this.container.previousSibling;
+    if (
+      previousSibling &&
+      previousSibling.id &&
+      previousSibling.id.includes("toolbar-") &&
+      previousSibling.className &&
+      previousSibling.className.includes("ql-toolbar")
+    ) {
+      previousSibling.remove();
+    }
     const toolbar = new Toolbar(options);
 
     this.container.parentElement.insertBefore(
@@ -81,6 +90,7 @@ class QlQuill {
   // 实例化编辑器
   instantiateEditor(options) {
     if (this.editor) return;
+
     const toolbar = this.instantiateToolbar(options);
 
     let editorOption = {
@@ -195,7 +205,6 @@ class QlQuill {
   }
 
   setEditorContents(value) {
-    this.value = value;
     const sel = this.selection;
     if (typeof value === "string") {
       this.editor.setContents(this.editor.clipboard.convert(value));
