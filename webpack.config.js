@@ -39,11 +39,6 @@ module.exports = {
     library: "QlQuill",
     libraryTarget: "umd",
   },
-  resolve: {
-    alias: {
-      "quill-image-resize-module": dir("assets/js/image-resize.min.js"),
-    },
-  },
   module: {
     rules: [
       {
@@ -52,12 +47,16 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
-        test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
+        test: /\.(png|jpe?g|gif)(\?.*)?$/,
         loader: "url-loader",
         options: {
           limit: 10000,
           name: "images/[name].[hash:8].[ext]",
         },
+      },
+      {
+        test: /\.svg$/,
+        use: "raw-loader",
       },
       {
         test: /\.styl$/,

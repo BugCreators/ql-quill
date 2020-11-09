@@ -11,10 +11,13 @@ class QuestionBlot extends Embed {
     return node;
   }
 
-  constructor(node) {
-    super(node);
+  constructor(scroll, domNode, value) {
+    super(scroll, domNode);
 
-    node.innerHTML = node.innerText = node.innerText.replace(/\uFEFF/g, "");
+    domNode.innerHTML = domNode.innerText = domNode.innerText.replace(
+      /\uFEFF/g,
+      ""
+    );
   }
 
   static formats(domNode) {
@@ -27,10 +30,6 @@ class QuestionBlot extends Embed {
     if (node.tagName === "SUB-QUESTION") return "question";
     if (node.tagName === "SUB-OPTION") return "option";
     return undefined;
-  }
-
-  index() {
-    return 1;
   }
 }
 QuestionBlot.blotName = "question";

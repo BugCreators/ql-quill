@@ -1,3 +1,15 @@
+## v2.0.0-dev.1
+
+- Quill
+  - 版本升至 2.0.0-dev.4
+- editor
+  - 从 quill-image-resize-module 迁移至 quill-blot-formatter
+  - concvert 方法替换成 dangerouslyPasteHTML
+  - 支持表格编辑
+  - 字数统计 使用 modules 形式实现
+- webpack 配置
+  - 新增 raw-loader 读取 svg 文件源文本
+
 ## v1.0.2
 
 - toolbar

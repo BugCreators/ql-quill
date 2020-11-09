@@ -2,21 +2,28 @@ import Quill from "quill";
 import isEqual from "lodash.isequal";
 
 import Toolbar from "./components/toolbar";
-import WordLimit from "./components/wordLimit";
 import QlDialog from "./components/qlDialog";
 
-import ImageResize from "quill-image-resize-module";
+import BlotFormatter, { ImageSpec } from "quill-blot-formatter";
 import FormulaReEdit from "./extends/formulaReEdit";
 
+import wordCount from "./modules/wordCount";
 import Image from "./modules/image";
 import Import from "./modules/import";
 import Question from "./modules/question";
+
+import cleanIcon from "./../assets/icons/clean.svg";
+import tableInsertRowIcon from "quill/assets/icons/table-insert-rows.svg";
+import tableInsertColumnIcon from "quill/assets/icons/table-insert-columns.svg";
+import tableDeleteRowIcon from "quill/assets/icons/table-delete-rows.svg";
+import tableDeleteColumnIcon from "quill/assets/icons/table-delete-columns.svg";
 
 import "../assets/index.styl";
 
 Quill.register(
   {
-    "modules/imageResize": ImageResize,
+    "modules/blotFormatter": BlotFormatter,
+    "modules/wordCount": wordCount,
     "modules/image": Image,
     "modules/import": Import,
     "modules/question": Question,
@@ -37,7 +44,6 @@ class QlQuill {
     this.replaceIcon();
     this.instantiateEditor(options);
     this.setEditorContents(options.value);
-    this.instantiateWordLimit(options, this.editor.getLength() - 1);
 
     this.setContent = this.setEditorContents.bind(this);
   }
@@ -46,8 +52,11 @@ class QlQuill {
   replaceIcon() {
     let Icons = Quill.import("ui/icons");
     Icons = Object.assign(Icons, {
-      clean:
-        '<svg t="1586414083235" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4848" width="16" height="16"><path d="M902.7 346.2l-314.4-256c-51.7-42-127.5-34.3-170 17.9L50.2 560.2c-42 51.7-34.3 127.5 17.4 170l313.9 255.5c52.2 42 127.5 34.3 170-17.4l368.6-452.1c41.9-52.2 34.3-127.5-17.4-170zM458.2 892.5L355.8 809l-93.7-76.3L142.8 637l38.4-47.1 39.9-49.2 314.4 256.5-38.9 48.1-38.4 47.2zM788 487l-76.3 93.7-111.1 137.2-314.9-256.5 111.1-136.2 76.3-93.7 38.4-47.1 118.3 96.3 93.7 76.3 101.9 82.9L788 487zM637.4 918h338.3v85.8H637.4z" p-id="4849"></path></svg>',
+      clean: cleanIcon,
+      "table-insert-row": tableInsertRowIcon,
+      "table-insert-column": tableInsertColumnIcon,
+      "table-delete-row": tableDeleteRowIcon,
+      "table-delete-column": tableDeleteColumnIcon,
     });
     Quill.register(
       {
@@ -55,15 +64,6 @@ class QlQuill {
       },
       true
     );
-  }
-
-  instantiateWordLimit(options, wordLens) {
-    if (!options.limit) return;
-
-    const wordLimit = new WordLimit(options.limit, wordLens);
-
-    this.container.appendChild(wordLimit.container);
-    this.updateLimit = wordLimit.update;
   }
 
   instantiateToolbar(options) {
@@ -129,10 +129,25 @@ class QlQuill {
             formula: () => {
               this.openFormulaDialog(options);
             },
+            table: () => {
+              this.editor.getModule("table").insertTable(2, 3);
+            },
+            "table-insert-row": () => {
+              this.editor.getModule("table").insertRowBelow();
+            },
+            "table-insert-column": () => {
+              this.editor.getModule("table").insertColumnRight();
+            },
+            "table-delete-row": () => {
+              this.editor.getModule("table").deleteRow();
+            },
+            "table-delete-column": () => {
+              this.editor.getModule("table").deleteColumn();
+            },
           },
         },
-        imageResize: {
-          modules: [FormulaReEdit],
+        blotFormatter: {
+          specs: [FormulaReEdit],
           onFormulaReEdit: img => {
             this.openFormulaDialog(options, img);
           },
@@ -155,19 +170,21 @@ class QlQuill {
             ],
           ],
         },
+        wordCount: {},
+        table: true,
       },
       placeholder: options.placeholder || "",
       readOnly: false,
     };
 
+    if (options.limit) {
+      options.limit = Number(options.limit) || 1000;
+      editorOption.modules.wordCount.limit = options.limit;
+    }
+
+    // 图片缩放功能
     if (options.imageResize) {
-      if (typeof options.imageResize === "boolean") {
-        editorOption.modules.imageResize.modules = editorOption.modules.imageResize.modules.concat(
-          ["Resize", "DisplaySize"]
-        );
-      } else if (typeof options.imageResize === "object") {
-        editorOption.modules.imageResize = imageResize;
-      }
+      editorOption.modules.blotFormatter.specs.push(ImageSpec);
     }
 
     if (options.image) {
@@ -207,7 +224,7 @@ class QlQuill {
   setEditorContents(value) {
     const sel = this.selection;
     if (typeof value === "string") {
-      this.editor.setContents(this.editor.clipboard.convert(value));
+      this.editor.clipboard.dangerouslyPasteHTML(value);
     } else {
       this.editor.setContents(value);
     }
@@ -237,7 +254,6 @@ class QlQuill {
       } else {
         this.editor.history.cutoff();
         options.onChange && options.onChange(value);
-        this.updateLimit && this.updateLimit(wordLens);
       }
     } else {
       options.onChange && options.onChange(value);

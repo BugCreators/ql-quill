@@ -12,6 +12,7 @@
   <div id="editor"></div>
   <button onclick="btnClick()">修改内容</button>
   <button onclick="insertImage()">插入图片</button>
+  <button onclick="insertTable()">插入表格</button>
 </body>
 
 <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.20.0/axios.min.js"></script>
@@ -20,7 +21,7 @@
   let value = "<p>hello</p>";
 
   const editor = new QlQuill("#editor", {
-    limit: 1000,
+    // limit: 1000,
     placeholder: "请输入作业内容...",
     image: {
       accept: ['jpg', 'jpeg', 'bmp'].map(i => `.${i}`).join(','),
@@ -50,17 +51,24 @@
       value = v
     },
     imageResize: true,
+    table: true,
     import: true,
     question: true,
-    formula: "./plugin/kityformula-plugin/qlKityFormulaDialog.html"
+    formula: "./plugin/kityformula-plugin/qlKityFormulaDialog.html",
   });
 
   function btnClick() {
-    editor.setContent("<p>Hi</p>")
+    editor.setContent('<p>hello<point contenteditable="false">啊</point><point contenteditable="false">啊</point></p>')
   }
 
   function insertImage() {
     editor.insertImage("http://192.168.4.119/group1/M00/01/57/wKgBF19YPz6AEfqrAABTEqBfftU969.jpg")
+  }
+
+  function insertTable() {
+    const table = '<p>&nbsp; &nbsp;配对阅读．请阅读以下左栏的相关信息， 然后与右栏内容相匹配．</p> <table border="1" cellpadding="0" cellspacing="0" class="MsoNormalTable" style="mso-border-insidev:.25pt solid black;   mso-border-insideh:.25pt solid black;mso-padding-alt:1.5pt 1.5pt 1.5pt 1.5pt;mso-yfti-tbllook:1184;mso-border-alt:   solid black .25pt;border:none;border-collapse:collapse;margin-left:14.0pt;">  <tbody>   <tr style="mso-yfti-irow:0;mso-yfti-firstrow:yes;mso-yfti-lastrow:yes">    <td style="width:186.0pt;border:solid black 1.0pt;    mso-border-alt:solid black .25pt;padding:1.5pt 1.5pt 1.5pt 1.5pt" valign="top" width="248"><p align="center" style="text-align:center;line-height:150%"><u>&nbsp; &nbsp; (1)&nbsp; &nbsp;&nbsp;</u> John is a 22﹣year﹣old young man． He can play the guitar and sing pop songs very well． But he is worried because he doesnˈt have a job now．</p><p align="center" style="text-align:center;line-height:150%"><u style="box-sizing: border-box; color: rgb(51, 51, 51); font-family: &quot;Times New Roman&quot;, &quot;Microsoft YaHei&quot;; font-size: 14px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; ">&nbsp; &nbsp; (2)&nbsp; &nbsp;&nbsp;</u>&nbsp; Wang Mi is a new comer in Guangzhou． She has no friends here now． She feels lonely． So she would like to find a place to make some in a short time．</p><p align="center" style="text-align:center;line-height:150%"><u style="box-sizing: border-box; color: rgb(51, 51, 51); font-family: &quot;Times New Roman&quot;, &quot;Microsoft YaHei&quot;; font-size: 14px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; ">&nbsp; &nbsp; (3)&nbsp; &nbsp;&nbsp;</u>&nbsp; Henry is an old man． He lives alone and has few friends． He wants to take part in some activities for the old people， such as playing cards， chess and so on to make him feel better．</p><p align="center" style="text-align:center;line-height:150%"><u style="box-sizing: border-box; color: rgb(51, 51, 51); font-family: &quot;Times New Roman&quot;, &quot;Microsoft YaHei&quot;; font-size: 14px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; ">&nbsp; &nbsp; (4)&nbsp; &nbsp;&nbsp;</u>&nbsp; Lucy came from Chengdu． Her money was stolen when she arrived at Guangzhou Railway Station． She is so helpless in the street now． And sheˈs hungry and cold． She was so sad． What could she do？</p><p align="center" style="text-align:center;line-height:150%"><u style="box-sizing: border-box; color: rgb(51, 51, 51); font-family: &quot;Times New Roman&quot;, &quot;Microsoft YaHei&quot;; font-size: 14px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; ">&nbsp; &nbsp; (5)&nbsp; &nbsp;&nbsp;</u>&nbsp; Rose was walking along Dong Feng road． Suddenly a car hit her and knocked her down． She was badly hurt and couldnˈt move． The driver ran away after the accident． What could Rose do？</p></td>    <td style="width:246.75pt;border:solid black 1.0pt;    border-left:none;mso-border-left-alt:solid black .25pt;mso-border-alt:solid black .25pt;    padding:1.5pt 1.5pt 1.5pt 1.5pt" valign="top" width="329"><p align="center" style="text-align:center;line-height:150%">A． If you have problems， you can call us at the following number． 110for anything urgent， 119for a fire burning， 112for a sick person． We will come to help you in 10minutes．</p><p align="center" style="text-align:center;line-height:150%">B． If you have no place to stay， you can call us for help． Weˈll serve you a room to stay in for one or two night for free． Our telephone number is 22335687．</p><p align="center" style="text-align:center;line-height:150%">C． My bar need a pop singer who is under 25years old． He or she must be able to play the guitar and good at singing． If you know how to play the piano， thatˈs better．</p><p align="center" style="text-align:center;line-height:150%">D． If you are over 60years old， welcome to come here to enjoy yourself． You will no longer be lonely． You can play chess， cards or Mahjong with your new friends here．</p><p align="center" style="text-align:center;line-height:150%">E． Itˈs a place for the young people to make friends here． Itˈs free for you to sign your name here． But you must help us to hand out some advertisements．</p><p align="center" style="text-align:center;line-height:150%">F． Our school needs an English teacher． He or she must have at least three yearsˈ teaching experiences． He or she must be friendly and warm﹣hearted．</p><p align="center" style="text-align:center;line-height:150%">G． More than 100artists get together and show their works here． If you are interested in them， you can buy the one you like at a low price． Come here to enjoy yourself．</p></td>   </tr>  </tbody> </table>'
+
+    editor.setContent(table);
   }
 </script>
 

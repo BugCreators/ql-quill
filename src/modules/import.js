@@ -7,23 +7,18 @@ class ImportBlot extends Embed {
   static create(value) {
     let node = super.create(value);
     node.setAttribute("contenteditable", false);
-    node.innerHTML = value;
 
     return node;
   }
 
-  constructor(node) {
-    super(node);
+  constructor(scroll, domNode, value) {
+    super(scroll, domNode);
 
-    node.innerHTML = node.innerText = node.innerText.replace(/\uFEFF/g, "");
+    domNode.innerHTML = domNode.innerText = value;
   }
 
   static value(domNode) {
     return domNode.innerText;
-  }
-
-  index() {
-    return 1;
   }
 }
 ImportBlot.blotName = "import";
