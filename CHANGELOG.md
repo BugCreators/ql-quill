@@ -1,3 +1,11 @@
+## v1.0.3
+
+- editor
+  - 字数统计 使用 modules 形式实现
+  - 修复空格不显示问题
+- webpack 配置
+  - 新增 raw-loader 读取 svg 文件源文本
+
 ## v1.0.2
 
 - toolbar
