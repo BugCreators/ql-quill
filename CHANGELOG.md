@@ -7,6 +7,7 @@
   - concvert 方法替换成 dangerouslyPasteHTML
   - 支持表格编辑
   - 字数统计 使用 modules 形式实现
+  - 修复空格无法显示问题
 - webpack 配置
   - 新增 raw-loader 读取 svg 文件源文本
 
