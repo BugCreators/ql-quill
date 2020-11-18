@@ -20,10 +20,9 @@
   "devDependencies": {
     "@babel/core": "^7.6.4",
     "@babel/plugin-proposal-class-properties": "^7.10.4",
-    "@babel/plugin-proposal-object-rest-spread": "~7.5.5",
-    "@babel/plugin-proposal-private-methods": "^7.10.4",
+    "@babel/plugin-transform-runtime": "^7.12.1",
     "@babel/preset-env": "^7.6.3",
-    "@babel/register": "^7.6.2",
+    "@babel/runtime": "^7.12.5",
     "babel-loader": "~8.0.6",
     "chai": "~4.2.0",
     "clean-webpack-plugin": "^3.0.0",
@@ -40,7 +39,7 @@
     "sinon-chai": "~3.3.0",
     "stylus": "^0.54.8",
     "stylus-loader": "^3.0.2",
-    "uglifyjs-webpack-plugin": "^2.2.0",
+    "terser-webpack-plugin": "^4.2.3",
     "url-loader": "^4.1.0",
     "webpack": "^4.40.3",
     "webpack-cli": "^3.3.12"
@@ -48,6 +47,7 @@
   "dependencies": {
     "lodash.isequal": "^4.5.0",
     "quill": "^2.0.0-dev.4",
+    "quill-better-table": "^1.2.10",
     "quill-blot-formatter": "^1.0.5"
   }
 }

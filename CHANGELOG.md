@@ -4,12 +4,14 @@
   - 版本升至 2.0.0-dev.4
 - editor
   - 从 quill-image-resize-module 迁移至 quill-blot-formatter
+  - image 标签保留 style 属性
   - concvert 方法替换成 dangerouslyPasteHTML
   - 支持表格编辑
   - 字数统计 使用 modules 形式实现
   - 修复空格无法显示问题
 - webpack 配置
   - 新增 raw-loader 读取 svg 文件源文本
+  - 使用 terser-webpack-plugin 替换 uglifyjs-webpack-plugin 压缩 js 文件
 
 ## v1.0.2
 

@@ -4,6 +4,7 @@ import isEqual from "lodash.isequal";
 import Toolbar from "./components/toolbar";
 import QlDialog from "./components/qlDialog";
 
+import QuillBetterTable from "quill-better-table/dist/quill-better-table.min.js";
 import BlotFormatter, { ImageSpec } from "quill-blot-formatter";
 import FormulaReEdit from "./extends/formulaReEdit";
 
@@ -13,15 +14,12 @@ import Import from "./modules/import";
 import Question from "./modules/question";
 
 import cleanIcon from "./../assets/icons/clean.svg";
-import tableInsertRowIcon from "quill/assets/icons/table-insert-rows.svg";
-import tableInsertColumnIcon from "quill/assets/icons/table-insert-columns.svg";
-import tableDeleteRowIcon from "quill/assets/icons/table-delete-rows.svg";
-import tableDeleteColumnIcon from "quill/assets/icons/table-delete-columns.svg";
 
 import "../assets/index.styl";
 
 Quill.register(
   {
+    "modules/better-table": QuillBetterTable,
     "modules/blotFormatter": BlotFormatter,
     "modules/wordCount": wordCount,
     "modules/image": Image,
@@ -51,13 +49,7 @@ class QlQuill {
   // 替换图标
   replaceIcon() {
     let Icons = Quill.import("ui/icons");
-    Icons = Object.assign(Icons, {
-      clean: cleanIcon,
-      "table-insert-row": tableInsertRowIcon,
-      "table-insert-column": tableInsertColumnIcon,
-      "table-delete-row": tableDeleteRowIcon,
-      "table-delete-column": tableDeleteColumnIcon,
-    });
+    Icons = Object.assign(Icons, { clean: cleanIcon });
     Quill.register(
       {
         "ui/icons": Icons,
@@ -130,19 +122,7 @@ class QlQuill {
               this.openFormulaDialog(options);
             },
             table: () => {
-              this.editor.getModule("table").insertTable(2, 3);
-            },
-            "table-insert-row": () => {
-              this.editor.getModule("table").insertRowBelow();
-            },
-            "table-insert-column": () => {
-              this.editor.getModule("table").insertColumnRight();
-            },
-            "table-delete-row": () => {
-              this.editor.getModule("table").deleteRow();
-            },
-            "table-delete-column": () => {
-              this.editor.getModule("table").deleteColumn();
+              this.editor.getModule("better-table").insertTable(3, 3);
             },
           },
         },
@@ -171,7 +151,25 @@ class QlQuill {
           ],
         },
         wordCount: {},
-        table: true,
+        table: false,
+        "better-table": {
+          operationMenu: {
+            items: {
+              insertColumnRight: { text: "右插入列" },
+              insertColumnLeft: { text: "左插入列" },
+              insertRowUp: { text: "上插入行" },
+              insertRowDown: { text: "下插入行" },
+              mergeCells: { text: "合并单元格" },
+              unmergeCells: { text: "取消合并" },
+              deleteColumn: { text: "删除列" },
+              deleteRow: { text: "删除行" },
+              deleteTable: { text: "删除表格" },
+            },
+          },
+        },
+        keyboard: {
+          bindings: QuillBetterTable.keyboardBindings,
+        },
       },
       placeholder: options.placeholder || "",
       readOnly: false,

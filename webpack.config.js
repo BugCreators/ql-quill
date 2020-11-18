@@ -6,7 +6,7 @@ const dir = (...args) => path.resolve(__dirname, ...args);
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
-const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 
 const isEnvProduction = process.env.NODE_ENV === "production";
 
@@ -42,8 +42,8 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /(\.jsx|\.js)$/,
-        loader: "babel-loader",
+        test: /\.js$/,
+        use: "babel-loader",
         exclude: /node_modules/,
       },
       {
@@ -67,14 +67,14 @@ module.exports = {
   },
   optimization: {
     minimizer: [
-      new UglifyJsPlugin({
+      new TerserPlugin({
         parallel: true,
-        sourceMap: !isEnvProduction,
-        uglifyOptions: {
+        terserOptions: {
           compress: {
             drop_console: isEnvProduction,
           },
         },
+        extractComments: /Copyright/,
       }),
       new OptimizeCssAssetsPlugin(),
     ],

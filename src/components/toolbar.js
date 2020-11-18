@@ -36,13 +36,7 @@ Toolbar.DEFAULT = [
   "image", // 插入图片
 ];
 
-Toolbar.TABLE_EDIT_TOOLBAR = [
-  { table: "TD" },
-  { "table-insert-row": "TIR" },
-  { "table-insert-column": "TIC" },
-  { "table-delete-row": "TDR" },
-  { "table-delete-column": "TDC" },
-];
+Toolbar.TABLE_EDIT_TOOLBAR = [{ table: "TD" }];
 
 Toolbar.TRANSLATE = {
   bold: "加粗",
