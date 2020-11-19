@@ -4,7 +4,7 @@
   - 版本升至 2.0.0-dev.4
 - editor
   - 从 quill-image-resize-module 迁移至 quill-blot-formatter
-  - image 标签保留 style 属性
+  - image 标签保留 width、style 等属性
   - concvert 方法替换成 dangerouslyPasteHTML
   - 支持表格编辑
   - 字数统计 使用 modules 形式实现

@@ -4,7 +4,7 @@ import isEqual from "lodash.isequal";
 import Toolbar from "./components/toolbar";
 import QlDialog from "./components/qlDialog";
 
-import QuillBetterTable from "quill-better-table/dist/quill-better-table.min.js";
+import QuillBetterTable from "quill-better-table";
 import BlotFormatter, { ImageSpec } from "quill-blot-formatter";
 import FormulaReEdit from "./extends/formulaReEdit";
 
@@ -17,8 +17,13 @@ import cleanIcon from "./../assets/icons/clean.svg";
 
 import "../assets/index.styl";
 
+const Icons = Quill.import("ui/icons");
+Object.assign(Icons, { clean: cleanIcon });
+
 Quill.register(
   {
+    "ui/icons": Icons,
+
     "modules/better-table": QuillBetterTable,
     "modules/blotFormatter": BlotFormatter,
     "modules/wordCount": wordCount,
@@ -39,23 +44,10 @@ class QlQuill {
     // 阻止谷歌翻译输入框
     this.container.classList.add("notranslate");
 
-    this.replaceIcon();
     this.instantiateEditor(options);
     this.setEditorContents(options.value);
 
     this.setContent = this.setEditorContents.bind(this);
-  }
-
-  // 替换图标
-  replaceIcon() {
-    let Icons = Quill.import("ui/icons");
-    Icons = Object.assign(Icons, { clean: cleanIcon });
-    Quill.register(
-      {
-        "ui/icons": Icons,
-      },
-      true
-    );
   }
 
   instantiateToolbar(options) {
@@ -85,7 +77,7 @@ class QlQuill {
 
     const toolbar = this.instantiateToolbar(options);
 
-    let editorOption = {
+    let option = {
       theme: "snow",
       modules: {
         toolbar: {
@@ -150,7 +142,6 @@ class QlQuill {
             ],
           ],
         },
-        wordCount: {},
         table: false,
         "better-table": {
           operationMenu: {
@@ -176,28 +167,29 @@ class QlQuill {
     };
 
     if (options.limit) {
-      options.limit = Number(options.limit) || 1000;
-      editorOption.modules.wordCount.limit = options.limit;
+      option.modules.wordCount = {
+        limit: Number(options.limit) || 1000,
+      };
     }
 
     // 图片缩放功能
     if (options.imageResize) {
-      editorOption.modules.blotFormatter.specs.push(ImageSpec);
+      option.modules.blotFormatter.specs.push(ImageSpec);
     }
 
     if (options.image) {
       if (typeof options.image === "function") {
-        editorOption.modules.toolbar.handlers.image = () =>
+        option.modules.toolbar.handlers.image = () =>
           options.image(this.insertImage);
       } else if (typeof options.image === "object") {
         if (options.image.action) {
-          editorOption.modules.toolbar.handlers.image = () =>
+          option.modules.toolbar.handlers.image = () =>
             this.uploadImages(options);
         }
       }
     }
 
-    this.editor = new Quill(this.container, editorOption);
+    this.editor = new Quill(this.container, option);
 
     this.editor.on(
       "editor-change",
@@ -311,8 +303,8 @@ class QlQuill {
     }
     const index = selection.index || 0;
     this.editor.insertEmbed(index, "image", {
-      url: src,
-      latex,
+      src,
+      "data-latex": latex,
     });
     this.editor.setSelection(index + 1);
   };
