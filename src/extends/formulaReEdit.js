@@ -21,6 +21,8 @@ class FormulaReEdit extends BlotSpec {
   }
 
   onHide() {
+    this.img.removeEventListener("dblclick", this.handleOverlaydblclick);
+
     this.img = null;
   }
 
@@ -31,6 +33,8 @@ class FormulaReEdit extends BlotSpec {
     }
 
     this.img = el;
+
+    this.img.addEventListener("dblclick", this.handleOverlaydblclick);
   };
 
   // 单击图片后再单击overlay 通过时间间隔长短模拟双击事件
