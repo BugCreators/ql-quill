@@ -3,21 +3,28 @@ import Quill from "quill";
 const Image = Quill.import("formats/image");
 const Module = Quill.import("core/module");
 
+const ATTRIBUTES = ["src", "data-latex", "style", "width", "height"];
+
 class ImageBlot extends Image {
   static create(value) {
-    let node = super.create(typeof value === "string" ? value : value.url);
-    if (value.latex) {
-      node.dataset.latex = value.latex;
+    let node = super.create(value);
+
+    if (typeof value === "object") {
+      for (let attribute in value) {
+        value[attribute] && node.setAttribute(attribute, value[attribute]);
+      }
     }
 
     return node;
   }
 
   static value(node) {
-    return {
-      url: node.getAttribute("src"),
-      latex: node.dataset.latex,
-    };
+    return ATTRIBUTES.reduce((formats, attribute) => {
+      if (node.hasAttribute(attribute)) {
+        formats[attribute] = node.getAttribute(attribute);
+      }
+      return formats;
+    }, {});
   }
 }
 
