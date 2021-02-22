@@ -33,8 +33,9 @@ Quill.register(
 );
 
 class QlQuill {
+  static Quill = Quill;
+
   constructor(container, options = {}) {
-    this.Quill = Quill;
     if (typeof container === "string") {
       container = document.querySelector(container);
     }
@@ -75,6 +76,8 @@ class QlQuill {
 
     const toolbar = this.instantiateToolbar(options);
 
+    const { limit, image, imageResize } = options;
+
     let option = {
       theme: "snow",
       modules: {
@@ -111,20 +114,36 @@ class QlQuill {
             formula: () => {
               this.openFormulaDialog(options);
             },
+            ...(typeof image === "function"
+              ? { image: () => image(this.insertImage) }
+              : typeof image === "object" && image.action
+              ? { image: () => this.uploadImages(options) }
+              : {}),
           },
         },
         imageResize: {
-          modules: [FormulaReEdit],
+          modules: [
+            FormulaReEdit,
+            ...(typeof imageResize === "boolean"
+              ? ["Resize", "DisplaySize"]
+              : []),
+          ],
           onFormulaReEdit: img => {
             this.openFormulaDialog(options, img);
           },
         },
-        wordCount: {},
+        wordCount: {
+          limit: limit ? Number(limit) || 1000 : undefined,
+        },
         clipboard: {
           matchers: [
             [
               "IMG",
               (node, delta) => {
+                if (image && image.clipboard) {
+                  return image.clipboard(node, delta);
+                }
+
                 const isBase64OrLocal = /^(data:image|file:\/\/)/.test(
                   node.src
                 );
@@ -142,34 +161,6 @@ class QlQuill {
       placeholder: options.placeholder || "",
       readOnly: false,
     };
-
-    if (options.limit) {
-      option.modules.wordCount = {
-        limit: Number(options.limit) || 1000,
-      };
-    }
-
-    if (options.imageResize) {
-      if (typeof options.imageResize === "boolean") {
-        option.modules.imageResize.modules = option.modules.imageResize.modules.concat(
-          ["Resize", "DisplaySize"]
-        );
-      } else if (typeof options.imageResize === "object") {
-        option.modules.imageResize = imageResize;
-      }
-    }
-
-    if (options.image) {
-      if (typeof options.image === "function") {
-        option.modules.toolbar.handlers.image = () =>
-          options.image(this.insertImage);
-      } else if (typeof options.image === "object") {
-        if (options.image.action) {
-          option.modules.toolbar.handlers.image = () =>
-            this.uploadImages(options);
-        }
-      }
-    }
 
     this.editor = new Quill(this.container, option);
 
@@ -255,18 +246,20 @@ class QlQuill {
 
   // 自定义上传图片
   uploadImages(options) {
+    const { image } = options;
+
     const input = document.createElement("input");
     input.setAttribute("type", "file");
     input.setAttribute("hidden", true);
-    if (options.image.accept) {
-      input.setAttribute("accept", options.image.accept);
+    if (image.accept) {
+      input.setAttribute("accept", image.accept);
     }
 
     input.addEventListener(
       "change",
       e => {
         const file = e.target.files[0];
-        options.image.action(file, this.insertImage);
+        image.action(file, this.insertImage);
       },
       false
     );
