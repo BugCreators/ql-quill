@@ -27,6 +27,15 @@ color-theme = #38c3a1
     width 64px
     background url('./images/ic_question.png') center no-repeat
 
+  .ql-picker-label:hover
+  .ql-picker-label.ql-active
+  .ql-picker-item:hover
+  .ql-picker-item.ql-selected
+    color color-theme
+
+    .ql-stroke
+      stroke color-theme
+
   button
     &.ql-active
     &:hover
@@ -39,6 +48,52 @@ color-theme = #38c3a1
         fill color-theme
     &:focus
       outline none
+
+.ql-snow .ql-picker.ql-font
+  .ql-picker-label
+  .ql-picker-item
+    &[data-value=SimSun]::before
+      content '宋体'
+      font-family 'SimSun'
+
+    &[data-value=SimHei]::before
+      content '黑体'
+      font-family 'SimHei'
+
+    &[data-value=Microsoft-YaHei]::before
+      content '微软雅黑'
+      font-family 'Microsoft YaHei'
+
+    &[data-value=KaiTi]::before
+      content '楷体'
+      font-family 'KaiTi'
+
+    &[data-value=FangSong]::before
+      content '仿宋'
+      font-family 'FangSong'
+
+    &[data-value=Arial]::before
+      content 'Arial'
+      font-family 'Arial'
+
+.ql-font
+  &-SimSun
+    font-family 'SimSun'
+  
+  &-SimHei
+    font-family 'SimHei'
+
+  &-Microsoft-YaHei
+    font-family 'Microsoft YaHei'
+
+  &-KaiTi
+    font-family 'KaiTi'
+
+  &-FangSong
+    font-family 'FangSong'
+
+  &-Arial
+    font-family 'Arial'
 
 .ql-container
   white-space pre

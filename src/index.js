@@ -19,9 +19,14 @@ import "../assets/index.styl";
 const Icons = Quill.import("ui/icons");
 Object.assign(Icons, { clean: cleanIcon });
 
+const Font = Quill.import("formats/font");
+Font.whitelist = Toolbar.FONT_LIST;
+
 Quill.register(
   {
     "ui/icons": Icons,
+
+    "formats/font": Font,
 
     "modules/wordCount": wordCount,
     "modules/imageResize": ImageResize,

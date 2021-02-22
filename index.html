@@ -22,6 +22,18 @@
   const editor = new QlQuill("#editor", {
     limit: 1000,
     placeholder: "请输入作业内容...",
+    toolbar: [
+      "font",
+      "bold",
+      "italic",
+      "underline",
+      { script: "sub" },
+      { script: "super" },
+      "clean",
+      "image",
+      "import",
+      "question",
+    ],
     image: {
       accept: ['jpg', 'jpeg', 'bmp'].map(i => `.${i}`).join(','),
       action: (file, cb) => {
@@ -29,10 +41,10 @@
         formData.append('file', file)
         axios({
           method: "post",
-          url: "http://192.168.1.24:10007/webservice/file/saveOne",
+          url: "http://192.168.1.47:3000/webservice/file/saveOne",
           headers: {
             'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
-            token: 'C32430FD6C2A093F847C66909F8130EC'
+            token: '41643C540D74D3D636A31E27197E5A38'
           },
           data: formData
         }).then(res => {
@@ -50,8 +62,6 @@
       value = v
     },
     imageResize: true,
-    import: true,
-    question: true,
     formula: "./plugin/kityformula-plugin/qlKityFormulaDialog.html"
   });
 

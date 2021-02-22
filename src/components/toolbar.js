@@ -6,20 +6,44 @@ class Toolbar {
 
     this.container = document.createElement("div");
     this.container.setAttribute("id", this.id);
-    config.forEach(item => {
-      const button = document.createElement("button");
-      button.setAttribute("type", "button");
-      if (typeof item === "string") {
-        button.classList.add(`ql-${item}`);
-      } else if (typeof item === "object") {
-        const name = Object.keys(item)[0];
-        const value = item[name];
-        button.classList.add(`ql-${name}`);
-        button.setAttribute("value", value);
+
+    config.forEach(format => {
+      if (typeof format === "string") {
+        addButton(this.container, format);
+      } else {
+        const name = Object.keys(format)[0];
+        const value = format[name];
+        Array.isArray(value)
+          ? addSelect(this.container, name, value)
+          : addButton(this.container, name, value);
       }
-      this.container.appendChild(button);
     });
   }
+}
+
+function addButton(container, format, value) {
+  let input = document.createElement("button");
+  input.setAttribute("type", "button");
+  input.classList.add("ql-" + format);
+  if (value != null) {
+    input.value = value;
+  }
+  container.appendChild(input);
+}
+
+function addSelect(container, format, values) {
+  let input = document.createElement("select");
+  input.classList.add("ql-" + format);
+  values.forEach(function (value) {
+    let option = document.createElement("option");
+    if (value !== false) {
+      option.setAttribute("value", value);
+    } else {
+      option.setAttribute("selected", "selected");
+    }
+    input.appendChild(option);
+  });
+  container.appendChild(input);
 }
 
 Toolbar.CUSTOM = ["import", "option", "formula", "question"];
@@ -32,17 +56,33 @@ Toolbar.DEFAULT = [
   { script: "super" }, // 下标
   "clean", // 清除格式
   "image", // 插入图片
-  // 'import'               // 插入重点
+];
+
+Toolbar.FONT_LIST = [
+  "Sans-Serif",
+  "SimSun",
+  "SimHei",
+  "Microsoft-YaHei",
+  "KaiTi",
+  "FangSong",
+  "Arial",
 ];
 
 function expandConfig(userConfig) {
-  const config = Toolbar.DEFAULT;
+  const config = Array.isArray(userConfig.toolbar)
+    ? userConfig.toolbar
+    : Toolbar.DEFAULT;
 
   Toolbar.CUSTOM.forEach(label => {
     if (!config.includes(label) && userConfig[label]) {
       config.push(label);
     }
   });
+
+  const fontIdx = config.indexOf("font");
+  if (fontIdx !== -1) {
+    config[fontIdx] = { font: Toolbar.FONT_LIST };
+  }
 
   return config;
 }
