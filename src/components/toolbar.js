@@ -68,6 +68,8 @@ Toolbar.FONT_LIST = [
   "Arial",
 ];
 
+Toolbar.SIZE_LIST = ["12", false, "14", "16", "18", "20", "22", "24", "26"];
+
 function expandConfig(userConfig) {
   const config = Array.isArray(userConfig.toolbar)
     ? userConfig.toolbar
@@ -82,6 +84,11 @@ function expandConfig(userConfig) {
   const fontIdx = config.indexOf("font");
   if (fontIdx !== -1) {
     config[fontIdx] = { font: Toolbar.FONT_LIST };
+  }
+
+  const sizeIdx = config.indexOf("size");
+  if (sizeIdx !== -1) {
+    config[sizeIdx] = { size: Toolbar.SIZE_LIST };
   }
 
   return config;

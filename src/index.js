@@ -24,9 +24,13 @@ Object.assign(Icons, { clean: cleanIcon });
 const Font = Quill.import("formats/font");
 Font.whitelist = Toolbar.FONT_LIST;
 
+const Size = Quill.import("formats/size");
+Size.whitelist = Toolbar.SIZE_LIST;
+
 Quill.register(
   {
     "formats/font": Font,
+    "formats/size": Size,
 
     "modules/wordCount": WordCount,
     "modules/imageResize": ImageResize,
@@ -314,7 +318,8 @@ class QlQuill {
 
   // 小题序号
   formatQuestion(options, type) {
-    if (!options[type] && !options.toolbar.includes(type)) return;
+    if (!options[type] && options.toolbar && !options.toolbar.includes(type))
+      return;
 
     const nodes = this.editor.root.querySelectorAll(`sub-${type}`);
     if (!nodes.length) return;

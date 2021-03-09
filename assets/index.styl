@@ -50,33 +50,65 @@ color-theme = #38c3a1
     &:focus
       outline none
 
-.ql-snow .ql-picker.ql-font
-  .ql-picker-label
-  .ql-picker-item
-    &[data-value=SimSun]::before
-      content '宋体'
-      font-family 'SimSun'
+.ql-snow .ql-picker
+  &.ql-font
+    .ql-picker-label
+    .ql-picker-item
+      &[data-value=SimSun]::before
+        content '宋体'
+        font-family 'SimSun'
 
-    &[data-value=SimHei]::before
-      content '黑体'
-      font-family 'SimHei'
+      &[data-value=SimHei]::before
+        content '黑体'
+        font-family 'SimHei'
 
-    &[data-value=Microsoft-YaHei]::before
-      content '微软雅黑'
-      font-family 'Microsoft YaHei'
+      &[data-value=Microsoft-YaHei]::before
+        content '微软雅黑'
+        font-family 'Microsoft YaHei'
 
-    &[data-value=KaiTi]::before
-      content '楷体'
-      font-family 'KaiTi'
+      &[data-value=KaiTi]::before
+        content '楷体'
+        font-family 'KaiTi'
 
-    &[data-value=FangSong]::before
-      content '仿宋'
-      font-family 'FangSong'
+      &[data-value=FangSong]::before
+        content '仿宋'
+        font-family 'FangSong'
 
-    &[data-value=Arial]::before
-      content 'Arial'
-      font-family 'Arial'
+      &[data-value=Arial]::before
+        content 'Arial'
+        font-family 'Arial'
+    
+  &.ql-size
+    .ql-picker-label
+    .ql-picker-item
+      &::before
+        content: '13'
 
+      &[data-value='12']::before
+        content: '12'
+
+      &[data-value='14']::before
+        content: '14'
+
+      &[data-value='16']::before
+        content: '16'
+      
+      &[data-value='18']::before
+        content: '18'
+
+      &[data-value='20']::before
+        content: '20'
+
+      &[data-value='22']::before
+        content: '22'
+
+      &[data-value='24']::before
+        content: '24'
+
+      &[data-value='26']::before
+        content: '26'
+
+// 文字字体
 .ql-font
   &-SimSun
     font-family 'SimSun'
@@ -95,6 +127,32 @@ color-theme = #38c3a1
 
   &-Arial
     font-family 'Arial'
+
+// 文字大小
+.ql-size
+  &-12
+    font-size 12px
+
+  &-14
+    font-size 14px
+
+  &-16
+    font-size 16px
+
+  &-18
+    font-size 18px
+
+  &-20
+    font-size 20px
+
+  &-22
+    font-size 22px
+
+  &-24
+    font-size 24px
+
+  &-26
+    font-size 26px
 
 .ql-container
   white-space pre
