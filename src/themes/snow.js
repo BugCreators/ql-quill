@@ -7,8 +7,9 @@ class SnowTheme extends Snow {
   extendToolbar(toolbar) {
     super.extendToolbar(toolbar);
 
-    if (toolbar.container.querySelector(".ql-color")) {
-      this.colorPicker = new ColorPicker(this.quill);
+    const colorButton = toolbar.container.querySelector(".ql-color");
+    if (colorButton) {
+      this.colorPicker = new ColorPicker(this.quill, null, colorButton);
     }
   }
 }
@@ -16,8 +17,10 @@ class SnowTheme extends Snow {
 const Tooltip = Quill.import("ui/tooltip");
 
 class ColorPicker extends Tooltip {
-  constructor(quill, boundsContainer) {
-    super(quill, boundsContainer);
+  constructor(quill, boundsContainer, buttonContainer) {
+    super(quill, boundsContainer, buttonContainer);
+
+    this.buttonContainer = buttonContainer;
 
     this.root.classList.add("ql-color-tooltip");
     this.confrim = this.root.querySelector(".ql-btn");
@@ -59,6 +62,11 @@ class ColorPicker extends Tooltip {
     this.setValue(color);
 
     this.show();
+    this.position();
+  }
+
+  position() {
+    this.root.style.left = this.buttonContainer.offsetLeft + "px";
   }
 
   setValue(color = this.constructor.DEFAULT_COLOR) {
