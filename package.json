@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack",
-    "dev": "cross-env NODE_ENV=development webpack"
+    "dev": "webpack-dev-server"
   },
   "keywords": [
     "ql-quill"
@@ -43,7 +43,8 @@
     "uglifyjs-webpack-plugin": "^2.2.0",
     "url-loader": "^4.1.0",
     "webpack": "^4.40.3",
-    "webpack-cli": "^3.3.12"
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.2"
   },
   "dependencies": {
     "lodash.isequal": "^4.5.0",

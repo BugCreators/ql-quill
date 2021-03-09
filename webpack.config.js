@@ -85,4 +85,10 @@ module.exports = {
     ],
   },
   plugins: plugins,
+  devServer: {
+    open: true,
+    port: 8080,
+    hot: true,
+    publicPath: "/dist/",
+  },
 };
