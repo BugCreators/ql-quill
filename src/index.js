@@ -330,15 +330,14 @@ class QlQuill {
     const latex = img ? img.dataset.latex || "" : "";
 
     new QlDialog({
-      width: 840,
-      height: 400,
+      width: 888,
       title: "插入公式",
       content: `
         <iframe
           id="kfEditorContainer-${time}"
           src="${options.formula}?=${time}"
           ${latex ? `data-latex="${latex}"` : ""}
-          style="border:none;height:100%;width:100%;"
+          style="border:none;height:400px;width:100%;"
         ></iframe>
       `,
       onOk: _ => {
