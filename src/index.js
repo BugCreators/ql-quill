@@ -4,7 +4,7 @@ import isEqual from "lodash.isequal";
 import Toolbar from "./components/toolbar";
 import QlDialog from "./components/qlDialog";
 
-import ImageResize from "quill-image-resize-module";
+import ImageResize from "@plugin/image-resize/image-resize.min.js";
 import FormulaReEdit from "./extends/formulaReEdit";
 
 import SnowTheme from "./themes/snow";
@@ -14,7 +14,7 @@ import Import from "./modules/import";
 import Question from "./modules/question";
 import WordCount from "./modules/wordCount";
 
-import cleanIcon from "./../assets/icons/clean.svg";
+import cleanIcon from "@icons/clean.svg";
 
 import "../assets/index.styl";
 

@@ -1,5 +1,5 @@
 import Quill from "quill";
-import MoColorPicker from "./../../plugin/color-picker/mo.color-picker";
+import MoColorPicker from "@plugin/color-picker/mo.color-picker.js";
 
 const Snow = Quill.import("themes/snow");
 

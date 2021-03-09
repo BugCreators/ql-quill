@@ -1,158 +1,9 @@
-@import 'quill/dist/quill.snow.css'
-@import '../plugin/color-picker/mo.color-picker.css'
-@import './dialog.styl'
-
 color-theme = #38c3a1
 
-.ql-toolbar.ql-snow
-  background-color #fafafa
-  border-color #dcdfe6
-  border-bottom 1px solid #f2f2f2
-  padding 2px 4px
-  border-top-left-radius 4px
-  border-top-right-radius 4px
-
-  &.on-focus 
-    border-color color-theme
-    border-bottom-color #f2f2f2
-
-  .icon 
-    fill #444
-
-  .ql-import 
-    background url('./images/ic_spot.png') center no-repeat
-  
-
-  .ql-option
-  .ql-question
-    width 64px
-    background url('./images/ic_question.png') center no-repeat
-
-  .ql-picker-label:hover
-  .ql-picker-label.ql-active
-  .ql-picker-item:hover
-  .ql-picker-item.ql-selected
-    color color-theme
-
-    .ql-stroke
-      stroke color-theme
-
-  button
-    &.ql-active
-    &:hover
-    &:focus
-      .ql-stroke 
-        stroke color-theme
-
-      .ql-fill
-      .icon 
-        fill color-theme
-    &:focus
-      outline none
-
-.ql-snow .ql-picker
-  &.ql-font
-    .ql-picker-label
-    .ql-picker-item
-      &[data-value=SimSun]::before
-        content '宋体'
-        font-family 'SimSun'
-
-      &[data-value=SimHei]::before
-        content '黑体'
-        font-family 'SimHei'
-
-      &[data-value=Microsoft-YaHei]::before
-        content '微软雅黑'
-        font-family 'Microsoft YaHei'
-
-      &[data-value=KaiTi]::before
-        content '楷体'
-        font-family 'KaiTi'
-
-      &[data-value=FangSong]::before
-        content '仿宋'
-        font-family 'FangSong'
-
-      &[data-value=Arial]::before
-        content 'Arial'
-        font-family 'Arial'
-    
-  &.ql-size
-    .ql-picker-label
-    .ql-picker-item
-      &::before
-        content: '13'
-
-      &[data-value='12']::before
-        content: '12'
-
-      &[data-value='14']::before
-        content: '14'
-
-      &[data-value='16']::before
-        content: '16'
-      
-      &[data-value='18']::before
-        content: '18'
-
-      &[data-value='20']::before
-        content: '20'
-
-      &[data-value='22']::before
-        content: '22'
-
-      &[data-value='24']::before
-        content: '24'
-
-      &[data-value='26']::before
-        content: '26'
-
-// 文字字体
-.ql-font
-  &-SimSun
-    font-family 'SimSun'
-  
-  &-SimHei
-    font-family 'SimHei'
-
-  &-Microsoft-YaHei
-    font-family 'Microsoft YaHei'
-
-  &-KaiTi
-    font-family 'KaiTi'
-
-  &-FangSong
-    font-family 'FangSong'
-
-  &-Arial
-    font-family 'Arial'
-
-// 文字大小
-.ql-size
-  &-12
-    font-size 12px
-
-  &-14
-    font-size 14px
-
-  &-16
-    font-size 16px
-
-  &-18
-    font-size 18px
-
-  &-20
-    font-size 20px
-
-  &-22
-    font-size 22px
-
-  &-24
-    font-size 24px
-
-  &-26
-    font-size 26px
+@import 'quill/dist/quill.snow.css'
+@import '../plugin/color-picker/mo.color-picker.css'
+@import './components/*'
+@import './modules/*'
 
 .ql-container
   white-space pre
@@ -166,62 +17,19 @@ color-theme = #38c3a1
   &.ql-snow.on-focus 
     border-color color-theme
 
-  .ql-editor
-    padding 10px 10px 0
+.ql-editor
+  padding 10px 10px 0
 
-    &.ql-blank:before 
-      left 10px
-      right 10px
-      color #b2b2b2
-      font-size 12px
-      font-style normal
-
-    img
-      display inline-block
-      vertical-align middle
-
-  .ql-word-count
-    font-size 12px
+  &.ql-blank:before 
+    left 10px
+    right 10px
     color #b2b2b2
-    position absolute
-    bottom 1px
-    right 5px
+    font-size 12px
+    font-style normal
 
-  .ql-word-entered
-    color #666
-
-  .ql-color-tooltip
-    padding 12px
-
-    &:not(.ql-hidden)
-      display flex
-
-    &::before
-      content ''
-      line-height 0
-      margin-right 0
-
-    input[type=text]
-      display inline-block
-      outline none
-      width 130px
-
-    .ql-btn
-      min-width auto
-      height auto
-      padding 0 5px
-  
-  .ql-color-picker
-    width auto
-
-  .ql-color-confrim
-    display flex
-    flex-direction column
-    justify-content space-between
-    margin-left 8px
-
-  .ql-color-block
-    height 40px
+  img
+    display inline-block
+    vertical-align middle
 
 point
   position relative

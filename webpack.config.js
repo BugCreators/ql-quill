@@ -41,7 +41,8 @@ module.exports = {
   },
   resolve: {
     alias: {
-      "quill-image-resize-module": dir("assets/js/image-resize.min.js"),
+      "@icons": dir("assets/icons"),
+      "@plugin": dir("plugin"),
     },
   },
   module: {

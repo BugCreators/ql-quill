@@ -1,0 +1,33 @@
+.ql-container
+  .ql-color-tooltip
+    padding 12px
+
+    &:not(.ql-hidden)
+      display flex
+
+    &::before
+      content ''
+      line-height 0
+      margin-right 0
+
+    input[type=text]
+      display inline-block
+      outline none
+      width 130px
+
+    .ql-btn
+      min-width auto
+      height auto
+      padding 0 5px
+  
+  .ql-color-picker
+    width auto
+
+  .ql-color-confrim
+    display flex
+    flex-direction column
+    justify-content space-between
+    margin-left 8px
+
+  .ql-color-block
+    height 40px

@@ -1,0 +1,147 @@
+.ql-snow
+  &.ql-toolbar
+    background-color #fafafa
+    border-color #dcdfe6
+    border-bottom 1px solid #f2f2f2
+    padding 2px 4px
+    border-top-left-radius 4px
+    border-top-right-radius 4px
+
+    &.on-focus 
+      border-color color-theme
+      border-bottom-color #f2f2f2
+
+    .icon 
+      fill #444
+
+    .ql-import 
+      background url('./images/ic_spot.png') center no-repeat
+    
+
+    .ql-option
+    .ql-question
+      width 64px
+      background url('./images/ic_question.png') center no-repeat
+
+    .ql-picker-label:hover
+    .ql-picker-label.ql-active
+    .ql-picker-item:hover
+    .ql-picker-item.ql-selected
+      color color-theme
+
+      .ql-stroke
+        stroke color-theme
+
+    button
+      &.ql-active
+      &:hover
+      &:focus
+        .ql-stroke 
+          stroke color-theme
+
+        .ql-fill
+        .icon 
+          fill color-theme
+      &:focus
+        outline none
+  
+  .ql-picker
+    &.ql-font
+      .ql-picker-label
+      .ql-picker-item
+        &[data-value=SimSun]::before
+          content '宋体'
+          font-family 'SimSun'
+
+        &[data-value=SimHei]::before
+          content '黑体'
+          font-family 'SimHei'
+
+        &[data-value=Microsoft-YaHei]::before
+          content '微软雅黑'
+          font-family 'Microsoft YaHei'
+
+        &[data-value=KaiTi]::before
+          content '楷体'
+          font-family 'KaiTi'
+
+        &[data-value=FangSong]::before
+          content '仿宋'
+          font-family 'FangSong'
+
+        &[data-value=Arial]::before
+          content 'Arial'
+          font-family 'Arial'
+    &.ql-size
+      .ql-picker-label
+      .ql-picker-item
+        &::before
+          content: '13'
+
+        &[data-value='12']::before
+          content: '12'
+
+        &[data-value='14']::before
+          content: '14'
+
+        &[data-value='16']::before
+          content: '16'
+        
+        &[data-value='18']::before
+          content: '18'
+
+        &[data-value='20']::before
+          content: '20'
+
+        &[data-value='22']::before
+          content: '22'
+
+        &[data-value='24']::before
+          content: '24'
+
+        &[data-value='26']::before
+          content: '26'
+
+.ql-font
+  &-SimSun
+    font-family 'SimSun'
+  
+  &-SimHei
+    font-family 'SimHei'
+
+  &-Microsoft-YaHei
+    font-family 'Microsoft YaHei'
+
+  &-KaiTi
+    font-family 'KaiTi'
+
+  &-FangSong
+    font-family 'FangSong'
+
+  &-Arial
+    font-family 'Arial'
+
+.ql-size
+  &-12
+    font-size 12px
+
+  &-14
+    font-size 14px
+
+  &-16
+    font-size 16px
+
+  &-18
+    font-size 18px
+
+  &-20
+    font-size 20px
+
+  &-22
+    font-size 22px
+
+  &-24
+    font-size 24px
+
+  &-26
+    font-size 26px
