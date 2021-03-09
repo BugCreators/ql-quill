@@ -7,10 +7,12 @@ import QlDialog from "./components/qlDialog";
 import ImageResize from "quill-image-resize-module";
 import FormulaReEdit from "./extends/formulaReEdit";
 
+import SnowTheme from "./themes/snow";
+
 import Image from "./modules/image";
 import Import from "./modules/import";
 import Question from "./modules/question";
-import wordCount from "./modules/wordCount";
+import WordCount from "./modules/wordCount";
 
 import cleanIcon from "./../assets/icons/clean.svg";
 
@@ -24,15 +26,17 @@ Font.whitelist = Toolbar.FONT_LIST;
 
 Quill.register(
   {
-    "ui/icons": Icons,
-
     "formats/font": Font,
 
-    "modules/wordCount": wordCount,
+    "modules/wordCount": WordCount,
     "modules/imageResize": ImageResize,
     "modules/image": Image,
     "modules/import": Import,
     "modules/question": Question,
+
+    "themes/snow": SnowTheme,
+
+    "ui/icons": Icons,
   },
   true
 );
@@ -109,6 +113,13 @@ class QlQuill {
                   this.editor.setSelection(currentRange);
                 },
               });
+            },
+            color: () => {
+              const formats = this.editor.getFormat(
+                this.editor.selection.savedRange.index
+              );
+
+              this.editor.theme.colorPicker.edit(formats.color);
             },
             question: () => {
               this.insertQuestion("question");
@@ -303,7 +314,7 @@ class QlQuill {
 
   // 小题序号
   formatQuestion(options, type) {
-    if (!options[type]) return;
+    if (!options[type] && !options.toolbar.includes(type)) return;
 
     const nodes = this.editor.root.querySelectorAll(`sub-${type}`);
     if (!nodes.length) return;
