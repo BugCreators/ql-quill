@@ -1,7 +1,11 @@
-.ql-container
+.ql-snow
+  .ql-tooltip
+    color #333
+
   .ql-color-tooltip
     padding 12px
     top -10px
+    border-radius 4px
 
     &:not(.ql-hidden)
       display flex
@@ -11,24 +15,46 @@
       line-height 0
       margin-right 0
 
-    input[type=text]
-      display inline-block
-      outline none
-      width 130px
-
     .ql-btn
       min-width auto
-      height auto
-      padding 0 5px
-  
+
+  .ql-color-standard
+    margin 5px 0 10px
+    display flex
+    justify-content space-between
+
+  .ql-color-item
+    width 18px
+    height 18px
+    cursor pointer
+
+    &:hover
+      border 1px solid color-theme
+
   .ql-color-picker
     width auto
+
+  .ql-color-button
+    display flex
+    flex-direction column
+
+    &-default
+      margin-top 8px
+
+  .ql-color-rgb
+    display flex
+    flex-direction column
+    margin-bottom 10px
+    font-size 16px
+
+    & > span
+      margin-top 8px
 
   .ql-color-confrim
     display flex
     flex-direction column
     justify-content space-between
-    margin-left 8px
+    margin-left 10px
 
   .ql-color-block
-    height 40px
+    height 68px
