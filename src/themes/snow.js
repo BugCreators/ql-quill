@@ -23,7 +23,7 @@ class ColorPicker extends Tooltip {
     this.root.classList.add("ql-color-tooltip");
 
     this.block = this.root.querySelector(".ql-color-block");
-    this.rgbContainer = this.root.querySelector(".ql-color-rgb");
+    this.inputContainer = this.root.querySelector(".ql-color-inputs");
     this.standardContainer = this.root.querySelector(".ql-color-standard");
 
     this.initPicker();
@@ -31,7 +31,13 @@ class ColorPicker extends Tooltip {
 
     this.position(buttonContainer);
 
-    this.setColor();
+    this.inputs = [
+      new RGBInput(this.inputContainer, "r"),
+      new RGBInput(this.inputContainer, "g"),
+      new RGBInput(this.inputContainer, "b"),
+    ];
+
+    this.updateColor();
     this.listen();
   }
 
@@ -40,7 +46,7 @@ class ColorPicker extends Tooltip {
 
     this.instance = new MoColorPicker(picker, {
       format: "hex",
-      change: color => this.updateColor(color, true),
+      change: color => this.updateColor(color, this.constructor.COLOR_PICK),
     });
   }
 
@@ -61,15 +67,14 @@ class ColorPicker extends Tooltip {
   }
 
   listen() {
+    const { COLOR_SELECT_HOVER, COLOR_SELECT, COLOR_INPUT } = this.constructor;
+
     this.standardContainer.addEventListener(
       "mouseover",
       e => {
         const { color } = e.target.dataset;
 
-        if (color) {
-          this.updateColor(color);
-          this.instance.setValue(color);
-        }
+        color && this.updateColor(color, COLOR_SELECT_HOVER);
       },
       true
     );
@@ -79,7 +84,7 @@ class ColorPicker extends Tooltip {
       e => {
         const { color } = e.target.dataset;
 
-        color && this.setColor(color);
+        color && this.updateColor(color, COLOR_SELECT);
       },
       true
     );
@@ -89,18 +94,25 @@ class ColorPicker extends Tooltip {
       () => {
         const previewColor = this.instance.getValue();
 
-        previewColor !== this.color && this.setColor(this.color);
+        previewColor !== this.color &&
+          this.updateColor(this.color, COLOR_SELECT_HOVER);
       },
       true
     );
 
+    this.inputContainer.addEventListener("change", () => {
+      const colors = this.inputs.map(input => input.value);
+
+      this.updateColor(rgb2hex(...colors), COLOR_INPUT);
+    });
+
     this.root
-      .querySelector(".ql-color-button-confrim")
+      .querySelector(".ql-color-confrim")
       .addEventListener("click", () => this.save());
 
     this.root
-      .querySelector(".ql-color-button-default")
-      .addEventListener("click", () => this.setColor());
+      .querySelector(".ql-color-default")
+      .addEventListener("click", () => this.updateColor());
 
     this.quill.on("selection-change", range => {
       if (range == null) return;
@@ -110,31 +122,38 @@ class ColorPicker extends Tooltip {
 
   edit(color) {
     this.show();
-    this.setColor(color);
+    this.updateColor(color, this.constructor.COLOR_SET);
   }
 
   position(container) {
     this.root.style.left = container.offsetLeft + "px";
   }
 
-  setColor(color = this.constructor.DEFAULT_COLOR) {
-    this.updateColor(color, true);
+  updateColor(color, from = "") {
+    const {
+      DEFAULT_COLOR,
+      COLOR_INPUT,
+      COLOR_PICK,
+      COLOR_SELECT_HOVER,
+    } = this.constructor;
 
-    this.instance.setValue(color);
-  }
+    color = color || DEFAULT_COLOR;
 
-  updateColor(color, change = false) {
     this.block.style.background = color;
 
-    const [r, g, b] = hex2rgb(color);
+    if (from !== COLOR_INPUT) {
+      const colors = hex2rgb(color);
 
-    this.rgbContainer.innerHTML = `
-      <span>R: ${r}</span>
-      <span>G: ${g}</span>
-      <span>B: ${b}</span>
-    `;
+      this.inputs.forEach(input => {
+        input.setValue(colors[input.key.toLocaleLowerCase()]);
+      });
+    }
 
-    if (change) {
+    if (from !== COLOR_PICK) {
+      this.instance.setValue(color);
+    }
+
+    if (from !== COLOR_SELECT_HOVER) {
       this.color = color;
     }
   }
@@ -148,6 +167,12 @@ class ColorPicker extends Tooltip {
     this.hide();
   }
 }
+
+ColorPicker.COLOR_SET = "SET";
+ColorPicker.COLOR_PICK = "PICK";
+ColorPicker.COLOR_INPUT = "INPUT";
+ColorPicker.COLOR_SELECT = "SELECT";
+ColorPicker.COLOR_SELECT_HOVER = "SELECT_HOVER";
 
 ColorPicker.STANDARD_COLORS = [
   "#c00000",
@@ -165,22 +190,71 @@ ColorPicker.STANDARD_COLORS = [
 ColorPicker.DEFAULT_COLOR = "#333333";
 
 ColorPicker.TEMPLATE = [
-  '<div>',
+  "<div>",
   "  <span>标准颜色</span>",
   '  <div class="ql-color-standard"></div>',
   '  <div class="ql-color-picker"></div>',
   "</div>",
-  '<div class="ql-color-confrim">',
-  '  <div class="ql-color-button">',
-  '    <button type="button" class="ql-btn ql-btn-primary ql-color-button-confrim">确定</button>',
-  '    <button type="button" class="ql-btn ql-color-button-default">恢复默认</button>',
-  "  </div>",
-  '  <div class="ql-color-preview">',
-  '    <div class="ql-color-rgb"></div>',
-  '    <div class="ql-color-block"></div>',
-  "  </div>",
+  '<div class="ql-color-operate">',
+  '  <button type="button" class="ql-btn ql-btn-primary ql-color-confrim">确定</button>',
+  '  <button type="button" class="ql-btn ql-color-default">恢复默认</button>',
+  '  <div class="ql-color-inputs"></div>',
+  '  <div class="ql-color-block"></div>',
   "</div>",
 ].join("");
+
+class RGBInput {
+  constructor(container, key, value) {
+    this.MAX = 255;
+    this.MIN = 0;
+
+    this.container = container;
+    this.key = key;
+    this.value = value;
+
+    this.input = this.initInput();
+
+    this.listen();
+  }
+
+  initInput() {
+    const span = document.createElement("span");
+    const input = document.createElement("input");
+    input.setAttribute("type", "number");
+    input.setAttribute("max", this.MAX);
+    input.setAttribute("min", this.MIN);
+    input.dataset.key = this.key;
+    input.value = this.value;
+
+    span.appendChild(new Text(this.key.toLocaleUpperCase()));
+    span.appendChild(input);
+
+    this.container.appendChild(span);
+
+    return input;
+  }
+
+  setValue(value) {
+    this.input.value = value;
+    this.value = value;
+  }
+
+  listen() {
+    this.input.addEventListener("change", e => {
+      const { valueAsNumber } = e.target;
+
+      if (valueAsNumber > this.MAX) {
+        this.setValue(this.MAX);
+        return;
+      } else if (valueAsNumber < this.MIN) {
+        this.setValue(this.MIN);
+        return;
+      }
+
+      this.value = valueAsNumber;
+    });
+  }
+}
 
 /**
  * @desc hex转rgb
@@ -201,7 +275,26 @@ function hex2rgb(color) {
   const g = parseInt([color[2], color[3]].join(""), 16);
   const b = parseInt([color[4], color[5]].join(""), 16);
 
-  return [r, g, b];
+  return { r, g, b };
+}
+
+/**
+ * @desc rgb转hex
+ * @param {Number} r
+ * @param {Number} g
+ * @param {Number} b
+ * @returns {String}
+ */
+function rgb2hex(r, g, b) {
+  let color = "#";
+  [r, g, b].forEach(v => {
+    let hex = v.toString(16);
+    if (hex.length < 2) {
+      hex = "0" + hex;
+    }
+    color += hex;
+  });
+  return color;
 }
 
 export default SnowTheme;

@@ -34,27 +34,41 @@
   .ql-color-picker
     width auto
 
-  .ql-color-button
-    display flex
-    flex-direction column
-
-    &-default
-      margin-top 8px
-
-  .ql-color-rgb
-    display flex
-    flex-direction column
-    margin-bottom 10px
-    font-size 16px
-
-    & > span
-      margin-top 8px
-
-  .ql-color-confrim
+  .ql-color-operate
     display flex
     flex-direction column
     justify-content space-between
     margin-left 10px
+
+  .ql-color-default
+    margin-top 8px
+
+  .ql-color-inputs
+    display flex
+    flex-direction column
+    margin 8px 0
+    font-size 16px
+    font-family "Consolas", monospace
+    flex 1
+    justify-content space-between
+
+    span
+      display flex
+      justify-content space-between
+      align-items center
+
+    input
+      width 60px
+      line-height 24px
+      border 1px solid #d9d9d9
+      outline none
+      border-radius 4px
+      padding-left 10px
+
+      &:hover
+      &:focus
+        border-color color-theme
+
 
   .ql-color-block
     height 68px
