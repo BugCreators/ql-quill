@@ -103,7 +103,7 @@ class ColorPicker extends Tooltip {
     this.inputContainer.addEventListener("change", () => {
       const colors = this.inputs.map(input => input.value);
 
-      this.updateColor(rgb2hex(...colors), COLOR_INPUT);
+      this.updateColor(MoColorPicker.rgb2hex(...colors), COLOR_INPUT);
     });
 
     this.root
@@ -142,7 +142,7 @@ class ColorPicker extends Tooltip {
     this.block.style.background = color;
 
     if (from !== COLOR_INPUT) {
-      const colors = hex2rgb(color);
+      const colors = MoColorPicker.hex2rgb(color);
 
       this.inputs.forEach(input => {
         input.setValue(colors[input.key.toLocaleLowerCase()]);
@@ -254,47 +254,6 @@ class RGBInput {
       this.value = valueAsNumber;
     });
   }
-}
-
-/**
- * @desc hex转rgb
- * @param {String} color hex格式字符串
- * @returns {Array} [r, g, b]
- */
-function hex2rgb(color) {
-  color = color.replace(/^#/, "");
-  if (color.length === 3) {
-    const colors = [];
-    for (let i = 0; i < 3; i++) {
-      colors.push(color[i], color[i]);
-    }
-    color = colors.join("");
-  }
-
-  const r = parseInt([color[0], color[1]].join(""), 16);
-  const g = parseInt([color[2], color[3]].join(""), 16);
-  const b = parseInt([color[4], color[5]].join(""), 16);
-
-  return { r, g, b };
-}
-
-/**
- * @desc rgb转hex
- * @param {Number} r
- * @param {Number} g
- * @param {Number} b
- * @returns {String}
- */
-function rgb2hex(r, g, b) {
-  let color = "#";
-  [r, g, b].forEach(v => {
-    let hex = v.toString(16);
-    if (hex.length < 2) {
-      hex = "0" + hex;
-    }
-    color += hex;
-  });
-  return color;
 }
 
 export default SnowTheme;
