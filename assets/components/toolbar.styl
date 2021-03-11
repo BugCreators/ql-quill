@@ -49,59 +49,62 @@
     &.ql-font
       .ql-picker-label
       .ql-picker-item
+        &::before
+          // 默认
+          content '\9ed8\8ba4'
+
         &[data-value=SimSun]::before
-          content '宋体'
+          // 宋体
+          content '\5b8b\4f53'
           font-family 'SimSun'
 
         &[data-value=SimHei]::before
-          content '黑体'
+          // 黑体
+          content '\9ed1\4f53'
           font-family 'SimHei'
 
         &[data-value=Microsoft-YaHei]::before
-          content '微软雅黑'
+          // 微软雅黑
+          content '\5fae\8f6f\96c5\9ed1'
           font-family 'Microsoft YaHei'
-
-        &[data-value=KaiTi]::before
-          content '楷体'
-          font-family 'KaiTi'
-
-        &[data-value=FangSong]::before
-          content '仿宋'
-          font-family 'FangSong'
 
         &[data-value=Arial]::before
           content 'Arial'
           font-family 'Arial'
 
+        &[data-value=Cursive]::before
+          content 'Cursive'
+          font-family Cursive
+
     &.ql-size
       .ql-picker-label
       .ql-picker-item
         &::before
-          content: '13'
+          content '13'
 
         &[data-value='12']::before
-          content: '12'
+          content '12'
 
         &[data-value='14']::before
-          content: '14'
+          content '14'
 
         &[data-value='16']::before
-          content: '16'
+          content '16'
         
         &[data-value='18']::before
-          content: '18'
+          content '18'
 
         &[data-value='20']::before
-          content: '20'
+          content '20'
 
         &[data-value='22']::before
-          content: '22'
+          content '22'
 
         &[data-value='24']::before
-          content: '24'
+          content '24'
 
         &[data-value='26']::before
-          content: '26'
+          content '26'
 
 .ql-font
   &-SimSun
@@ -113,14 +116,11 @@
   &-Microsoft-YaHei
     font-family 'Microsoft YaHei'
 
-  &-KaiTi
-    font-family 'KaiTi'
-
-  &-FangSong
-    font-family 'FangSong'
-
   &-Arial
     font-family 'Arial'
+
+  &-Cursive
+    font-family Cursive
 
 .ql-size
   &-12

@@ -61,11 +61,12 @@ Toolbar.DEFAULT = [
 Toolbar.FONT_LIST = [
   false,
   "Arial",
+  "serif",
+  "monospace",
+  "Cursive",
   "SimSun",
   "SimHei",
   "Microsoft-YaHei",
-  "KaiTi",
-  "FangSong",
 ];
 
 Toolbar.SIZE_LIST = ["12", false, "14", "16", "18", "20", "22", "24", "26"];
