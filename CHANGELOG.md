@@ -1,9 +1,23 @@
+## v1.0.4
+
+- editor
+  - 配置集成完善
+  - 新增颜色选择器
+- toolbar
+  - 新增自定义工具栏列表配置
+  - 更新默认字体
+  - 更新默认文字大小
+- webpack 配置
+  - 新增 devServer
+  - 新增 第三方插件及 icons 别名
+- 目录结构优化
+
 ## v1.0.3
 
 - editor
   - 字数统计 使用 modules 形式实现
   - 修复空格不显示问题
-  - iamge 标签保留 width、height 等属性
+  - image 标签保留 width、height 等属性
 - webpack 配置
   - 新增 raw-loader 读取 svg 文件源文本
 
