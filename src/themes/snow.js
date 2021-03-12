@@ -126,7 +126,8 @@ class ColorPicker extends Tooltip {
   }
 
   position(container) {
-    this.root.style.left = container.offsetLeft + "px";
+    this.root.style.left =
+      container.offsetLeft - container.parentElement.offsetLeft + "px";
   }
 
   updateColor(color, from = "") {
