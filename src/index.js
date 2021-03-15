@@ -1,13 +1,12 @@
 import Quill from "quill";
 import isEqual from "lodash.isequal";
 
-import Toolbar from "./components/toolbar";
 import QlDialog from "./components/qlDialog";
 
 import ImageResize from "@plugin/image-resize/image-resize.min.js";
 import FormulaReEdit from "./extends/formulaReEdit";
 
-import SnowTheme from "./themes/snow";
+import SnowTheme, { DEFAULT_FONT, DEFAULT_SIZE } from "./themes/snow";
 
 import Image from "./modules/image";
 import Import from "./modules/import";
@@ -18,14 +17,16 @@ import cleanIcon from "@icons/clean.svg";
 
 import "../assets/index.styl";
 
+const CUSTOM_TOOL = ["import", "option", "formula", "question"];
+
 const Icons = Quill.import("ui/icons");
 Object.assign(Icons, { clean: cleanIcon });
 
 const Font = Quill.import("formats/font");
-Font.whitelist = Toolbar.FONT_LIST;
+Font.whitelist = DEFAULT_FONT;
 
 const Size = Quill.import("formats/size");
-Size.whitelist = Toolbar.SIZE_LIST;
+Size.whitelist = DEFAULT_SIZE;
 
 Quill.register(
   {
@@ -62,32 +63,9 @@ class QlQuill {
     this.setContent = this.setEditorContents.bind(this);
   }
 
-  instantiateToolbar(options) {
-    const previousSibling = this.container.previousSibling;
-    if (
-      previousSibling &&
-      previousSibling.id &&
-      previousSibling.id.includes("toolbar-") &&
-      previousSibling.className &&
-      previousSibling.className.includes("ql-toolbar")
-    ) {
-      previousSibling.remove();
-    }
-    const toolbar = new Toolbar(options);
-
-    this.container.parentElement.insertBefore(
-      toolbar.container,
-      this.container
-    );
-
-    return toolbar;
-  }
-
   // 实例化编辑器
   instantiateEditor(options) {
     if (this.editor) return;
-
-    const toolbar = this.instantiateToolbar(options);
 
     const { limit, image, imageResize } = options;
 
@@ -95,7 +73,7 @@ class QlQuill {
       theme: "snow",
       modules: {
         toolbar: {
-          container: `#${toolbar.id}`,
+          container: options.toolbar,
           handlers: {
             import: () => {
               new QlDialog({
@@ -178,6 +156,7 @@ class QlQuill {
           ],
         },
       },
+      custom: CUSTOM_TOOL.filter(tool => !!options[tool]),
       placeholder: options.placeholder || "",
       readOnly: false,
     };
@@ -198,7 +177,7 @@ class QlQuill {
             options
           );
         } else if (eventName === "selection-change") {
-          this.onEditorChangeSelection(rangeOrDelta, toolbar, source);
+          this.onEditorChangeSelection(rangeOrDelta, source);
         }
       }
     );
@@ -243,7 +222,7 @@ class QlQuill {
     }
   }
 
-  onEditorChangeSelection(nextSelection, toolbar, source) {
+  onEditorChangeSelection(nextSelection, source) {
     if (!this.editor) return;
     const currentSelection = this.selection;
     const hasGainedFocus = !currentSelection && nextSelection;
@@ -253,14 +232,12 @@ class QlQuill {
 
     this.selection = nextSelection;
 
-    const toolbarEl = document.querySelector(`#${toolbar.id}`);
-
     if (hasGainedFocus) {
       this.container.classList.add("on-focus");
-      toolbarEl.classList.add("on-focus");
+      this.editor.theme.modules.toolbar.container.classList.add("on-focus");
     } else if (hasLostFocus) {
       this.container.classList.remove("on-focus");
-      toolbarEl.classList.remove("on-focus");
+      this.editor.theme.modules.toolbar.container.classList.remove("on-focus");
     }
   }
 

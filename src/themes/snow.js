@@ -3,7 +3,36 @@ import MoColorPicker from "@plugin/color-picker/mo.color-picker.js";
 
 const Snow = Quill.import("themes/snow");
 
+export const DEFAULT_TOOL = [
+  "bold", // 加粗
+  "italic", // 斜体
+  "underline", // 下划线
+  { script: "sub" }, // 上标
+  { script: "super" }, // 下标
+  "clean", // 清除格式
+  "image", // 插入图片
+];
+
+export const DEFAULT_FONT = [
+  false,
+  "Arial",
+  "serif",
+  "monospace",
+  "Cursive",
+  "SimSun",
+  "SimHei",
+  "Microsoft-YaHei",
+];
+
+const DEFAULT_SIZE = ["12", false, "14", "16", "18", "20", "22", "24", "26"];
+
 class SnowTheme extends Snow {
+  constructor(quill, options) {
+    expandConfig(options.modules.toolbar, options);
+
+    super(quill, options);
+  }
+
   extendToolbar(toolbar) {
     super.extendToolbar(toolbar);
 
@@ -12,6 +41,33 @@ class SnowTheme extends Snow {
       this.colorPicker = new ColorPicker(this.quill, null, colorButton);
     }
   }
+}
+
+function expandConfig(toolbar, option) {
+  if (!toolbar) {
+    toolbar = DEFAULT_TOOL;
+  } else {
+    if (!toolbar.container || !toolbar.container.length)
+      toolbar.container = DEFAULT_TOOL;
+
+    toolbar = toolbar.container;
+  }
+
+  const fontIdx = toolbar.indexOf("font");
+  if (fontIdx !== -1) {
+    toolbar[fontIdx] = { font: DEFAULT_FONT };
+  }
+
+  const sizeIdx = toolbar.indexOf("size");
+  if (sizeIdx !== -1) {
+    toolbar[sizeIdx] = { size: DEFAULT_SIZE };
+  }
+
+  option.custom.forEach(tool => {
+    if (!toolbar.includes(tool)) {
+      toolbar.push(tool);
+    }
+  });
 }
 
 const Tooltip = Quill.import("ui/tooltip");
