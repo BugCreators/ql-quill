@@ -58,9 +58,7 @@ class QlQuill {
     this.container.classList.add("notranslate");
 
     this.instantiateEditor(options);
-    this.setEditorContents(options.value);
-
-    this.setContent = this.setEditorContents.bind(this);
+    this.setContents(options.value);
   }
 
   // 实例化编辑器
@@ -183,7 +181,7 @@ class QlQuill {
     );
   }
 
-  setEditorContents(value) {
+  setContents = value => {
     const sel = this.selection;
     if (typeof value === "string") {
       this.editor.setContents(this.editor.clipboard.convert(value));
@@ -191,7 +189,11 @@ class QlQuill {
       this.editor.setContents(value);
     }
     postpone(() => this.setEditorSelection(this.editor, sel));
-  }
+  };
+
+  getHTML = () => {
+    return this.editor.root.innerHTML;
+  };
 
   setEditorSelection(editor, range) {
     this.selection = range;
