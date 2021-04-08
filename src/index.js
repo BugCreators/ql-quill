@@ -121,7 +121,7 @@ class QlQuill {
         imageResize: {
           modules: [
             FormulaReEdit,
-            ...(typeof imageResize === "boolean"
+            ...(typeof imageResize === "boolean" && imageResize
               ? ["Resize", "DisplaySize"]
               : []),
           ],

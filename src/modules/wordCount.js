@@ -1,4 +1,4 @@
-class wordCount {
+class WordCount {
   constructor(quill, options = {}) {
     this.quill = quill;
     this.options = options;
@@ -25,4 +25,4 @@ class wordCount {
   }
 }
 
-export default wordCount;
+export default WordCount;
