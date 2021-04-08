@@ -23,6 +23,18 @@
   const editor = new QlQuill("#editor", {
     limit: 1000,
     placeholder: "请输入作业内容...",
+    toolbar: [
+      "bold",
+      "italic",
+      "underline",
+      { script: "sub" },
+      { script: "super" },
+      "clean",
+      "image",
+      "import",
+      "question",
+      { table: 'TD' }
+    ],
     image: {
       accept: ['jpg', 'jpeg', 'bmp'].map(i => `.${i}`).join(','),
       action: (file, cb) => {
@@ -30,7 +42,7 @@
         formData.append('file', file)
         axios({
           method: "post",
-          url: "http://192.168.1.24:10007/webservice/file/saveOne",
+          url: "http://192.168.1.47/webservice/file/saveOne",
           headers: {
             'content-type': 'application/x-www-form-urlencoded;charset=utf-8',
             token: 'C32430FD6C2A093F847C66909F8130EC'
@@ -58,7 +70,7 @@
   });
 
   function btnClick() {
-    editor.setContent('<p>hello<point contenteditable="false">啊</point><point contenteditable="false">啊</point></p>')
+    editor.setContents('<p>hello<point contenteditable="false">啊</point><point contenteditable="false">啊</point></p>')
   }
 
   function insertImage() {
