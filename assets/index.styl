@@ -1,45 +1,9 @@
-@import 'quill/dist/quill.snow.css'
-@import './dialog.styl'
-@import 'quill-better-table/dist/quill-better-table.css'
-
 color-theme = #38c3a1
 
-.ql-toolbar.ql-snow
-  background-color #fafafa
-  border-color #dcdfe6
-  border-bottom 1px solid #f2f2f2
-  padding 2px 4px
-  border-top-left-radius 4px
-  border-top-right-radius 4px
-
-  &.on-focus 
-    border-color color-theme
-    border-bottom-color #f2f2f2
-
-  .icon 
-    fill #444
-
-  .ql-import 
-    background url('./images/ic_spot.png') center no-repeat
-  
-
-  .ql-option
-  .ql-question
-    width 64px
-    background url('./images/ic_question.png') center no-repeat
-
-  button
-    &.ql-active
-    &:hover
-    &:focus
-      .ql-stroke 
-        stroke color-theme
-
-      .ql-fill
-      .icon 
-        fill color-theme
-    &:focus
-      outline none
+@import 'quill/dist/quill.snow.css'
+@import 'quill-better-table/dist/quill-better-table.css'
+@import './components/*'
+@import './modules/*'
 
 .ql-container
   white-space pre
@@ -49,33 +13,24 @@ color-theme = #38c3a1
   padding-bottom 20px
   border-bottom-left-radius 4px
   border-bottom-right-radius 4px
+  height auto
 
   &.ql-snow.on-focus 
     border-color color-theme
 
-  .ql-editor
-    padding 10px 10px 0
+.ql-editor
+  padding 10px 10px 0
 
-    &.ql-blank:before 
-      left 10px
-      right 10px
-      color #b2b2b2
-      font-size 12px
-      font-style normal
-
-    img
-      display inline-block
-      vertical-align middle
-
-  .ql-word-count
-    font-size 12px
+  &.ql-blank:before 
+    left 10px
+    right 10px
     color #b2b2b2
-    position absolute
-    bottom 1px
-    right 5px
+    font-size 12px
+    font-style normal
 
-  .ql-word-entered
-    color #666
+  img
+    display inline-block
+    vertical-align middle
 
 .blot-formatter__overlay
   white-space normal

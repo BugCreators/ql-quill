@@ -13,7 +13,7 @@ import Image from "./modules/image";
 import Import from "./modules/import";
 import Question from "./modules/question";
 
-import cleanIcon from "./../assets/icons/clean.svg";
+import cleanIcon from "@icons/clean.svg";
 
 import "../assets/index.styl";
 

@@ -39,6 +39,11 @@ module.exports = {
     library: "QlQuill",
     libraryTarget: "umd",
   },
+  resolve: {
+    alias: {
+      "@icons": dir("assets/icons"),
+    },
+  },
   module: {
     rules: [
       {

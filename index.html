@@ -21,7 +21,7 @@
   let value = "<p>hello</p>";
 
   const editor = new QlQuill("#editor", {
-    // limit: 1000,
+    limit: 1000,
     placeholder: "请输入作业内容...",
     image: {
       accept: ['jpg', 'jpeg', 'bmp'].map(i => `.${i}`).join(','),

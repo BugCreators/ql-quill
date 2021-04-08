@@ -1,0 +1,37 @@
+.ql-snow
+  &.ql-toolbar
+    background-color #fafafa
+    border-color #dcdfe6
+    border-bottom 1px solid #f2f2f2
+    padding 2px 4px
+    border-top-left-radius 4px
+    border-top-right-radius 4px
+
+    &.on-focus 
+      border-color color-theme
+      border-bottom-color #f2f2f2
+
+    .icon 
+      fill #444
+
+    .ql-import 
+      background url('./images/ic_spot.png') center no-repeat
+    
+
+    .ql-option
+    .ql-question
+      width 64px
+      background url('./images/ic_question.png') center no-repeat
+
+    button
+      &.ql-active
+      &:hover
+      &:focus
+        .ql-stroke 
+          stroke color-theme
+
+        .ql-fill
+        .icon 
+          fill color-theme
+      &:focus
+        outline none
