@@ -110,11 +110,12 @@ class QlQuill {
             formula: () => {
               this.openFormulaDialog(options);
             },
-            ...(typeof image === "function"
-              ? { image: () => image(this.insertImage) }
-              : typeof image === "object" && image.action
-              ? { image: () => this.uploadImages(options) }
-              : {}),
+            image:
+              typeof image === "function"
+                ? () => image(this.insertImage)
+                : typeof image === "object" && image.action
+                ? () => this.uploadImages(options)
+                : undefined,
           },
         },
         imageResize: {
