@@ -1,3 +1,13 @@
+## v1.0.5
+
+- editor
+  - 样式调整
+  - setContent 方法改名为 setContents
+  - 新增 getHTML 方法
+- toolbar
+  - 使用原生 toolbar
+- 去除一些无用依赖
+
 ## v1.0.4
 
 - editor
