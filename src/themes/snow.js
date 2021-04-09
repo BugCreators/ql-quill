@@ -24,7 +24,17 @@ export const DEFAULT_FONT = [
   "Microsoft-YaHei",
 ];
 
-export const DEFAULT_SIZE = ["12", false, "14", "16", "18", "20", "22", "24", "26"];
+export const DEFAULT_SIZE = [
+  "12",
+  false,
+  "14",
+  "16",
+  "18",
+  "20",
+  "22",
+  "24",
+  "26",
+];
 
 class SnowTheme extends Snow {
   constructor(quill, options) {
