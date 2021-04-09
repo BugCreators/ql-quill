@@ -1,4 +1,4 @@
-# ql-quill V2.0.0
+# ql-quill
 
 基于 quill@2.0.0-dev.4
 

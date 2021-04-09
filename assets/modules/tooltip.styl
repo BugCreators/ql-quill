@@ -1,0 +1,74 @@
+.ql-snow
+  .ql-tooltip
+    color #333
+
+  .ql-color-tooltip
+    padding 12px
+    top -2px
+    border-radius 4px
+    z-index 1
+
+    &:not(.ql-hidden)
+      display flex
+
+    &::before
+      content ''
+      line-height 0
+      margin-right 0
+
+    .ql-btn
+      min-width auto
+
+  .ql-color-standard
+    margin 5px 0 10px
+    display flex
+    justify-content space-between
+
+  .ql-color-item
+    width 18px
+    height 18px
+    cursor pointer
+
+    &:hover
+      border 1px solid color-theme
+
+  .ql-color-picker
+    width auto
+
+  .ql-color-operate
+    display flex
+    flex-direction column
+    justify-content space-between
+    margin-left 10px
+
+  .ql-color-default
+    margin-top 8px
+
+  .ql-color-inputs
+    display flex
+    flex-direction column
+    margin 8px 0
+    font-size 16px
+    font-family "Consolas", monospace
+    flex 1
+    justify-content space-between
+
+    span
+      display flex
+      justify-content space-between
+      align-items center
+
+    input
+      width 60px
+      line-height 24px
+      border 1px solid #d9d9d9
+      outline none
+      border-radius 4px
+      padding-left 10px
+
+      &:hover
+      &:focus
+        border-color color-theme
+
+  .ql-color-block
+    height 68px

@@ -42,6 +42,7 @@ module.exports = {
   resolve: {
     alias: {
       "@icons": dir("assets/icons"),
+      "@plugin": dir("plugin"),
     },
   },
   module: {

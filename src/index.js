@@ -7,6 +7,8 @@ import QuillBetterTable from "quill-better-table";
 import BlotFormatter, { ImageSpec } from "quill-blot-formatter";
 import FormulaReEdit from "./extends/formulaReEdit";
 
+import SnowTheme, { DEFAULT_FONT, DEFAULT_SIZE } from "./themes/snow";
+
 import Image from "./modules/image";
 import Import from "./modules/import";
 import Question from "./modules/question";
@@ -16,17 +18,30 @@ import cleanIcon from "@icons/clean.svg";
 
 import "../assets/index.styl";
 
+const CUSTOM_TOOL = ["import", "option", "formula", "question"];
+
 const Icons = Quill.import("ui/icons");
 Object.assign(Icons, { clean: cleanIcon });
 
+const Font = Quill.import("formats/font");
+Font.whitelist = DEFAULT_FONT;
+
+const Size = Quill.import("formats/size");
+Size.whitelist = DEFAULT_SIZE;
+
 Quill.register(
   {
+    "formats/font": Font,
+    "formats/size": Size,
+
+    "modules/wordCount": WordCount,
     "modules/better-table": QuillBetterTable,
     "modules/blotFormatter": BlotFormatter,
-    "modules/wordCount": WordCount,
     "modules/image": Image,
     "modules/import": Import,
     "modules/question": Question,
+
+    "themes/snow": SnowTheme,
 
     "ui/icons": Icons,
   },
@@ -80,6 +95,13 @@ class QlQuill {
                   this.editor.setSelection(currentRange);
                 },
               });
+            },
+            color: () => {
+              const formats = this.editor.getFormat(
+                this.editor.selection.savedRange.index
+              );
+
+              this.editor.theme.colorPicker.edit(formats.color);
             },
             question: () => {
               this.insertQuestion("question");
@@ -157,6 +179,7 @@ class QlQuill {
           bindings: QuillBetterTable.keyboardBindings,
         },
       },
+      custom: CUSTOM_TOOL.filter(tool => !!options[tool]),
       placeholder: options.placeholder || "",
       readOnly: false,
     };
