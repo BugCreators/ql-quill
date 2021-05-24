@@ -1,8 +1,18 @@
 import closeIcon from "@icons/close.svg";
+import { replaceMustache } from "./../i18n";
 
 class QlDialog {
+  static destoryContainer = () => {
+    const root = this.getContainer();
+    root && root.parentElement.remove();
+  };
+
+  static getContainer() {
+    return document.querySelector(".ql-dialog-root");
+  }
+
   constructor(options) {
-    const root = document.querySelector(".ql-dialog-root");
+    const root = this.constructor.getContainer();
 
     if (!root || !root.parentElement) {
       this.createContainer(options);
@@ -22,7 +32,7 @@ class QlDialog {
   createContainer() {
     this.container = document.createElement("div");
 
-    this.container.innerHTML = this.constructor.TEMPLATE;
+    this.container.innerHTML = replaceMustache(this.constructor.TEMPLATE);
 
     document.body.appendChild(this.container);
   }
@@ -90,7 +100,7 @@ QlDialog.TEMPLATE = [
   '        <button type="button" class="ql-dialog-close">',
   '          <span class="ql-dialog-close-x">',
   '            <span role="img" class="ql-anticon">',
-                closeIcon,
+  closeIcon,
   "            </span>",
   "          </span>",
   "        </button>",
@@ -99,8 +109,12 @@ QlDialog.TEMPLATE = [
   "        </div>",
   '        <div class="ql-dialog-body" style="padding-top: 0px;"></div>',
   '        <div class="ql-dialog-footer">',
-  '         <button type="button" class="ql-btn ql-dialog-cancel"><span>取消</span></button>',
-  '         <button type="button" class="ql-btn ql-btn-primary ql-dialog-confrim"><span>确定</span></button>',
+  '         <button type="button" class="ql-btn ql-dialog-cancel">',
+  "           <span>{{cancel}}</span>",
+  "         </button>",
+  '         <button type="button" class="ql-btn ql-btn-primary ql-dialog-confrim">',
+  "           <span>{{ok}}</span>",
+  "         </button>",
   "        </div>",
   "      </div>",
   "    </div>",

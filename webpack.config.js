@@ -43,6 +43,7 @@ module.exports = {
     alias: {
       "@icons": dir("assets/icons"),
       "@plugin": dir("plugin"),
+      "@locales": dir("src/locales"),
     },
   },
   module: {

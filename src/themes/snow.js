@@ -1,4 +1,5 @@
 import Quill from "quill";
+import { replaceMustache } from "./../i18n";
 import MoColorPicker from "@plugin/color-picker/mo.color-picker.js";
 
 const Snow = Quill.import("themes/snow");
@@ -46,11 +47,17 @@ class SnowTheme extends Snow {
   extendToolbar(toolbar) {
     super.extendToolbar(toolbar);
 
+    this.initColorPicker(toolbar);
+  }
+
+  initColorPicker = (toolbar = this.modules.toolbar) => {
+    this.colorPicker && this.colorPicker.destroy();
+
     const colorButton = toolbar.container.querySelector(".ql-color");
     if (colorButton) {
       this.colorPicker = new ColorPicker(this.quill, null, colorButton);
     }
-  }
+  };
 }
 
 function expandConfig(toolbar, option) {
@@ -85,6 +92,7 @@ const Tooltip = Quill.import("ui/tooltip");
 class ColorPicker extends Tooltip {
   constructor(quill, boundsContainer, buttonContainer) {
     super(quill, boundsContainer, buttonContainer);
+    this.root.innerHTML = replaceMustache(this.constructor.TEMPLATE);
 
     this.root.classList.add("ql-color-tooltip");
 
@@ -197,12 +205,8 @@ class ColorPicker extends Tooltip {
   }
 
   updateColor(color, from = "") {
-    const {
-      DEFAULT_COLOR,
-      COLOR_INPUT,
-      COLOR_PICK,
-      COLOR_SELECT_HOVER,
-    } = this.constructor;
+    const { DEFAULT_COLOR, COLOR_INPUT, COLOR_PICK, COLOR_SELECT_HOVER } =
+      this.constructor;
 
     color = color || DEFAULT_COLOR;
 
@@ -233,6 +237,10 @@ class ColorPicker extends Tooltip {
     );
     this.hide();
   }
+
+  destroy = () => {
+    this.root && this.root.remove();
+  };
 }
 
 ColorPicker.COLOR_SET = "SET";
@@ -258,13 +266,13 @@ ColorPicker.DEFAULT_COLOR = "#333333";
 
 ColorPicker.TEMPLATE = [
   "<div>",
-  "  <span>标准颜色</span>",
+  "  <span>{{standardColors}}</span>",
   '  <div class="ql-color-standard"></div>',
   '  <div class="ql-color-picker"></div>',
   "</div>",
   '<div class="ql-color-operate">',
-  '  <button type="button" class="ql-btn ql-btn-primary ql-color-confrim">确定</button>',
-  '  <button type="button" class="ql-btn ql-color-default">恢复默认</button>',
+  '  <button type="button" class="ql-btn ql-btn-primary ql-color-confrim">{{ok}}</button>',
+  '  <button type="button" class="ql-btn ql-color-default">{{restoreDefault}}</button>',
   '  <div class="ql-color-inputs"></div>',
   '  <div class="ql-color-block"></div>',
   "</div>",

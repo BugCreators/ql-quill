@@ -12,6 +12,7 @@
   <div id="editor"></div>
   <button onclick="btnClick()">修改内容</button>
   <button onclick="insertImage()">插入图片</button>
+  <button onclick="changeLang()">切换中文</button>
 </body>
 
 <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.20.0/axios.min.js"></script>
@@ -64,7 +65,8 @@
       value = v
     },
     imageResize: true,
-    formula: "./plugin/kityformula-plugin/qlKityFormulaDialog.html"
+    formula: "./plugin/kityformula-plugin/qlKityFormulaDialog.html",
+    locales: "en-US"
   });
 
   function btnClick() {
@@ -73,6 +75,10 @@
 
   function insertImage() {
     editor.insertImage("http://192.168.4.119/group1/M00/01/57/wKgBF19YPz6AEfqrAABTEqBfftU969.jpg")
+  }
+
+  function changeLang() {
+    editor.changeLanguage("zh-CN")
   }
 </script>
 

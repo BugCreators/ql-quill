@@ -1,5 +1,6 @@
 import Quill from "quill";
 import isEqual from "lodash.isequal";
+import i18n, { initI18n } from "./i18n";
 
 import QlDialog from "./components/qlDialog";
 
@@ -57,9 +58,17 @@ class QlQuill {
     // 阻止谷歌翻译输入框
     this.container.classList.add("notranslate");
 
+    initI18n(options.locales);
+
     this.instantiateEditor(options);
     this.setContents(options.value);
   }
+
+  changeLanguage = lang => {
+    i18n.changeLanguage(lang);
+    QlDialog.destoryContainer();
+    this.editor.theme.initColorPicker();
+  };
 
   // 实例化编辑器
   instantiateEditor(options) {
@@ -76,7 +85,7 @@ class QlQuill {
             import: () => {
               new QlDialog({
                 width: 640,
-                title: "插入重点",
+                title: i18n.t("insertImport"),
                 content:
                   '<input class="ql-input ql-import-input" type="text" value="">',
                 onOk: container => {
@@ -316,7 +325,7 @@ class QlQuill {
 
     new QlDialog({
       width: 888,
-      title: "插入公式",
+      title: i18n.t("insertFormula"),
       content: `
         <iframe
           id="kfEditorContainer-${time}"
