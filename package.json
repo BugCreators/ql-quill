@@ -1,6 +1,6 @@
 {
   "name": "ql-quill",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A wrapper for quill",
   "main": "./dist/ql-quill.js",
   "files": [
