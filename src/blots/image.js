@@ -1,7 +1,6 @@
 import Quill from "quill";
 
 const Image = Quill.import("formats/image");
-const Module = Quill.import("core/module");
 
 const ATTRIBUTES = ["src", "data-latex", "style", "width", "height"];
 
@@ -28,10 +27,4 @@ class ImageBlot extends Image {
   }
 }
 
-class ImageModule extends Module {
-  static register() {
-    Quill.register(ImageBlot, true);
-  }
-}
-
-export { ImageBlot, ImageModule as default };
+export default ImageBlot;
