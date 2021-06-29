@@ -15,7 +15,6 @@ export const DEFAULT_TOOL = [
 
 export const DEFAULT_FONT = [
   false,
-  "Arial",
   "serif",
   "monospace",
   "Cursive",

@@ -52,8 +52,7 @@ sizes = 12 14 16 18 20 22 24 26
       .ql-picker-label
       .ql-picker-item
         &::before
-          // 默认
-          content '\9ed8\8ba4'
+          content 'Arial'
 
         &[data-value=SimSun]::before
           // 宋体
@@ -69,10 +68,6 @@ sizes = 12 14 16 18 20 22 24 26
           // 微软雅黑
           content '\5fae\8f6f\96c5\9ed1'
           font-family 'Microsoft YaHei'
-
-        &[data-value=Arial]::before
-          content 'Arial'
-          font-family 'Arial'
 
         &[data-value=Cursive]::before
           content 'Cursive'
@@ -99,9 +94,6 @@ sizes = 12 14 16 18 20 22 24 26
 
   &-Microsoft-YaHei
     font-family 'Microsoft YaHei'
-
-  &-Arial
-    font-family 'Arial'
 
   &-Cursive
     font-family Cursive
