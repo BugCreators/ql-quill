@@ -16,7 +16,6 @@ export const DEFAULT_TOOL = [
 
 export const DEFAULT_FONT = [
   false,
-  "Arial",
   "serif",
   "monospace",
   "Cursive",
@@ -102,6 +101,12 @@ class ColorPicker extends Tooltip {
 
     this.initPicker();
     this.buildSelect(this.constructor.STANDARD_COLORS);
+
+    if (this.quill.root === this.quill.scrollingContainer) {
+      this.quill.root.addEventListener("scroll", () => {
+        this.root.style.top = this.quill.root.scrollTop + "px";
+      });
+    }
 
     this.position(buttonContainer);
 

@@ -1,3 +1,5 @@
+sizes = 12 14 16 18 20 22 24 26
+
 .ql-snow
   &.ql-toolbar
     background-color #fafafa
@@ -50,8 +52,7 @@
       .ql-picker-label
       .ql-picker-item
         &::before
-          // 默认
-          content '\9ed8\8ba4'
+          content 'Arial'
 
         &[data-value=SimSun]::before
           // 宋体
@@ -68,10 +69,6 @@
           content '\5fae\8f6f\96c5\9ed1'
           font-family 'Microsoft YaHei'
 
-        &[data-value=Arial]::before
-          content 'Arial'
-          font-family 'Arial'
-
         &[data-value=Cursive]::before
           content 'Cursive'
           font-family Cursive
@@ -81,30 +78,12 @@
       .ql-picker-item
         &::before
           content '13'
-
-        &[data-value='12']::before
-          content '12'
-
-        &[data-value='14']::before
-          content '14'
-
-        &[data-value='16']::before
-          content '16'
         
-        &[data-value='18']::before
-          content '18'
+        for size in sizes
+          font-size = "'%s'" % size
 
-        &[data-value='20']::before
-          content '20'
-
-        &[data-value='22']::before
-          content '22'
-
-        &[data-value='24']::before
-          content '24'
-
-        &[data-value='26']::before
-          content '26'
+          &[data-value={font-size}]::before
+            content font-size
 
 .ql-font
   &-SimSun
@@ -116,33 +95,9 @@
   &-Microsoft-YaHei
     font-family 'Microsoft YaHei'
 
-  &-Arial
-    font-family 'Arial'
-
   &-Cursive
     font-family Cursive
 
-.ql-size
-  &-12
-    font-size 12px
-
-  &-14
-    font-size 14px
-
-  &-16
-    font-size 16px
-
-  &-18
-    font-size 18px
-
-  &-20
-    font-size 20px
-
-  &-22
-    font-size 22px
-
-  &-24
-    font-size 24px
-
-  &-26
-    font-size 26px
+for size in sizes
+  .ql-size-{size}
+    font-size '%spx' % size
