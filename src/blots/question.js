@@ -1,7 +1,6 @@
 import Quill from "quill";
 
 const Embed = Quill.import("blots/embed");
-const Module = Quill.import("core/module");
 
 class QuestionBlot extends Embed {
   static create(value) {
@@ -35,10 +34,4 @@ class QuestionBlot extends Embed {
 QuestionBlot.blotName = "question";
 QuestionBlot.tagName = ["SUB-QUESTION", "SUB-OPTION"];
 
-class QuestionModule extends Module {
-  static register() {
-    Quill.register(QuestionBlot, true);
-  }
-}
-
-export { QuestionBlot, QuestionModule as default };
+export default QuestionBlot;

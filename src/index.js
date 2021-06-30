@@ -9,9 +9,10 @@ import FormulaReEdit from "./extends/formulaReEdit";
 
 import SnowTheme, { DEFAULT_FONT, DEFAULT_SIZE } from "./themes/snow";
 
-import Image from "./modules/image";
-import Import from "./modules/import";
-import Question from "./modules/question";
+import ImageBlot from "./blots/image";
+import ImportBlot from "./blots/import";
+import QuestionBlot from "./blots/question";
+
 import WordCount from "./modules/wordCount";
 
 import cleanIcon from "@icons/clean.svg";
@@ -31,22 +32,18 @@ Size.whitelist = DEFAULT_SIZE;
 
 Quill.register(
   {
-    "formats/font": Font,
-    "formats/size": Size,
-
     "modules/wordCount": WordCount,
     "modules/better-table": QuillBetterTable,
     "modules/blotFormatter": BlotFormatter,
-    "modules/image": Image,
-    "modules/import": Import,
-    "modules/question": Question,
 
     "themes/snow": SnowTheme,
-
-    "ui/icons": Icons,
   },
   true
 );
+
+Quill.register(ImageBlot, true);
+Quill.register(ImportBlot, true);
+Quill.register(QuestionBlot, true);
 
 class QlQuill {
   static Quill = Quill;
