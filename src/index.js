@@ -6,7 +6,7 @@ import QlDialog from "./components/qlDialog";
 import ImageResize from "@plugin/image-resize/image-resize.min.js";
 import FormulaReEdit from "./extends/formulaReEdit";
 
-import SnowTheme, { DEFAULT_FONT, DEFAULT_SIZE } from "./themes/snow";
+import SnowTheme from "./themes/snow";
 
 import ImageBlot from "./blots/image";
 import ImportBlot from "./blots/import";
@@ -22,12 +22,6 @@ const CUSTOM_TOOL = ["import", "option", "formula", "question"];
 
 const Icons = Quill.import("ui/icons");
 Object.assign(Icons, { clean: cleanIcon });
-
-const Font = Quill.import("formats/font");
-Font.whitelist = DEFAULT_FONT;
-
-const Size = Quill.import("formats/size");
-Size.whitelist = DEFAULT_SIZE;
 
 Quill.register(
   {
