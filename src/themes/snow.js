@@ -3,37 +3,27 @@ import MoColorPicker from "@plugin/color-picker/mo.color-picker";
 
 const Snow = Quill.import("themes/snow");
 
-export const DEFAULT_TOOL = [
-  "bold", // 加粗
-  "italic", // 斜体
-  "underline", // 下划线
-  { script: "sub" }, // 上标
-  { script: "super" }, // 下标
-  "clean", // 清除格式
-  "image", // 插入图片
-];
-
-export const DEFAULT_FONT = [
-  false,
-  "serif",
-  "monospace",
-  "Cursive",
-  "SimSun",
-  "SimHei",
-  "Microsoft-YaHei",
-];
-
-export const DEFAULT_SIZE = [
-  "12",
-  false,
-  "14",
-  "16",
-  "18",
-  "20",
-  "22",
-  "24",
-  "26",
-];
+const DEFAULTS = {
+  tool: [
+    "bold", // 加粗
+    "italic", // 斜体
+    "underline", // 下划线
+    { script: "sub" }, // 上标
+    { script: "super" }, // 下标
+    "clean", // 清除格式
+    "image", // 插入图片
+  ],
+  font: [
+    false,
+    "serif",
+    "monospace",
+    "Cursive",
+    "SimSun",
+    "SimHei",
+    "Microsoft-YaHei",
+  ],
+  size: ["12", false, "14", "16", "18", "20", "22", "24", "26"],
+};
 
 class SnowTheme extends Snow {
   constructor(quill, options) {
@@ -54,23 +44,15 @@ class SnowTheme extends Snow {
 
 function expandConfig(toolbar, option) {
   if (!toolbar) {
-    toolbar = DEFAULT_TOOL;
+    toolbar = DEFAULTS.tool;
   } else {
     if (!toolbar.container || !toolbar.container.length)
-      toolbar.container = DEFAULT_TOOL;
+      toolbar.container = DEFAULTS.tool;
 
     toolbar = toolbar.container;
   }
 
-  const fontIdx = toolbar.indexOf("font");
-  if (fontIdx !== -1) {
-    toolbar[fontIdx] = { font: DEFAULT_FONT };
-  }
-
-  const sizeIdx = toolbar.indexOf("size");
-  if (sizeIdx !== -1) {
-    toolbar[sizeIdx] = { size: DEFAULT_SIZE };
-  }
+  setDefault(toolbar, "font", "size");
 
   option.custom.forEach(tool => {
     if (!toolbar.includes(tool)) {
@@ -79,11 +61,23 @@ function expandConfig(toolbar, option) {
   });
 }
 
+function setDefault(toolbar, ...formats) {
+  formats.forEach(format => {
+    const index = toolbar.indexOf(format);
+    if (index !== -1) {
+      const Format = Quill.import("formats/" + format);
+      Format.whitelist = DEFAULTS[format];
+
+      toolbar[index] = { [format]: DEFAULTS[format] };
+    }
+  });
+}
+
 const Tooltip = Quill.import("ui/tooltip");
 
 class ColorPicker extends Tooltip {
   constructor(quill, boundsContainer, buttonContainer) {
-    super(quill, boundsContainer, buttonContainer);
+    super(quill, boundsContainer);
 
     this.root.classList.add("ql-color-tooltip");
 
