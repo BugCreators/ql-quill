@@ -94,6 +94,12 @@ class ColorPicker extends Tooltip {
     this.initPicker();
     this.buildSelect(this.constructor.STANDARD_COLORS);
 
+    if (this.quill.root === this.quill.scrollingContainer) {
+      this.quill.root.addEventListener("scroll", () => {
+        this.root.style.top = this.quill.root.scrollTop + "px";
+      });
+    }
+
     this.position(buttonContainer);
 
     this.inputs = [
@@ -196,12 +202,8 @@ class ColorPicker extends Tooltip {
   }
 
   updateColor(color, from = "") {
-    const {
-      DEFAULT_COLOR,
-      COLOR_INPUT,
-      COLOR_PICK,
-      COLOR_SELECT_HOVER,
-    } = this.constructor;
+    const { DEFAULT_COLOR, COLOR_INPUT, COLOR_PICK, COLOR_SELECT_HOVER } =
+      this.constructor;
 
     color = color || DEFAULT_COLOR;
 
