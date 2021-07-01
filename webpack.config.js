@@ -3,10 +3,9 @@ const path = require("path");
 const pkg = require("./package.json");
 const dir = (...args) => path.resolve(__dirname, ...args);
 
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
-const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 
 const isEnvProduction = process.env.NODE_ENV === "production";
 
@@ -17,7 +16,6 @@ const bannerPack = new webpack.BannerPlugin({
 
 const plugins = [
   bannerPack,
-  new CleanWebpackPlugin(),
   new webpack.ProvidePlugin({
     "window.Quill": "quill",
   }),
@@ -38,6 +36,7 @@ module.exports = {
     filename: "[name].js",
     library: "QlQuill",
     libraryTarget: "umd",
+    clean: true,
   },
   resolve: {
     alias: {
@@ -72,17 +71,12 @@ module.exports = {
     ],
   },
   optimization: {
+    minimize: true,
     minimizer: [
-      new UglifyJsPlugin({
-        parallel: true,
-        sourceMap: !isEnvProduction,
-        uglifyOptions: {
-          compress: {
-            drop_console: isEnvProduction,
-          },
-        },
+      new TerserPlugin({
+        extractComments: false,
       }),
-      new OptimizeCssAssetsPlugin(),
+      new CssMinimizerPlugin(),
     ],
   },
   plugins: plugins,
@@ -90,6 +84,6 @@ module.exports = {
     open: true,
     port: 8080,
     hot: true,
-    publicPath: "/dist/",
+    static: path.join(__dirname, "demo"),
   },
 };
