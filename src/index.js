@@ -3,7 +3,7 @@ import isEqual from "lodash.isequal";
 
 import QlDialog from "./components/qlDialog";
 
-import ImageResize from "@plugin/image-resize/image-resize.min.js";
+import "@plugin/image-resize/image-resize.min.js";
 import FormulaReEdit from "./extends/formulaReEdit";
 
 import SnowTheme from "./themes/snow";
@@ -26,7 +26,6 @@ Object.assign(Icons, { clean: cleanIcon });
 Quill.register(
   {
     "modules/wordCount": WordCount,
-    "modules/imageResize": ImageResize,
 
     "themes/snow": SnowTheme,
   },
