@@ -55,7 +55,7 @@ function expandConfig(toolbar, option) {
   setDefault(toolbar, "font", "size");
 
   option.custom.forEach(tool => {
-    if (!toolbar.includes(tool)) {
+    if (toolbar.indexOf(tool) === -1) {
       toolbar.push(tool);
     }
   });
@@ -288,7 +288,7 @@ class RGBInput {
     input.dataset.key = this.key;
     input.value = this.value;
 
-    span.appendChild(new Text(this.key.toLocaleUpperCase()));
+    span.innerHTML = this.key.toLocaleUpperCase();
     span.appendChild(input);
 
     this.container.appendChild(span);

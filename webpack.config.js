@@ -27,6 +27,7 @@ const plugins = [
 
 module.exports = {
   mode: process.env.NODE_ENV,
+  target: false,
   entry: {
     "ql-quill": dir("index.js"),
   },
