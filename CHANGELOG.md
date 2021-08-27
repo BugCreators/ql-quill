@@ -1,3 +1,10 @@
+## v1.0.9
+
+- editor
+  - 新增 onLimit 参数 字数限制时触发
+- webpack 配置
+  - 解决热更新失效问题
+
 ## v1.0.8
 
 - webpack 配置
