@@ -205,6 +205,7 @@ class QlQuill {
     if (options.limit) {
       const wordLens = this.editor.getLength() - 1;
       if (wordLens > options.limit) {
+        options.onLimit && options.onLimit();
         this.editor.history.undo();
       } else {
         this.editor.history.cutoff();
