@@ -18,10 +18,11 @@
 <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.20.0/axios.min.js"></script>
 <script src="/ql-quill.js"> </script>
 <script>
-  let value = "<p>hello</p>";
+  var value = "<p>hello</p>";
 
-  const editor = new QlQuill("#editor", {
+  var editor = new QlQuill("#editor", {
     limit: 1000,
+    onLimit: () => console.log('超出字数限制！'),
     placeholder: "请输入作业内容...",
     toolbar: [
       "font",
@@ -38,8 +39,8 @@
       "question",
     ],
     image: {
-      accept: ['jpg', 'jpeg', 'bmp'].map(i => `.${i}`).join(','),
-      action: (file, cb) => {
+      accept: ".jpg, .jpeg, .bmp",
+      action: function (file, cb) {
         const formData = new FormData();
         formData.append('file', file)
         axios({
@@ -50,7 +51,7 @@
             token: '41643C540D74D3D636A31E27197E5A38'
           },
           data: formData
-        }).then(res => {
+        }).then(function (res) {
           cb(res.data.data.fullUrl);
         })
       }
@@ -59,8 +60,8 @@
     //   console.log('custom')
     //   cb("http://192.168.4.119/group1/M00/01/57/wKgBF19YPz6AEfqrAABTEqBfftU969.jpg")
     // },
-    value,
-    onChange: v => {
+    value: value,
+    onChange: function (v) {
       console.log(v)
       value = v
     },
