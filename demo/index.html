@@ -22,7 +22,9 @@
 
   var editor = new QlQuill("#editor", {
     limit: 1000,
-    onLimit: () => console.log('超出字数限制！'),
+    onLimit: function () {
+      console.log('超出字数限制！')
+    },
     placeholder: "请输入作业内容...",
     toolbar: [
       "font",

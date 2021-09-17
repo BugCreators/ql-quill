@@ -1,11 +1,56 @@
 class WordCount {
   constructor(quill, options = {}) {
     this.quill = quill;
+    this.setOptions(options);
+  }
+
+  setOptions(options) {
     this.options = options;
+
     if (options.limit) {
-      this.quill.on("text-change", this.update.bind(this));
-      this.update();
+      this.initLimiter();
+
+      this.registerListener();
     }
+  }
+
+  registerListener() {
+    this.quill.on("editor-change", (eventName, delta, oldDelta, source) => {
+      if (eventName === "text-change") {
+        const wordLens = this.calculate();
+
+        const { limit, onLimit, onChange } = this.options;
+        if (wordLens > limit) {
+          onLimit && onLimit();
+          this.quill.history.undo();
+        } else {
+          this.quill.history.cutoff();
+          onChange && onChange(this.quill.root.innerHTML);
+        }
+
+        this.update();
+      }
+    });
+  }
+
+  initLimiter() {
+    this.container = document.createElement("span");
+    this.container.classList.add("ql-word-count");
+    this.quill.container.appendChild(this.container);
+
+    this.initCounter();
+
+    this.container.appendChild(this.counter);
+    this.container.appendChild(
+      document.createTextNode("/" + this.options.limit)
+    );
+  }
+
+  initCounter() {
+    this.counter = document.createElement("span");
+    this.counter.classList.add("ql-word-entered");
+
+    this.update();
   }
 
   calculate() {
@@ -13,15 +58,7 @@ class WordCount {
   }
 
   update() {
-    let length = this.calculate();
-
-    if (!this.container) {
-      this.container = document.createElement("span");
-      this.container.classList.add("ql-word-count");
-      this.quill.container.appendChild(this.container);
-    }
-
-    this.container.innerHTML = `<span class="ql-word-entered">${length}</span>/${this.options.limit}`;
+    this.counter.innerText = this.calculate();
   }
 }
 

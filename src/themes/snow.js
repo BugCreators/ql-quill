@@ -35,40 +35,35 @@ class SnowTheme extends Snow {
   extendToolbar(toolbar) {
     super.extendToolbar(toolbar);
 
-    const colorButton = toolbar.container.querySelector(".ql-color");
-    if (colorButton) {
-      this.colorPicker = new ColorPicker(this.quill, null, colorButton);
+    if (toolbar.container.querySelector(".ql-color")) {
+      this.colorPicker = new ColorPicker(this.quill, null);
     }
   }
 }
 
-function expandConfig(toolbar, option) {
-  if (!toolbar) {
-    toolbar = DEFAULTS.tool;
-  } else {
-    if (!toolbar.container || !toolbar.container.length)
-      toolbar.container = DEFAULTS.tool;
-
-    toolbar = toolbar.container;
+function expandConfig(toolbar, options) {
+  if (typeof toolbar.container === "string") return;
+  if (!toolbar.container) {
+    toolbar.container = DEFAULTS.tool;
   }
 
   setDefault(toolbar, "font", "size");
 
-  option.custom.forEach(tool => {
-    if (toolbar.indexOf(tool) === -1) {
-      toolbar.push(tool);
+  options.custom.forEach(tool => {
+    if (toolbar.container.indexOf(tool) === -1) {
+      toolbar.container.push(tool);
     }
   });
 }
 
 function setDefault(toolbar, ...formats) {
   formats.forEach(format => {
-    const index = toolbar.indexOf(format);
+    const index = toolbar.container.indexOf(format);
     if (index !== -1) {
       const Format = Quill.import("formats/" + format);
       Format.whitelist = DEFAULTS[format];
 
-      toolbar[index] = { [format]: DEFAULTS[format] };
+      toolbar.container[index] = { [format]: DEFAULTS[format] };
     }
   });
 }
@@ -76,8 +71,15 @@ function setDefault(toolbar, ...formats) {
 const Tooltip = Quill.import("ui/tooltip");
 
 class ColorPicker extends Tooltip {
-  constructor(quill, boundsContainer, buttonContainer) {
+  constructor(quill, boundsContainer) {
     super(quill, boundsContainer);
+
+    const toolbar = quill.getModule("toolbar");
+    toolbar.addHandler("color", () => {
+      const formats = quill.getFormat(quill.selection.savedRange.index);
+
+      this.edit(formats.color);
+    });
 
     this.root.classList.add("ql-color-tooltip");
 
@@ -94,7 +96,7 @@ class ColorPicker extends Tooltip {
       });
     }
 
-    this.position(buttonContainer);
+    this.position();
 
     this.inputs = [
       new RGBInput(this.inputContainer, "r"),
@@ -116,13 +118,11 @@ class ColorPicker extends Tooltip {
   }
 
   buildSelect(colors) {
-    let html = "";
-
-    colors.forEach(color => {
+    this.standardContainer.innerHTML = colors.reduce((html, color) => {
       html += `<span class="ql-color-item" style="background: ${color}" data-color="${color}"></span>`;
-    });
 
-    this.standardContainer.innerHTML = html;
+      return html;
+    }, "");
   }
 
   show() {
@@ -190,9 +190,13 @@ class ColorPicker extends Tooltip {
     this.updateColor(color, this.constructor.COLOR_SET);
   }
 
-  position(container) {
+  position() {
+    const control = this.quill
+      .getModule("toolbar")
+      .container.querySelector(".ql-color");
+
     this.root.style.left =
-      container.offsetLeft - container.parentElement.offsetLeft + "px";
+      control.offsetLeft - control.parentElement.offsetLeft + "px";
   }
 
   updateColor(color, from = "") {
@@ -266,10 +270,10 @@ ColorPicker.TEMPLATE = [
 ].join("");
 
 class RGBInput {
-  constructor(container, key, value) {
-    this.MAX = 255;
-    this.MIN = 0;
+  static max = 255;
+  static min = 0;
 
+  constructor(container, key, value) {
     this.container = container;
     this.key = key;
     this.value = value;
@@ -283,8 +287,8 @@ class RGBInput {
     const span = document.createElement("span");
     const input = document.createElement("input");
     input.setAttribute("type", "number");
-    input.setAttribute("max", this.MAX);
-    input.setAttribute("min", this.MIN);
+    input.setAttribute("max", this.constructor.max);
+    input.setAttribute("min", this.constructor.min);
     input.dataset.key = this.key;
     input.value = this.value;
 
@@ -305,11 +309,11 @@ class RGBInput {
     this.input.addEventListener("change", e => {
       const { valueAsNumber } = e.target;
 
-      if (valueAsNumber > this.MAX) {
-        this.setValue(this.MAX);
+      if (valueAsNumber > this.constructor.max) {
+        this.setValue(this.constructor.max);
         return;
-      } else if (valueAsNumber < this.MIN) {
-        this.setValue(this.MIN);
+      } else if (valueAsNumber < this.constructor.min) {
+        this.setValue(this.constructor.min);
         return;
       }
 
