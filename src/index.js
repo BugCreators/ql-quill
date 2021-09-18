@@ -236,8 +236,7 @@ class QlQuill {
 
   // 插入图片
   insertImage = (src, latex = "") => {
-    !this.editor.hasFocus() && this.editor.focus();
-    const selection = this.editor.getSelection();
+    const selection = this.editor.getSelection(true);
     if (selection && selection.length) {
       this.editor.deleteText(selection.index, selection.length);
     }

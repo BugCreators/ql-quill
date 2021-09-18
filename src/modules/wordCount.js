@@ -1,3 +1,5 @@
+import Quill from "quill";
+
 class WordCount {
   constructor(quill, options = {}) {
     this.quill = quill;
@@ -17,14 +19,35 @@ class WordCount {
   registerListener() {
     this.quill.on("editor-change", (eventName, delta, oldDelta, source) => {
       if (eventName === "text-change") {
-        const wordLens = this.calculate();
-
         const { limit, onLimit, onChange } = this.options;
-        if (wordLens > limit) {
+
+        const distance = this.calculate() - limit;
+
+        if (distance > 0) {
           onLimit && onLimit();
-          this.quill.history.undo();
+
+          if (!this.quill.selection.composing) {
+            const Delta = Quill.import("delta");
+
+            const retainIndex = delta.reduce((length, op) => {
+              if (typeof op.retain === "number") {
+                length += op.retain;
+              } else if (typeof op.insert === "string") {
+                length += op.insert.length;
+              } else if (typeof op.insert === "object") {
+                length += 1;
+              }
+
+              return length;
+            }, -distance);
+
+            this.quill.updateContents(
+              new Delta().retain(retainIndex).delete(distance)
+            );
+
+            setTimeout(() => this.quill.setSelection(retainIndex, 0));
+          }
         } else {
-          this.quill.history.cutoff();
           onChange && onChange(this.quill.root.innerHTML);
         }
 
