@@ -2,7 +2,7 @@ import Quill from "quill";
 import QlDialog from "../components/qlDialog";
 
 const Parchment = Quill.import("parchment");
-const Modele = Quill.import("core/module");
+const Module = Quill.import("core/module");
 
 class ImportBlot extends Parchment.Embed {
   static create(value) {
@@ -21,7 +21,7 @@ class ImportBlot extends Parchment.Embed {
 ImportBlot.blotName = "import";
 ImportBlot.tagName = "POINT";
 
-class Import extends Modele {
+class Import extends Module {
   static register() {
     Quill.register(ImportBlot, true);
   }

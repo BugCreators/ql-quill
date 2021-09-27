@@ -1,6 +1,6 @@
 import Quill from "quill";
 
-const Modele = Quill.import("core/module");
+const Module = Quill.import("core/module");
 const Parchment = Quill.import("parchment");
 
 class QuestionBlot extends Parchment.Embed {
@@ -20,7 +20,7 @@ class QuestionBlot extends Parchment.Embed {
 QuestionBlot.blotName = "question";
 QuestionBlot.tagName = ["SUB-QUESTION", "SUB-OPTION"];
 
-class Question extends Modele {
+class Question extends Module {
   static register() {
     Quill.register(QuestionBlot, true);
   }
