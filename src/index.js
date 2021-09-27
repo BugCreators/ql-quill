@@ -208,28 +208,27 @@ class QlQuill {
       return;
     }
 
+    const toolbar = this.editor.getModule("toolbar");
+
     if (image.action) {
-      const input = document.createElement("input");
-      input.setAttribute("type", "file");
-      input.setAttribute("hidden", true);
-      image.accept && input.setAttribute("accept", image.accept);
-
-      input.addEventListener(
-        "change",
-        e => {
-          const file = e.target.files[0];
-          image.action(file, this.insertImage);
-        },
-        false
-      );
-
-      this.container.appendChild(input);
+      let input = toolbar.container.querySelector("input.ql-image[type=file]");
+      if (input == null) {
+        input = document.createElement("input");
+        input.setAttribute("type", "file");
+        image.accept && input.setAttribute("accept", image.accept);
+        input.classList.add("ql-image");
+        input.addEventListener("change", () => {
+          if (fileInput.files != null && fileInput.files[0] != null) {
+            image.action(input.files[0], this.insertImage);
+            fileInput.value = "";
+          }
+        });
+        toolbar.container.appendChild(input);
+      }
       input.click();
-      this.container.removeChild(input);
+
       return;
     }
-
-    const toolbar = this.editor.getModule("toolbar");
 
     SnowTheme.DEFAULTS.modules.toolbar.handlers.image.call(toolbar);
   }
