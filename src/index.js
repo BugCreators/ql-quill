@@ -246,7 +246,7 @@ class QlQuill {
   };
 
   // 插入公式弹窗
-  openFormulaDialog(img = null, callback) {
+  openFormulaDialog(img = null) {
     const time = new Date().getTime();
     const latex = img ? img.dataset.latex || "" : "";
 
@@ -264,10 +264,12 @@ class QlQuill {
       onOk: _ => {
         if (!window.kfe) return;
 
+        const { image: { action } = {} } = this.options;
+
         window.kfe.execCommand("get.image.data", data => {
           const sLatex = window.kfe.execCommand("get.source");
 
-          if (!callback) {
+          if (!action) {
             if (img) {
               img.setAttribute("src", data.img);
               if (sLatex) img.dataset.latex = sLatex;
@@ -280,7 +282,7 @@ class QlQuill {
 
           const file = dataURLtoFile(data.img, `latex-formula-${time}.png`);
 
-          callback(file, src => {
+          action(file, src => {
             if (img) {
               img.setAttribute("src", src);
               if (sLatex) img.dataset.latex = sLatex;
