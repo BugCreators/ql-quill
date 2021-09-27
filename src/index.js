@@ -236,11 +236,9 @@ class QlQuill {
 
   // 插入图片
   insertImage = (src, latex = "") => {
-    const selection = this.editor.getSelection(true);
-    if (selection && selection.length) {
-      this.editor.deleteText(selection.index, selection.length);
-    }
-    const index = selection.index || 0;
+    const range = this.editor.getSelection(true);
+    this.editor.deleteText(range.index, range.length);
+    const index = range.index;
     this.editor.insertEmbed(index, "image", {
       src,
       "data-latex": latex,

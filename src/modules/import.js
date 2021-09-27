@@ -38,16 +38,18 @@ class Import extends Module {
       title: "插入重点",
       content: '<input class="ql-input ql-import-input" type="text" value="">',
       onOk: container => {
-        let currentRange = this.quill.getSelection(true).index;
+        const range = this.quill.getSelection(true);
+        this.quill.deleteText(range.index, range.length);
+        let index = range.index;
 
         container
           .querySelector(".ql-import-input")
           .value.split("")
-          .forEach(item => {
-            this.quill.insertEmbed(currentRange, "import", item);
-            currentRange++;
+          .forEach(word => {
+            this.quill.insertEmbed(index, "import", word);
+            index++;
           });
-        this.quill.setSelection(currentRange);
+        this.quill.setSelection(index);
       },
     });
   }

@@ -39,11 +39,9 @@ class Question extends Module {
   }
 
   insert(type) {
-    const selection = this.quill.getSelection(true);
-    if (selection && selection.length) {
-      this.quill.deleteText(selection.index, selection.length);
-    }
-    const index = selection.index || 0;
+    const range = this.quill.getSelection(true);
+    this.quill.deleteText(range.index, range.length);
+    const index = range.index;
     this.quill.insertEmbed(index, "question", type);
     this.quill.setSelection(index + 1);
   }
