@@ -218,9 +218,9 @@ class QlQuill {
         image.accept && input.setAttribute("accept", image.accept);
         input.classList.add("ql-image");
         input.addEventListener("change", () => {
-          if (fileInput.files != null && fileInput.files[0] != null) {
+          if (input.files != null && input.files[0] != null) {
             image.action(input.files[0], this.insertImage);
-            fileInput.value = "";
+            input.value = "";
           }
         });
         toolbar.container.appendChild(input);
