@@ -8,6 +8,7 @@ import {
 class FormulaEditAction extends Action {
   onCreate() {
     this.options = this.formatter.options.formula;
+    this.overlay = this.formatter.overlay;
 
     if (typeof this.options.onFormulaEdit !== "function")
       console.warn(
@@ -18,33 +19,29 @@ class FormulaEditAction extends Action {
     // 两次单击的间隔时间
     this.timer = 500;
 
-    this.formatter.overlay.addEventListener(
-      "click",
-      this.onOverlayClick.bind(this)
-    );
-    this.formatter.overlay.addEventListener(
-      "dblclick",
-      this.onOverlayDblclick.bind(this)
-    );
+    if (!this.overlay.dataset.formula) {
+      this.overlay.dataset.formula = true;
+
+      this.overlay.addEventListener("click", this.onOverlayClick);
+      this.overlay.addEventListener("dblclick", this.onOverlayDblclick);
+    }
   }
 
   // 单击图片后再单击overlay 通过时间间隔长短模拟双击事件
-  onOverlayClick() {
+  onOverlayClick = () => {
     const target = this.formatter.currentSpec.getTargetElement();
     if (!target || !target.dataset.latex || !this.timer) return;
 
     const time = new Date().getTime();
-    if (time - this.createTime < this.timer) {
-      this.options.onFormulaEdit(target);
-    }
+    if (time - this.createTime < this.timer) this.options.onFormulaEdit(target);
     this.timer = 0;
-  }
+  };
 
-  onOverlayDblclick(e) {
+  onOverlayDblclick = () => {
     const target = this.formatter.currentSpec.getTargetElement();
     if (!target || !target.dataset.latex) return;
     this.options.onFormulaEdit(target);
-  }
+  };
 }
 
 class DisplaySizeAction extends Action {
