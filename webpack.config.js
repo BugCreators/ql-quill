@@ -16,9 +16,6 @@ const bannerPack = new webpack.BannerPlugin({
 
 const plugins = [
   bannerPack,
-  new webpack.ProvidePlugin({
-    "window.Quill": "quill",
-  }),
   new MiniCssExtractPlugin({
     filename: "[name].snow.css",
     chunkFilename: "[id].css",

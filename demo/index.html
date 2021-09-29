@@ -13,6 +13,7 @@
   <div id="editor"></div>
   <button onclick="btnClick()">修改内容</button>
   <button onclick="insertImage()">插入图片</button>
+  <button onclick="insertFormulaImage()">插入公式图片</button>
 </body>
 
 <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.20.0/axios.min.js"></script>
@@ -76,7 +77,11 @@
   }
 
   function insertImage() {
-    editor.insertImage("http://192.168.4.119/group1/M00/00/2B/rBIACWDNlc2AavC4AABTEqBfftU832.jpg")
+    editor.insertImage("http://192.168.1.47:80/group1/M00/00/55/rBQAEGFTyqyAZYLPAABTEqBfftU380.jpg")
+  }
+
+  function insertFormulaImage() {
+    editor.insertImage("http://192.168.1.47:80/group1/M00/00/55/rBQAEGFT4jmARVB6AAACEGbtTVs0316102", "\\vector {A}")
   }
 </script>
 

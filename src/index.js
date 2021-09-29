@@ -4,8 +4,8 @@ import extend from "extend";
 
 import QlDialog from "./components/qlDialog";
 
-import "@plugin/image-resize/image-resize.min.js";
-import FormulaReEdit from "./extends/formulaReEdit";
+import BlotFormatter from "quill-blot-formatter";
+import FormulaEdit from "./extends/formulaEdit";
 
 import SnowTheme from "./themes/snow";
 
@@ -29,6 +29,7 @@ Quill.register(
     "modules/wordCount": WordCount,
     "modules/question": Question,
     "modules/import": Import,
+    "modules/blotFormatter": BlotFormatter,
 
     "themes/snow": SnowTheme,
   },
@@ -69,21 +70,21 @@ class QlQuill {
     const { imageResize, formula } = this.options;
 
     if (imageResize || formula) {
-      const defaultOption = { modules: ["Resize", "DisplaySize"] };
-
-      options.modules.imageResize =
-        typeof imageResize === "object"
-          ? extend(defaultOption, imageResize)
-          : imageResize
-          ? defaultOption
-          : { modules: [] };
-
-      if (formula) {
-        options.modules.imageResize.modules.push(FormulaReEdit);
-        options.modules.imageResize.onFormulaReEdit = img => {
-          this.openFormulaDialog(img);
-        };
-      }
+      options = extend(
+        true,
+        {
+          modules: {
+            blotFormatter: {
+              specs: [FormulaEdit],
+              resizable: imageResize,
+              formula: formula && {
+                onFormulaEdit: this.openFormulaDialog.bind(this),
+              },
+            },
+          },
+        },
+        options
+      );
     }
 
     return options;
