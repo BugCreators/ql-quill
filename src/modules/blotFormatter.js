@@ -1,5 +1,5 @@
-import {
-  ImageSpec,
+import BlotFormatter, {
+  ImageSpec as BaseImageSpec,
   Action,
   ResizeAction,
   DeleteAction,
@@ -107,7 +107,7 @@ class DisplaySizeAction extends Action {
   }
 }
 
-class FormulaReEdit extends ImageSpec {
+export class ImageSpec extends BaseImageSpec {
   getActions() {
     return [
       this.formatter.options.resizable && ResizeAction,
@@ -118,4 +118,4 @@ class FormulaReEdit extends ImageSpec {
   }
 }
 
-export default FormulaReEdit;
+export default BlotFormatter;

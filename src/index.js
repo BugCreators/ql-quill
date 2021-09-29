@@ -4,8 +4,7 @@ import extend from "extend";
 
 import QlDialog from "./components/qlDialog";
 
-import BlotFormatter from "quill-blot-formatter";
-import FormulaEdit from "./extends/formulaEdit";
+import BlotFormatter, { ImageSpec } from "./modules/blotFormatter";
 
 import SnowTheme from "./themes/snow";
 
@@ -75,7 +74,7 @@ class QlQuill {
         {
           modules: {
             blotFormatter: {
-              specs: [FormulaEdit],
+              specs: [ImageSpec],
               resizable: imageResize,
               formula: formula && {
                 onFormulaEdit: this.openFormulaDialog.bind(this),
