@@ -3,6 +3,7 @@ import Quill from "quill";
 class WordCount {
   constructor(quill, options = {}) {
     this.quill = quill;
+    this.countTemp = 0;
     this.setOptions(options);
   }
 
@@ -81,6 +82,10 @@ class WordCount {
   }
 
   update() {
+    const count = this.calculate();
+
+    if (count === this.countTemp) return;
+    this.countTemp = count;
     this.counter.innerText = this.calculate();
   }
 }
