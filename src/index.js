@@ -10,6 +10,7 @@ import SnowTheme from "./themes/snow";
 
 import ImageBlot from "./blots/image";
 
+import ImageUploader from "./modules/imageUploader";
 import WordCount from "./modules/wordCount";
 import Import from "./modules/import";
 import Question from "./modules/question";
@@ -26,6 +27,7 @@ Object.assign(Icons, { clean: cleanIcon });
 Quill.register(
   {
     dialog: Dialog,
+    "modules/imageUploader": ImageUploader,
     "modules/wordCount": WordCount,
     "modules/question": Question,
     "modules/import": Import,
@@ -65,27 +67,23 @@ class QlQuill {
       options
     );
 
-    if (!options.modules) options.modules = {};
+    const { imageResize, formula, image } = this.options;
 
-    const { imageResize, formula } = this.options;
+    let modules = {};
 
     if (imageResize || formula) {
-      options = extend(
-        true,
-        {
-          modules: {
-            blotFormatter: {
-              specs: [ImageSpec],
-              resizable: imageResize,
-              formula: formula && {
-                onFormulaEdit: this.openFormulaDialog.bind(this),
-              },
-            },
-          },
+      modules.blotFormatter = {
+        specs: [ImageSpec],
+        resizable: imageResize,
+        formula: formula && {
+          onFormulaEdit: this.openFormulaDialog.bind(this),
         },
-        options
-      );
+      };
     }
+
+    if (image) modules.imageUploader = image;
+
+    options = extend(true, { modules }, options);
 
     return options;
   }
@@ -116,7 +114,6 @@ class QlQuill {
 
   transformConfig() {
     const toolbar = this.editor.getModule("toolbar");
-    toolbar.addHandler("image", () => this.uploadImages());
 
     if (
       toolbar.container.querySelector(".ql-question") ||
@@ -136,8 +133,7 @@ class QlQuill {
       wordCount.setOptions(this.options);
     }
 
-    image &&
-      image.clipboard &&
+    image?.clipboard &&
       this.editor.clipboard.addMatcher("IMG", image.clipboard);
 
     formula && toolbar.addHandler("formula", () => this.openFormulaDialog());
@@ -171,11 +167,9 @@ class QlQuill {
   }
 
   onEditorChangeText(value, delta, source) {
-    const { onChange } = this.options;
-
     if (!this.editor || this.editor.getModule("wordCount")) return;
 
-    onChange && onChange(value);
+    this.options.onChange?.(value);
   }
 
   onEditorChangeSelection(nextSelection, source) {
@@ -200,50 +194,8 @@ class QlQuill {
     }
   }
 
-  // 上传图片
-  uploadImages() {
-    const { image } = this.options;
-
-    if (typeof image === "function") {
-      image(this.insertImage);
-      return;
-    }
-
-    const toolbar = this.editor.getModule("toolbar");
-
-    if (image.action) {
-      let input = toolbar.container.querySelector("input.ql-image[type=file]");
-      if (input == null) {
-        input = document.createElement("input");
-        input.setAttribute("type", "file");
-        image.accept && input.setAttribute("accept", image.accept);
-        input.classList.add("ql-image");
-        input.addEventListener("change", () => {
-          if (input.files != null && input.files[0] != null) {
-            image.action(input.files[0], this.insertImage);
-            input.value = "";
-          }
-        });
-        toolbar.container.appendChild(input);
-      }
-      input.click();
-
-      return;
-    }
-
-    SnowTheme.DEFAULTS.modules.toolbar.handlers.image.call(toolbar);
-  }
-
-  // 插入图片
   insertImage = (src, latex = "") => {
-    const range = this.editor.getSelection(true);
-    this.editor.deleteText(range.index, range.length);
-    const index = range.index;
-    this.editor.insertEmbed(index, "image", {
-      src,
-      "data-latex": latex,
-    });
-    this.editor.setSelection(index + 1);
+    return ImageUploader.insertImage.call(this.editor, src, latex);
   };
 
   // 插入公式弹窗
