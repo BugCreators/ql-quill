@@ -43,29 +43,32 @@ class SnowTheme extends Snow {
 
 function expandConfig(toolbar, options) {
   if (typeof toolbar.container === "string") return;
-  if (!toolbar.container) {
-    toolbar.container = DEFAULTS.tool;
-  }
+  if (!toolbar.container) toolbar.container = DEFAULTS.tool;
 
-  setDefault(toolbar, "font", "size");
+  toolbar = toolbar.container;
 
-  options.custom.forEach(tool => {
-    if (toolbar.container.indexOf(tool) === -1) {
-      toolbar.container.push(tool);
-    }
+  const twoD = Array.isArray(toolbar[0]);
+  !twoD && (toolbar = [toolbar]);
+
+  let custom = {};
+
+  toolbar.forEach(tool => {
+    options.custom.forEach(
+      t => !custom[t] && (custom[t] = tool.indexOf(t) !== -1)
+    );
+
+    ["font", "size"].forEach(format => {
+      const index = tool.indexOf(format);
+      if (index !== -1) {
+        const Format = Quill.import("formats/" + format);
+        Format.whitelist = DEFAULTS[format];
+
+        tool[index] = { [format]: DEFAULTS[format] };
+      }
+    });
   });
-}
 
-function setDefault(toolbar, ...formats) {
-  formats.forEach(format => {
-    const index = toolbar.container.indexOf(format);
-    if (index !== -1) {
-      const Format = Quill.import("formats/" + format);
-      Format.whitelist = DEFAULTS[format];
-
-      toolbar.container[index] = { [format]: DEFAULTS[format] };
-    }
-  });
+  for (const key in custom) !custom[key] && toolbar.push(twoD ? [key] : key);
 }
 
 const Tooltip = Quill.import("ui/tooltip");
