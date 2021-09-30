@@ -265,7 +265,7 @@ QlQuill.CUSTOM_OPTIONS = [
 ];
 
 function extractConfig(options) {
-  return QlQuill.CUSTOM_OPTIONS.concat(QlQuill.CUSTOM_TOOL).reduce(
+  return QlQuill.CUSTOM_OPTIONS.concat(QlQuill.CUSTOM_TOOLS).reduce(
     (memo, option) => {
       memo[option] = options[option] || false;
       delete options[option];
