@@ -48,11 +48,11 @@ function expandConfig(toolbar, options) {
   toolbar = toolbar.container;
 
   const twoD = Array.isArray(toolbar[0]);
-  !twoD && (toolbar = [toolbar]);
+  const toolbarTemp = twoD ? toolbar : [toolbar];
 
   let custom = {};
 
-  toolbar.forEach(tool => {
+  toolbarTemp.forEach(tool => {
     options.custom.forEach(
       t => !custom[t] && (custom[t] = tool.indexOf(t) !== -1)
     );

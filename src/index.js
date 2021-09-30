@@ -19,8 +19,6 @@ import cleanIcon from "@icons/clean.svg";
 
 import "../assets/index.styl";
 
-const CUSTOM_TOOL = ["import", "option", "formula", "question"];
-
 const Icons = Quill.import("ui/icons");
 Object.assign(Icons, { clean: cleanIcon });
 
@@ -62,7 +60,9 @@ class QlQuill {
       {
         theme: "snow",
         modules: { toolbar: { container: this.options.toolbar } },
-        custom: CUSTOM_TOOL.filter(tool => !!this.options[tool]),
+        custom: this.constructor.CUSTOM_TOOLS.filter(
+          tool => !!this.options[tool]
+        ),
       },
       options
     );
@@ -252,6 +252,8 @@ class QlQuill {
   }
 }
 
+QlQuill.CUSTOM_TOOLS = ["import", "option", "formula", "question"];
+
 QlQuill.CUSTOM_OPTIONS = [
   "toolbar",
   "limit",
@@ -260,19 +262,18 @@ QlQuill.CUSTOM_OPTIONS = [
   "image",
   "imageResize",
   "onChange",
-  "import",
-  "question",
-  "option",
-  "formula",
 ];
 
 function extractConfig(options) {
-  return QlQuill.CUSTOM_OPTIONS.reduce((memo, option) => {
-    memo[option] = options[option] || false;
-    delete options[option];
+  return QlQuill.CUSTOM_OPTIONS.concat(QlQuill.CUSTOM_TOOL).reduce(
+    (memo, option) => {
+      memo[option] = options[option] || false;
+      delete options[option];
 
-    return memo;
-  }, {});
+      return memo;
+    },
+    {}
+  );
 }
 
 function dataURLtoFile(dataurl, filename) {
