@@ -40,17 +40,14 @@ class Question extends Module {
 
   insert(type) {
     const range = this.quill.getSelection(true);
-    this.quill.deleteText(range.index, range.length);
-    const index = range.index;
-    this.quill.insertEmbed(index, "question", type);
-    this.quill.setSelection(index + 1);
+    this.quill.deleteText(range);
+    this.quill.insertEmbed(range.index, "question", type);
+    this.quill.setSelection(range.index + 1);
   }
 
   format() {
     QuestionBlot.tagName.forEach(tag => {
-      const elements = this.quill.root.querySelectorAll(
-        tag.toLocaleLowerCase()
-      );
+      const elements = this.quill.root.querySelectorAll(tag);
       elements.forEach((el, index) => (el.innerHTML = "(" + (index + 1) + ")"));
     });
   }

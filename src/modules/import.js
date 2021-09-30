@@ -40,7 +40,7 @@ class Import extends Module {
       content: '<input class="ql-input ql-import-input" type="text" value="">',
       onOk: container => {
         const range = this.quill.getSelection(true);
-        this.quill.deleteText(range.index, range.length);
+        this.quill.deleteText(range);
         let index = range.index;
 
         container

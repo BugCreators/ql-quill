@@ -46,7 +46,7 @@ class WordCount {
               new Delta().retain(retainIndex).delete(distance)
             );
 
-            setTimeout(() => this.quill.setSelection(retainIndex, 0));
+            setTimeout(() => this.quill.setSelection(retainIndex));
           }
         } else {
           onChange && onChange(this.quill.root.innerHTML);
