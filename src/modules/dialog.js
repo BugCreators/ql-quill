@@ -90,7 +90,7 @@ QlDialog.TEMPLATE = [
   '        <button type="button" class="ql-dialog-close">',
   '          <span class="ql-dialog-close-x">',
   '            <span role="img" class="ql-anticon">',
-                closeIcon,
+  closeIcon,
   "            </span>",
   "          </span>",
   "        </button>",

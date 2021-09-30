@@ -1,5 +1,4 @@
 import Quill from "quill";
-import QlDialog from "../components/qlDialog";
 
 const Parchment = Quill.import("parchment");
 const Module = Quill.import("core/module");
@@ -33,7 +32,9 @@ class Import extends Module {
   }
 
   insert() {
-    new QlDialog({
+    const Dialog = Quill.import("dialog");
+
+    new Dialog({
       width: 640,
       title: "插入重点",
       content: '<input class="ql-input ql-import-input" type="text" value="">',

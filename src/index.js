@@ -2,7 +2,7 @@ import Quill from "quill";
 import isEqual from "lodash.isequal";
 import extend from "extend";
 
-import QlDialog from "./components/qlDialog";
+import Dialog from "./modules/dialog";
 
 import BlotFormatter, { ImageSpec } from "./modules/blotFormatter";
 
@@ -25,6 +25,7 @@ Object.assign(Icons, { clean: cleanIcon });
 
 Quill.register(
   {
+    dialog: Dialog,
     "modules/wordCount": WordCount,
     "modules/question": Question,
     "modules/import": Import,
@@ -250,7 +251,9 @@ class QlQuill {
     const time = new Date().getTime();
     const latex = img ? img.dataset.latex || "" : "";
 
-    new QlDialog({
+    const Dialog = Quill.import("dialog");
+
+    new Dialog({
       width: 888,
       title: "插入公式",
       content: `
