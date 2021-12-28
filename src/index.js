@@ -195,7 +195,9 @@ class QlQuill {
   }
 
   insertImage = (src, latex = "") => {
-    return ImageUploader.insertImage.call(this.editor, src, latex);
+    const imageUploader = this.editor.getModule("imageUploader");
+
+    return imageUploader.constructor.insertImage.call(this.editor, src, latex);
   };
 
   // 插入公式弹窗
@@ -219,25 +221,12 @@ class QlQuill {
       onOk: _ => {
         if (!window.kfe) return;
 
-        const { image: { action } = {} } = this.options;
-
         window.kfe.execCommand("get.image.data", data => {
           const sLatex = window.kfe.execCommand("get.source");
 
-          if (!action) {
-            if (img) {
-              img.setAttribute("src", data.img);
-              if (sLatex) img.dataset.latex = sLatex;
-              return;
-            }
+          const imageUploader = this.editor.getModule("imageUploader");
 
-            this.insertImage(data.img, sLatex);
-            return;
-          }
-
-          const file = dataURLtoFile(data.img, `latex-formula-${time}.png`);
-
-          action(file, src => {
+          imageUploader.uploadImage(data.img, src => {
             if (img) {
               img.setAttribute("src", src);
               if (sLatex) img.dataset.latex = sLatex;
@@ -274,23 +263,6 @@ function extractConfig(options) {
     },
     {}
   );
-}
-
-function dataURLtoFile(dataurl, filename) {
-  const arr = dataurl.split(","),
-    mime = arr[0].match(/:(.*?);/)[1],
-    bstr = atob(arr[1]);
-
-  let n = bstr.length,
-    u8arr = new Uint8Array(n);
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n);
-  }
-
-  const file = new Blob([u8arr], { type: mime });
-  file.lastModifiedDate = new Date();
-  file.name = filename;
-  return file;
 }
 
 function postpone(fn) {

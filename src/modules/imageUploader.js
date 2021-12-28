@@ -14,24 +14,34 @@ export default class ImageUploader {
     this.options = options;
 
     const toolbar = this.quill.getModule("toolbar");
-    toolbar.addHandler("image", this.uploadImage);
+    toolbar.addHandler("image", this.handlerImage);
 
     options.drop &&
       this.quill.root.addEventListener("drop", this.handleDrop, false);
   }
 
-  insertImage(file) {
+  uploadImage(file, cb) {
+    const insertImage = src => {
+      this.constructor.insertImage.call(this.quill, src);
+    };
+    const callback = cb || insertImage;
+
+    const isBase64 =
+      typeof file === "string" && /^data:image\/.+;base64/.test(file);
+
     if (typeof this.options.action === "function") {
-      this.options.action(file, this.constructor.insertImage.bind(this.quill));
+      if (isBase64) file = dataURLtoFile(file);
+      this.options.action(file, callback);
       return;
     }
 
+    if (isBase64) return callback(file);
     const fr = new FileReader();
-    fr.onload = _ => this.constructor.insertImage.call(this.quill, fr.result);
+    fr.onload = _ => callback(fr.result);
     fr.readAsDataURL(file);
   }
 
-  uploadImage = () => {
+  handlerImage = () => {
     if (typeof this.options === "function") {
       this.options();
       return;
@@ -47,7 +57,7 @@ export default class ImageUploader {
       input.classList.add("ql-image");
       input.addEventListener("change", () => {
         if (input.files != null && input.files[0] != null) {
-          this.insertImage(input.files[0]);
+          this.uploadImage(input.files[0]);
           input.value = "";
         }
       });
@@ -88,4 +98,21 @@ export default class ImageUploader {
       setTimeout(() => this.insertImage(file));
     }
   };
+}
+
+function dataURLtoFile(dataurl, filename) {
+  const arr = dataurl.split(","),
+    mime = arr[0].match(/:(.*?);/)[1],
+    bstr = atob(arr[1]);
+
+  let n = bstr.length,
+    u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+
+  const file = new Blob([u8arr], { type: mime });
+  file.lastModifiedDate = new Date();
+  file.name = filename;
+  return file;
 }
