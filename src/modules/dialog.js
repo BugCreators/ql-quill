@@ -1,6 +1,6 @@
 import closeIcon from "@icons/close.svg";
 
-class QlDialog {
+class Dialog {
   constructor(options) {
     const root = document.querySelector(".ql-dialog-root");
 
@@ -80,7 +80,7 @@ class QlDialog {
   }
 }
 
-QlDialog.TEMPLATE = [
+Dialog.TEMPLATE = [
   '<div class="ql-dialog-root">',
   '  <div class="ql-dialog-mask"></div>',
   '  <div tabindex="-1" class="ql-dialog-wrap">',
@@ -108,4 +108,4 @@ QlDialog.TEMPLATE = [
   "</div>",
 ].join("");
 
-export default QlDialog;
+export default Dialog;
