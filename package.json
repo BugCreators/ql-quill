@@ -44,7 +44,8 @@
     "url-loader": "^4.1.0",
     "webpack": "^5.40.0",
     "webpack-cli": "^4.7.2",
-    "webpack-dev-server": "^4.0.0-beta.3"
+    "webpack-dev-server": "^4.0.0-beta.3",
+    "worker-loader": "^3.0.8"
   },
   "dependencies": {
     "extend": "^3.0.2",

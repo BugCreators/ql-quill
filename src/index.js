@@ -11,6 +11,7 @@ import SnowTheme from "./themes/snow";
 import ImageBlot from "./blots/image";
 
 import ImageUploader from "./modules/imageUploader";
+import PasteFromWord from "./modules/pasteFromWord";
 import WordCount from "./modules/wordCount";
 import Import from "./modules/import";
 import Question from "./modules/question";
@@ -26,6 +27,7 @@ Quill.register(
   {
     dialog: Dialog,
     "modules/imageUploader": ImageUploader,
+    "modules/pasteFromWord": PasteFromWord,
     "modules/wordCount": WordCount,
     "modules/question": Question,
     "modules/import": Import,
@@ -126,7 +128,11 @@ class QlQuill {
       this.editor.theme.addModule("import");
     }
 
-    const { limit, image, formula } = this.options;
+    const { limit, image, formula, pasteFromWord } = this.options;
+
+    if (pasteFromWord) {
+      this.editor.theme.addModule("pasteFromWord");
+    }
 
     if (limit) {
       const wordCount = this.editor.theme.addModule("wordCount");
@@ -251,6 +257,7 @@ QlQuill.CUSTOM_OPTIONS = [
   "image",
   "imageResize",
   "onChange",
+  "pasteFromWord",
 ];
 
 function extractConfig(options) {

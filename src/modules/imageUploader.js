@@ -113,6 +113,7 @@ function dataURLtoFile(dataurl, filename) {
 
   const file = new Blob([u8arr], { type: mime });
   file.lastModifiedDate = new Date();
-  file.name = filename;
+  file.name =
+    filename || "base642image" + Date.now() + "." + mime.replace(/image\//, "");
   return file;
 }
