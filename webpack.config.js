@@ -45,6 +45,13 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.worker\.(c|m)?js$/i,
+        loader: "worker-loader",
+        options: {
+          inline: "fallback",
+        },
+      },
+      {
         test: /(\.jsx|\.js)$/,
         loader: "babel-loader",
         exclude: /node_modules/,
