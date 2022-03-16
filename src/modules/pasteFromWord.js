@@ -5,6 +5,9 @@ const BaseClipboard = Quill.import("modules/clipboard");
 
 class Clipboard extends BaseClipboard {
   onPaste(e) {
+    const pasteFromWord = this.quill.getModule("pasteFromWord");
+    if (!pasteFromWord) return super.onPaste(e);
+
     setTimeout(() => {
       [...this.container.querySelectorAll("V\\:IMAGEDATA")].forEach(el => {
         const img = document.createElement("img");
@@ -18,36 +21,40 @@ class Clipboard extends BaseClipboard {
     });
     super.onPaste(e);
 
-    const worker = new RtfExtracter();
-    worker.postMessage(e.clipboardData.getData("text/rtf"));
-    worker.onmessage = e => {
-      if (!e.data.length) return;
+    try {
+      const worker = new RtfExtracter();
+      worker.postMessage(e.clipboardData.getData("text/rtf"));
+      worker.onmessage = e => {
+        if (!e.data.length) return;
 
-      const uploader = this.quill.getModule("imageUploader");
+        const uploader = this.quill.getModule("imageUploader");
 
-      let index = 0;
-      [...this.quill.container.querySelectorAll("img")].forEach(el => {
-        const src = el.getAttribute("src");
+        let index = 0;
+        [...this.quill.container.querySelectorAll("img")].forEach(el => {
+          const src = el.getAttribute("src");
 
-        if (/^file:\/\/[\s\S]+/.test(src)) {
-          const image = e.data[index];
-          if (uploader) {
-            uploader.uploadImage(image.base64, url =>
-              el.setAttribute("src", url)
-            );
-          } else {
-            el.setAttribute("src", image.base64);
+          if (/^file:\/\/[\s\S]+/.test(src)) {
+            const image = e.data[index];
+            if (uploader) {
+              uploader.uploadImage(image.base64, url =>
+                el.setAttribute("src", url)
+              );
+            } else {
+              el.setAttribute("src", image.base64);
+            }
+
+            index++;
           }
-
-          index++;
-        }
-      });
-      worker.terminate();
-    };
-    worker.onerror = e => {
+        });
+        worker.terminate();
+      };
+      worker.onerror = e => {
+        console.log(e);
+        worker.terminate();
+      };
+    } catch (e) {
       console.log(e);
-      worker.terminate();
-    };
+    }
   }
 }
 
