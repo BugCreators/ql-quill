@@ -25,7 +25,7 @@ class WordCount {
         const distance = this.calculate() - limit;
 
         if (distance > 0) {
-          onLimit && onLimit();
+          onLimit?.();
 
           if (!this.quill.selection.composing) {
             const Delta = Quill.import("delta");
@@ -49,7 +49,7 @@ class WordCount {
             setTimeout(() => this.quill.setSelection(retainIndex));
           }
         } else {
-          onChange && onChange(this.quill.root.innerHTML);
+          onChange?.(this.quill.root.innerHTML);
         }
 
         this.update();

@@ -57,14 +57,14 @@ class Dialog {
   registerListener(options) {
     const confrimBtn = this.container.querySelector(".ql-dialog-confrim");
     confrimBtn.onclick = _ => {
-      options.onOk && options.onOk(this.body);
+      options.onOk?.(this.body);
       this.close();
     };
 
     const closeBtn = this.container.querySelector(".ql-dialog-close");
     const cancelBtn = this.container.querySelector(".ql-dialog-cancel");
     closeBtn.onclick = cancelBtn.onclick = _ => {
-      options.onCancel && options.onCancel();
+      options.onCancel?.();
       this.close();
     };
   }

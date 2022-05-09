@@ -209,7 +209,7 @@ class QlQuill {
   // 插入公式弹窗
   openFormulaDialog(img = null) {
     const time = new Date().getTime();
-    const latex = img ? img.dataset.latex || "" : "";
+    const latex = img?.dataset.latex || "";
 
     const Dialog = Quill.import("dialog");
 
