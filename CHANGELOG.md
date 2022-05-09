@@ -1,3 +1,16 @@
+## v1.1.0
+
+- editor
+  - options 参数可传 quill 配置
+  - question、import 等模块重写
+  - wordCount 模块优化
+  - 新增 pasteFromWord 模块
+  - 使用 quill-blot-formatter 替代 quill-image-resize-module
+  - 新增 imageUploader 模块
+  - toolbar 参数支持二维数组
+- webpack 配置
+  - 修复开发环境下 debugger 失效问题
+
 ## v1.0.9
 
 - editor
