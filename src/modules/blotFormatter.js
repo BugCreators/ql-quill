@@ -1,7 +1,7 @@
 import BlotFormatter, {
   ImageSpec as BaseImageSpec,
   Action,
-  ResizeAction,
+  ResizeAction as BaseResizeAction,
   DeleteAction,
 } from "quill-blot-formatter";
 
@@ -11,9 +11,7 @@ class FormulaEditAction extends Action {
     this.overlay = this.formatter.overlay;
 
     if (typeof this.options.onFormulaEdit !== "function")
-      console.warn(
-        "[Missing config] formula onFormulaEdit function is required"
-      );
+      console.warn("[Missing config] formula onFormulaEdit function is required");
 
     this.createTime = new Date().getTime();
     // 两次单击的间隔时间
@@ -30,7 +28,7 @@ class FormulaEditAction extends Action {
   // 单击图片后再单击overlay 通过时间间隔长短模拟双击事件
   onOverlayClick = () => {
     const target = this.formatter.currentSpec.getTargetElement();
-    if (!target || !target.dataset.latex || !this.timer) return;
+    if (!target?.dataset.latex || !this.timer) return;
 
     const time = new Date().getTime();
     if (time - this.createTime < this.timer) this.options.onFormulaEdit(target);
@@ -39,8 +37,45 @@ class FormulaEditAction extends Action {
 
   onOverlayDblclick = () => {
     const target = this.formatter.currentSpec.getTargetElement();
-    if (!target || !target.dataset.latex) return;
+    if (!target?.dataset.latex) return;
     this.options.onFormulaEdit(target);
+  };
+}
+
+class ResizeAction extends BaseResizeAction {
+  createHandle(position, cursor) {
+    const box = super.createHandle(position, cursor);
+
+    box.addEventListener("touchstart", e => this.onTouchStart(e));
+
+    return box;
+  }
+
+  onTouchStart = e => {
+    this.dragHandle = e.target;
+    this.setCursor(this.dragHandle.style.cursor);
+
+    const target = this.formatter.currentSpec?.getTargetElement();
+    if (!target) return;
+
+    const rect = target.getBoundingClientRect();
+
+    this.dragStartX = e.touches[0].clientX;
+    this.preDragWidth = rect.width;
+    this.targetRatio = rect.height / rect.width;
+
+    document.addEventListener("touchmove", this.onTouchMove);
+    document.addEventListener("touchend", this.onTouchEnd);
+  };
+
+  onTouchMove = e => {
+    this.onDrag(e.touches[0]);
+  };
+
+  onTouchEnd = () => {
+    this.setCursor("");
+    document.removeEventListener("touchmove", this.onTouchMove);
+    document.removeEventListener("touchend", this.onTouchEnd);
   };
 }
 
@@ -100,10 +135,7 @@ class DisplaySizeAction extends Action {
   getCurrentSize() {
     const target = this.formatter.currentSpec.getTargetElement();
 
-    return [
-      target.width,
-      Math.round((target.width / target.naturalWidth) * target.naturalHeight),
-    ];
+    return [target.width, Math.round((target.width / target.naturalWidth) * target.naturalHeight)];
   }
 }
 
