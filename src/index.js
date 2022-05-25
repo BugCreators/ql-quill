@@ -253,10 +253,10 @@ QlQuill.CUSTOM_OPTIONS = [
   "toolbar",
   "limit",
   "value",
-  "onLimit",
+  // "onLimit",
   "image",
   "imageResize",
-  "onChange",
+  // "onChange",
   "pasteFromWord",
 ];
 
