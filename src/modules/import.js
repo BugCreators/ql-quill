@@ -32,9 +32,9 @@ class Import extends Module {
   }
 
   insert() {
-    const Dialog = Quill.import("dialog");
+    const dialog = this.quill.getModule("dialog");
 
-    new Dialog({
+    dialog.open({
       width: 640,
       title: "插入重点",
       content: '<input class="ql-input ql-import-input" type="text" value="">',

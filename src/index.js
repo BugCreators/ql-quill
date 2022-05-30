@@ -25,7 +25,7 @@ Object.assign(Icons, { clean: cleanIcon });
 
 Quill.register(
   {
-    dialog: Dialog,
+    "modules/dialog": Dialog,
     "modules/imageUploader": ImageUploader,
     "modules/pasteFromWord": PasteFromWord,
     "modules/wordCount": WordCount,
@@ -62,16 +62,16 @@ class QlQuill {
       {
         theme: "snow",
         modules: { toolbar: { container: this.options.toolbar } },
-        custom: this.constructor.CUSTOM_TOOLS.filter(
-          tool => !!this.options[tool]
-        ),
+        custom: this.constructor.CUSTOM_TOOLS.filter(tool => !!this.options[tool]),
       },
       options
     );
 
     const { imageResize, formula, image } = this.options;
 
-    let modules = {};
+    let modules = {
+      dialog: {},
+    };
 
     if (imageResize || formula) {
       modules.blotFormatter = {
@@ -98,29 +98,19 @@ class QlQuill {
 
     this.transformConfig();
 
-    this.editor.on(
-      "editor-change",
-      (eventName, rangeOrDelta, oldRangeOrDelta, source) => {
-        if (eventName === "text-change") {
-          this.onEditorChangeText(
-            this.editor.root.innerHTML,
-            rangeOrDelta,
-            source
-          );
-        } else if (eventName === "selection-change") {
-          this.onEditorChangeSelection(rangeOrDelta, source);
-        }
+    this.editor.on("editor-change", (eventName, rangeOrDelta, oldRangeOrDelta, source) => {
+      if (eventName === "text-change") {
+        this.onEditorChangeText(this.editor.root.innerHTML, rangeOrDelta, source);
+      } else if (eventName === "selection-change") {
+        this.onEditorChangeSelection(rangeOrDelta, source);
       }
-    );
+    });
   }
 
   transformConfig() {
     const toolbar = this.editor.getModule("toolbar");
 
-    if (
-      toolbar.container.querySelector(".ql-question") ||
-      toolbar.container.querySelector(".ql-option")
-    ) {
+    if (toolbar.container.querySelector(".ql-question") || toolbar.container.querySelector(".ql-option")) {
       this.editor.theme.addModule("question");
     }
 
@@ -139,8 +129,7 @@ class QlQuill {
       wordCount.setOptions(this.options);
     }
 
-    image?.clipboard &&
-      this.editor.clipboard.addMatcher("IMG", image.clipboard);
+    image?.clipboard && this.editor.clipboard.addMatcher("IMG", image.clipboard);
 
     formula && toolbar.addHandler("formula", () => this.openFormulaDialog());
   }
@@ -164,10 +153,7 @@ class QlQuill {
     if (range) {
       const length = editor.getLength();
       range.index = Math.max(0, Math.min(range.index, length - 1));
-      range.length = Math.max(
-        0,
-        Math.min(range.length, length - 1 - range.index)
-      );
+      range.length = Math.max(0, Math.min(range.length, length - 1 - range.index));
       editor.setSelection(range);
     }
   }
@@ -211,9 +197,9 @@ class QlQuill {
     const time = new Date().getTime();
     const latex = img?.dataset.latex || "";
 
-    const Dialog = Quill.import("dialog");
+    const dialog = this.editor.getModule("dialog");
 
-    new Dialog({
+    dialog.open({
       width: 888,
       title: "插入公式",
       content: `
@@ -261,15 +247,12 @@ QlQuill.CUSTOM_OPTIONS = [
 ];
 
 function extractConfig(options) {
-  return QlQuill.CUSTOM_OPTIONS.concat(QlQuill.CUSTOM_TOOLS).reduce(
-    (memo, option) => {
-      memo[option] = options[option] || false;
-      delete options[option];
+  return QlQuill.CUSTOM_OPTIONS.concat(QlQuill.CUSTOM_TOOLS).reduce((memo, option) => {
+    memo[option] = options[option] || false;
+    delete options[option];
 
-      return memo;
-    },
-    {}
-  );
+    return memo;
+  }, {});
 }
 
 function postpone(fn) {
