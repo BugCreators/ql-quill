@@ -3,6 +3,7 @@
 - imageResize 图片缩放兼容移动端
 - editor
   - 修复函数传参无传值时默认置为 false 导致报错问题
+  - 修复 question、import 标签光标错误问题
 - dialog
   - 渲染到 editor 中
 
