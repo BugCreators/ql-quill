@@ -1,5 +1,7 @@
 import Quill from "quill";
-import MoColorPicker from "@plugin/color-picker/mo.color-picker.js";
+// import MoColorPicker from "@plugin/color-picker/mo.color-picker.js";
+
+// console.log(MoColorPicker);
 
 const Snow = Quill.import("themes/snow");
 
@@ -13,15 +15,7 @@ const DEFAULTS = {
     "clean", // 清除格式
     "image", // 插入图片
   ],
-  font: [
-    false,
-    "serif",
-    "monospace",
-    "Cursive",
-    "SimSun",
-    "SimHei",
-    "Microsoft-YaHei",
-  ],
+  font: [false, "serif", "monospace", "Cursive", "SimSun", "SimHei", "Microsoft-YaHei"],
   size: ["12", false, "14", "16", "18", "20", "22", "24", "26"],
 };
 
@@ -53,9 +47,7 @@ function expandConfig(toolbar, options) {
   let custom = {};
 
   toolbarTemp.forEach(tool => {
-    options.custom.forEach(
-      t => !custom[t] && (custom[t] = tool.indexOf(t) !== -1)
-    );
+    options.custom.forEach(t => !custom[t] && (custom[t] = tool.indexOf(t) !== -1));
 
     ["font", "size"].forEach(format => {
       const index = tool.indexOf(format);
@@ -114,10 +106,10 @@ class ColorPicker extends Tooltip {
   initPicker() {
     const picker = this.root.querySelector(".ql-color-picker");
 
-    this.instance = new MoColorPicker(picker, {
-      format: "hex",
-      change: color => this.updateColor(color, this.constructor.COLOR_PICK),
-    });
+    // this.instance = new MoColorPicker(picker, {
+    //   format: "hex",
+    //   change: color => this.updateColor(color, this.constructor.COLOR_PICK),
+    // });
   }
 
   buildSelect(colors) {
@@ -162,8 +154,7 @@ class ColorPicker extends Tooltip {
       () => {
         const previewColor = this.instance.getValue();
 
-        previewColor !== this.color &&
-          this.updateColor(this.color, COLOR_SELECT_HOVER);
+        previewColor !== this.color && this.updateColor(this.color, COLOR_SELECT_HOVER);
       },
       true
     );
@@ -171,16 +162,12 @@ class ColorPicker extends Tooltip {
     this.inputContainer.addEventListener("change", () => {
       const colors = this.inputs.map(input => input.value);
 
-      this.updateColor(MoColorPicker.rgb2hex(...colors), COLOR_INPUT);
+      // this.updateColor(MoColorPicker.rgb2hex(...colors), COLOR_INPUT);
     });
 
-    this.root
-      .querySelector(".ql-color-confrim")
-      .addEventListener("click", () => this.save());
+    this.root.querySelector(".ql-color-confrim").addEventListener("click", () => this.save());
 
-    this.root
-      .querySelector(".ql-color-default")
-      .addEventListener("click", () => this.updateColor());
+    this.root.querySelector(".ql-color-default").addEventListener("click", () => this.updateColor());
 
     this.quill.on("selection-change", range => {
       if (range == null) return;
@@ -194,32 +181,28 @@ class ColorPicker extends Tooltip {
   }
 
   position() {
-    const control = this.quill
-      .getModule("toolbar")
-      .container.querySelector(".ql-color");
+    const control = this.quill.getModule("toolbar").container.querySelector(".ql-color");
 
-    this.root.style.left =
-      control.offsetLeft - control.parentElement.offsetLeft + "px";
+    this.root.style.left = control.offsetLeft - control.parentElement.offsetLeft + "px";
   }
 
   updateColor(color, from = "") {
-    const { DEFAULT_COLOR, COLOR_INPUT, COLOR_PICK, COLOR_SELECT_HOVER } =
-      this.constructor;
+    const { DEFAULT_COLOR, COLOR_INPUT, COLOR_PICK, COLOR_SELECT_HOVER } = this.constructor;
 
     color = color || DEFAULT_COLOR;
 
     this.block.style.background = color;
 
     if (from !== COLOR_INPUT) {
-      const colors = MoColorPicker.hex2rgb(color);
+      // const colors = MoColorPicker.hex2rgb(color);
 
       this.inputs.forEach(input => {
-        input.setValue(colors[input.key.toLocaleLowerCase()]);
+        // input.setValue(colors[input.key.toLocaleLowerCase()]);
       });
     }
 
     if (from !== COLOR_PICK) {
-      this.instance.setValue(color);
+      // this.instance.setValue(color);
     }
 
     if (from !== COLOR_SELECT_HOVER) {
@@ -228,11 +211,7 @@ class ColorPicker extends Tooltip {
   }
 
   save() {
-    this.quill.format(
-      "color",
-      this.color === this.constructor.DEFAULT_COLOR ? false : this.color,
-      Quill.sources.USER
-    );
+    this.quill.format("color", this.color === this.constructor.DEFAULT_COLOR ? false : this.color, Quill.sources.USER);
     this.hide();
   }
 }

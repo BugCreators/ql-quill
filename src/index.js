@@ -16,7 +16,7 @@ import WordCount from "./modules/wordCount";
 import Import from "./modules/import";
 import Question from "./modules/question";
 
-import cleanIcon from "@icons/clean.svg";
+import cleanIcon from "@icons/clean.svg?raw";
 
 import "../assets/index.styl";
 
