@@ -1,12 +1,11 @@
 import Quill from "quill";
 
-const Parchment = Quill.import("parchment");
+const Embed = Quill.import("blots/embed");
 const Module = Quill.import("core/module");
 
-class ImportBlot extends Parchment.Embed {
+class ImportBlot extends Embed {
   static create(value) {
     const node = super.create(value);
-    node.setAttribute("contenteditable", false);
     node.innerText = value;
 
     return node;

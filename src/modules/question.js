@@ -1,12 +1,13 @@
 import Quill from "quill";
 
+const Embed = Quill.import("blots/embed");
 const Module = Quill.import("core/module");
-const Parchment = Quill.import("parchment");
 
-class QuestionBlot extends Parchment.Embed {
+class QuestionBlot extends Embed {
   static create(value) {
     const node = super.create("sub-" + value);
-    node.setAttribute("contenteditable", false);
+    node.innerText = "(1)";
+
     return node;
   }
 
@@ -48,7 +49,7 @@ class Question extends Module {
   format() {
     QuestionBlot.tagName.forEach(tag => {
       const elements = this.quill.root.querySelectorAll(tag);
-      elements.forEach((el, index) => (el.innerHTML = "(" + (index + 1) + ")"));
+      elements.forEach((el, index) => (el.children[0].innerText = "(" + (index + 1) + ")"));
     });
   }
 }
