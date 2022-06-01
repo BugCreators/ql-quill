@@ -1,4 +1,5 @@
-import BlotFormatter, {
+import BlotFormatter from "quill-blot-formatter/dist/BlotFormatter";
+import {
   ImageSpec as BaseImageSpec,
   Action,
   ResizeAction as BaseResizeAction,
