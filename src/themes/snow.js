@@ -1,7 +1,5 @@
 import Quill from "quill";
-// import MoColorPicker from "@plugin/color-picker/mo.color-picker.js";
-
-// console.log(MoColorPicker);
+import MoColorPicker from "@plugin/color-picker/mo.color-picker.es.js";
 
 const Snow = Quill.import("themes/snow");
 
@@ -106,10 +104,10 @@ class ColorPicker extends Tooltip {
   initPicker() {
     const picker = this.root.querySelector(".ql-color-picker");
 
-    // this.instance = new MoColorPicker(picker, {
-    //   format: "hex",
-    //   change: color => this.updateColor(color, this.constructor.COLOR_PICK),
-    // });
+    this.instance = new MoColorPicker(picker, {
+      format: "hex",
+      change: color => this.updateColor(color, this.constructor.COLOR_PICK),
+    });
   }
 
   buildSelect(colors) {
@@ -162,7 +160,7 @@ class ColorPicker extends Tooltip {
     this.inputContainer.addEventListener("change", () => {
       const colors = this.inputs.map(input => input.value);
 
-      // this.updateColor(MoColorPicker.rgb2hex(...colors), COLOR_INPUT);
+      this.updateColor(MoColorPicker.rgb2hex(...colors), COLOR_INPUT);
     });
 
     this.root.querySelector(".ql-color-confrim").addEventListener("click", () => this.save());
@@ -194,15 +192,15 @@ class ColorPicker extends Tooltip {
     this.block.style.background = color;
 
     if (from !== COLOR_INPUT) {
-      // const colors = MoColorPicker.hex2rgb(color);
+      const colors = MoColorPicker.hex2rgb(color);
 
       this.inputs.forEach(input => {
-        // input.setValue(colors[input.key.toLocaleLowerCase()]);
+        input.setValue(colors[input.key.toLocaleLowerCase()]);
       });
     }
 
     if (from !== COLOR_PICK) {
-      // this.instance.setValue(color);
+      this.instance.setValue(color);
     }
 
     if (from !== COLOR_SELECT_HOVER) {
