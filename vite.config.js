@@ -1,7 +1,6 @@
 import path from "path";
 import { defineConfig } from "vite";
-import commonjs from "@rollup/plugin-commonjs";
-import { babel } from "@rollup/plugin-babel";
+import { getBabelOutputPlugin } from "@rollup/plugin-babel";
 
 const pathResolve = dir => {
   return path.resolve(__dirname, ".", dir);
@@ -14,15 +13,7 @@ export default defineConfig({
       "@plugin": pathResolve("plugin"),
     },
   },
-  plugins: [
-    commonjs({
-      exclude: /static/,
-    }),
-    babel({
-      exclude: /static/,
-      presets: [["@babel/preset-env"]],
-    }),
-  ],
+  plugins: [getBabelOutputPlugin({ allowAllFormats: true, presets: [["@babel/preset-env"]] })],
   server: {
     port: 8080,
   },
@@ -31,7 +22,8 @@ export default defineConfig({
     lib: {
       entry: pathResolve("./src/index.js"),
       name: "QlQuill",
-      fileName: format => `ql-quill.${format}.js`,
+      fileName: format => "ql-quill.js",
+      formats: ["umd"],
     },
     rollupOptions: {
       output: {

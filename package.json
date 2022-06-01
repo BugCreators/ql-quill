@@ -27,9 +27,8 @@
     "@babel/core": "^7.18.2",
     "@babel/preset-env": "^7.18.2",
     "@rollup/plugin-babel": "^5.3.1",
-    "@rollup/plugin-commonjs": "^22.0.0",
     "stylus": "^0.54.8",
-    "vite": "^2.9.9"
+    "vite": "^2.9.5"
   },
   "dependencies": {
     "extend": "^3.0.2",
