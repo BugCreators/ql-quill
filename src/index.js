@@ -64,7 +64,7 @@ class QlQuill extends Quill {
         specs: [ImageSpec],
         resizable: imageResize,
         formula: formula && {
-          onFormulaEdit: this.openFormulaDialog.bind(this),
+          onFormulaEdit: this.openFormulaDialog,
         },
       };
 
@@ -99,7 +99,7 @@ class QlQuill extends Quill {
 
     image?.clipboard && this.clipboard.addMatcher("IMG", image.clipboard);
 
-    formula && toolbar.addHandler("formula", this.openFormulaDialog.bind(this));
+    formula && toolbar.addHandler("formula", this.openFormulaDialog);
 
     return options;
   }
@@ -171,9 +171,8 @@ class QlQuill extends Quill {
   }
 
   // 插入公式弹窗
-  openFormulaDialog(img = null) {
+  openFormulaDialog = (img = null) => {
     const isImage = img instanceof HTMLImageElement;
-    const time = new Date().getTime();
     const latex = isImage ? img.dataset.latex : "";
 
     const dialog = this.getModule("dialog");
@@ -183,9 +182,8 @@ class QlQuill extends Quill {
       title: "插入公式",
       content: `
         <iframe
-          id="kfEditorContainer-${time}"
-          src="${this.qlOptions.formula}?=${time}"
-          ${latex ? `data-latex="${latex}"` : ""}
+          src="${this.qlOptions.formula}"
+          data-latex="${latex}"
           style="border:none;height:400px;width:100%;"
         ></iframe>
       `,
@@ -209,7 +207,7 @@ class QlQuill extends Quill {
         });
       },
     });
-  }
+  };
 }
 
 QlQuill.CUSTOM_TOOLS = ["import", "option", "formula", "question"];
