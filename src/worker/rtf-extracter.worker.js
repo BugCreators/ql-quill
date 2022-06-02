@@ -20,7 +20,7 @@ function extractImageDataFromRtf(rtfData) {
     "g"
   );
 
-  const images = rtfData.match(regexPicture) || [];
+  const images = rtfData.match?.(regexPicture) || [];
 
   return images.reduce((result, image) => {
     let imageType = false;

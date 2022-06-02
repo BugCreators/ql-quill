@@ -1,5 +1,5 @@
 import Quill from "quill";
-import MoColorPicker from "@plugin/color-picker/mo.color-picker.js";
+import MoColorPicker from "@plugin/color-picker/mo.color-picker.es.js";
 
 const Snow = Quill.import("themes/snow");
 
@@ -13,15 +13,7 @@ const DEFAULTS = {
     "clean", // 清除格式
     "image", // 插入图片
   ],
-  font: [
-    false,
-    "serif",
-    "monospace",
-    "Cursive",
-    "SimSun",
-    "SimHei",
-    "Microsoft-YaHei",
-  ],
+  font: [false, "serif", "monospace", "Cursive", "SimSun", "SimHei", "Microsoft-YaHei"],
   size: ["12", false, "14", "16", "18", "20", "22", "24", "26"],
 };
 
@@ -53,9 +45,7 @@ function expandConfig(toolbar, options) {
   let custom = {};
 
   toolbarTemp.forEach(tool => {
-    options.custom.forEach(
-      t => !custom[t] && (custom[t] = tool.indexOf(t) !== -1)
-    );
+    options.custom.forEach(t => !custom[t] && (custom[t] = tool.indexOf(t) !== -1));
 
     ["font", "size"].forEach(format => {
       const index = tool.indexOf(format);
@@ -162,8 +152,7 @@ class ColorPicker extends Tooltip {
       () => {
         const previewColor = this.instance.getValue();
 
-        previewColor !== this.color &&
-          this.updateColor(this.color, COLOR_SELECT_HOVER);
+        previewColor !== this.color && this.updateColor(this.color, COLOR_SELECT_HOVER);
       },
       true
     );
@@ -174,13 +163,9 @@ class ColorPicker extends Tooltip {
       this.updateColor(MoColorPicker.rgb2hex(...colors), COLOR_INPUT);
     });
 
-    this.root
-      .querySelector(".ql-color-confrim")
-      .addEventListener("click", () => this.save());
+    this.root.querySelector(".ql-color-confrim").addEventListener("click", () => this.save());
 
-    this.root
-      .querySelector(".ql-color-default")
-      .addEventListener("click", () => this.updateColor());
+    this.root.querySelector(".ql-color-default").addEventListener("click", () => this.updateColor());
 
     this.quill.on("selection-change", range => {
       if (range == null) return;
@@ -194,17 +179,13 @@ class ColorPicker extends Tooltip {
   }
 
   position() {
-    const control = this.quill
-      .getModule("toolbar")
-      .container.querySelector(".ql-color");
+    const control = this.quill.getModule("toolbar").container.querySelector(".ql-color");
 
-    this.root.style.left =
-      control.offsetLeft - control.parentElement.offsetLeft + "px";
+    this.root.style.left = control.offsetLeft - control.parentElement.offsetLeft + "px";
   }
 
   updateColor(color, from = "") {
-    const { DEFAULT_COLOR, COLOR_INPUT, COLOR_PICK, COLOR_SELECT_HOVER } =
-      this.constructor;
+    const { DEFAULT_COLOR, COLOR_INPUT, COLOR_PICK, COLOR_SELECT_HOVER } = this.constructor;
 
     color = color || DEFAULT_COLOR;
 
@@ -228,11 +209,7 @@ class ColorPicker extends Tooltip {
   }
 
   save() {
-    this.quill.format(
-      "color",
-      this.color === this.constructor.DEFAULT_COLOR ? false : this.color,
-      Quill.sources.USER
-    );
+    this.quill.format("color", this.color === this.constructor.DEFAULT_COLOR ? false : this.color, Quill.sources.USER);
     this.hide();
   }
 }

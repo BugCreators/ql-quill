@@ -1,4 +1,4 @@
-import closeIcon from "@icons/close.svg";
+import closeIcon from "@icons/close.svg?raw";
 
 class Dialog {
   constructor(quill) {

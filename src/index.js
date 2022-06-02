@@ -16,7 +16,7 @@ import WordCount from "./modules/wordCount";
 import Import from "./modules/import";
 import Question from "./modules/question";
 
-import cleanIcon from "@icons/clean.svg";
+import cleanIcon from "@icons/clean.svg?raw";
 
 import "../assets/index.styl";
 
@@ -40,8 +40,6 @@ Quill.register(
 Quill.register(ImageBlot, true);
 
 class QlQuill {
-  static Quill = Quill;
-
   constructor(container, options = {}) {
     if (typeof container === "string") {
       container = document.querySelector(container);

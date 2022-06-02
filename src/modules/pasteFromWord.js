@@ -1,5 +1,5 @@
 import Quill from "quill";
-import RtfExtracter from "../worker/rtf-extracter.worker";
+import RtfExtracter from "../worker/rtf-extracter.worker?worker&inline";
 
 const BaseClipboard = Quill.import("modules/clipboard");
 
@@ -36,9 +36,7 @@ class Clipboard extends BaseClipboard {
           if (/^file:\/\/[\s\S]+/.test(src)) {
             const image = e.data[index];
             if (uploader) {
-              uploader.uploadImage(image.base64, url =>
-                el.setAttribute("src", url)
-              );
+              uploader.uploadImage(image.base64, url => el.setAttribute("src", url));
             } else {
               el.setAttribute("src", image.base64);
             }
