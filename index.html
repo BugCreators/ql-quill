@@ -11,6 +11,7 @@
     <button onclick="btnClick()">修改内容</button>
     <button onclick="insertImage()">插入图片</button>
     <button onclick="insertFormulaImage()">插入公式图片</button>
+    <button onclick="getHTML()">获取HTML</button>
   </body>
 
   <script src="./static/axios/axios.min.js"></script>
@@ -82,6 +83,10 @@
 
     window.insertFormulaImage = () => {
       editor.insertImage("http://192.168.1.47:80/group1/M00/00/55/rBQAEGFT4jmARVB6AAACEGbtTVs0316102", "\\vector {A}");
+    };
+
+    window.getHTML = () => {
+      console.log(editor.getHTML());
     };
   </script>
 </html>
