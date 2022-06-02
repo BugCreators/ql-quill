@@ -4,4 +4,4 @@
 
 ## Options
 
-具体配置 <a href="https://github.com/BugCreators/ql-quill/blob/master/demo/index.html">点击这里<a/>
+具体配置 <a href="https://github.com/BugCreators/ql-quill/blob/master/index.html">点击这里<a/>
