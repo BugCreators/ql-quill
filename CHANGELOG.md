@@ -1,3 +1,11 @@
+## v1.1.3
+
+- 使用 vite 替代 webpack 作为开发构建工具
+- editor
+  - 继承 quill
+  - 修复 v1.1.2 引起的函数传参不触发的问题
+  - 新增 onFocus、onBlur 传参
+
 ## v1.1.2
 
 - imageResize 图片缩放兼容移动端
