@@ -212,16 +212,7 @@ class QlQuill extends Quill {
 
 QlQuill.CUSTOM_TOOLS = ["import", "option", "formula", "question"];
 
-QlQuill.CUSTOM_OPTIONS = [
-  "toolbar",
-  "limit",
-  "value",
-  // "onLimit",
-  "image",
-  "imageResize",
-  // "onChange",
-  "pasteFromWord",
-];
+QlQuill.CUSTOM_OPTIONS = ["toolbar", "limit", "value", "onLimit", "image", "imageResize", "onChange", "pasteFromWord"];
 
 function defaultConfig(options, qlOptions) {
   return extend(
@@ -240,7 +231,7 @@ function defaultConfig(options, qlOptions) {
 
 function extractConfig(options) {
   return QlQuill.CUSTOM_OPTIONS.concat(QlQuill.CUSTOM_TOOLS).reduce((memo, option) => {
-    memo[option] = options[option] || false;
+    memo[option] = options[option];
     delete options[option];
 
     return memo;
