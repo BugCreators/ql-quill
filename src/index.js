@@ -53,6 +53,9 @@ class QlQuill extends Quill {
     this.onEditorChange();
 
     this.setContents(qlOptions.value);
+
+    // 兼容旧版本
+    this.editor.root = this.root;
   }
 
   expandConfig(options, qlOptions) {
