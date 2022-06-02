@@ -39,115 +39,130 @@ Quill.register(
 );
 Quill.register(ImageBlot, true);
 
-class QlQuill {
+class QlQuill extends Quill {
   constructor(container, options = {}) {
-    if (typeof container === "string") {
-      container = document.querySelector(container);
-    }
-    this.container = container;
+    const qlOptions = extractConfig(options);
+
+    super(container, defaultConfig(options, qlOptions));
     // 阻止谷歌翻译输入框
     this.container.classList.add("notranslate");
 
-    this.options = extractConfig(options);
+    this.qlOptions = qlOptions;
+    this.expandConfig(this.options, qlOptions);
 
-    this.instantiateEditor(options);
-    this.setContents(this.options.value);
+    this.onEditorChange();
+
+    this.setContents(qlOptions.value);
+
+    // 兼容旧版本
+    this.editor.root = this.root;
   }
 
-  expandConfig(options) {
-    options = extend(
-      true,
-      {
-        theme: "snow",
-        modules: { toolbar: { container: this.options.toolbar } },
-        custom: this.constructor.CUSTOM_TOOLS.filter(tool => !!this.options[tool]),
-      },
-      options
-    );
+  expandConfig(options, qlOptions) {
+    const { imageResize, formula, image, limit, pasteFromWord } = qlOptions;
 
-    const { imageResize, formula, image } = this.options;
-
-    let modules = {
-      dialog: {},
-    };
-
+    // 添加图片缩放模块以及公式再编辑模块
     if (imageResize || formula) {
-      modules.blotFormatter = {
+      options.modules.blotFormatter = {
         specs: [ImageSpec],
         resizable: imageResize,
         formula: formula && {
-          onFormulaEdit: this.openFormulaDialog.bind(this),
+          onFormulaEdit: this.openFormulaDialog,
         },
       };
+
+      this.theme.addModule("blotFormatter");
     }
 
-    if (image) modules.imageUploader = image;
+    // 添加图片上传模块
+    if (image) {
+      options.modules.imageUploader = image;
 
-    options = extend(true, { modules }, options);
+      this.theme.addModule("imageUploader");
+    }
+
+    const toolbar = this.getModule("toolbar");
+
+    if (toolbar.container.querySelector(".ql-question") || toolbar.container.querySelector(".ql-option")) {
+      this.theme.addModule("question");
+    }
+
+    if (toolbar.container.querySelector(".ql-import")) {
+      this.theme.addModule("import");
+    }
+
+    if (pasteFromWord) {
+      this.theme.addModule("pasteFromWord");
+    }
+
+    if (limit) {
+      const wordCount = this.theme.addModule("wordCount");
+      wordCount.setOptions(qlOptions);
+    }
+
+    image?.clipboard && this.clipboard.addMatcher("IMG", image.clipboard);
+
+    formula && toolbar.addHandler("formula", this.openFormulaDialog);
 
     return options;
   }
 
-  // 实例化编辑器
-  instantiateEditor(options) {
-    if (this.editor) return;
-
-    this.editor = new Quill(this.container, this.expandConfig(options));
-
-    this.transformConfig();
-
-    this.editor.on("editor-change", (eventName, rangeOrDelta, oldRangeOrDelta, source) => {
+  onEditorChange() {
+    this.on("editor-change", (eventName, rangeOrDelta, oldRangeOrDelta, source) => {
       if (eventName === "text-change") {
-        this.onEditorChangeText(this.editor.root.innerHTML, rangeOrDelta, source);
+        this.onEditorChangeText(this.root.innerHTML, rangeOrDelta, source);
       } else if (eventName === "selection-change") {
         this.onEditorChangeSelection(rangeOrDelta, source);
       }
     });
   }
 
-  transformConfig() {
-    const toolbar = this.editor.getModule("toolbar");
+  onEditorChangeText(value, delta, source) {
+    if (this.getModule("wordCount")) return;
 
-    if (toolbar.container.querySelector(".ql-question") || toolbar.container.querySelector(".ql-option")) {
-      this.editor.theme.addModule("question");
-    }
-
-    if (toolbar.container.querySelector(".ql-import")) {
-      this.editor.theme.addModule("import");
-    }
-
-    const { limit, image, formula, pasteFromWord } = this.options;
-
-    if (pasteFromWord) {
-      this.editor.theme.addModule("pasteFromWord");
-    }
-
-    if (limit) {
-      const wordCount = this.editor.theme.addModule("wordCount");
-      wordCount.setOptions(this.options);
-    }
-
-    image?.clipboard && this.editor.clipboard.addMatcher("IMG", image.clipboard);
-
-    formula && toolbar.addHandler("formula", () => this.openFormulaDialog());
+    this.qlOptions.onChange?.(value);
   }
 
-  setContents = value => {
-    const sel = this.selection;
-    if (typeof value === "string") {
-      this.editor.setContents(this.editor.clipboard.convert(value));
-    } else {
-      this.editor.setContents(value);
-    }
-    postpone(() => this.setEditorSelection(this.editor, sel));
-  };
+  onEditorChangeSelection(nextSelection, source) {
+    const currentSelection = this.prevSelection;
+    const hasGainedFocus = !currentSelection && nextSelection;
+    const hasLostFocus = currentSelection && !nextSelection;
 
-  getHTML = () => {
-    return this.editor.root.innerHTML;
-  };
+    if (isEqual(nextSelection, currentSelection)) return;
+
+    this.prevSelection = nextSelection;
+
+    const toolbar = this.getModule("toolbar");
+
+    if (hasGainedFocus) {
+      this.container.classList.add("on-focus");
+      toolbar.container.classList.add("on-focus");
+
+      this.qlOptions.onFocus?.();
+    } else if (hasLostFocus) {
+      this.container.classList.remove("on-focus");
+      toolbar.container.classList.remove("on-focus");
+
+      this.qlOptions.onBlur?.();
+    }
+  }
+
+  setContents(value) {
+    const sel = this.prevSelection;
+    if (typeof value === "string") {
+      super.setContents(this.clipboard.convert(value));
+    } else {
+      super.setContents(value);
+    }
+    postpone(() => this.setEditorSelection(this, sel));
+  }
+
+  getHTML() {
+    return this.root.innerHTML;
+  }
 
   setEditorSelection(editor, range) {
-    this.selection = range;
+    this.prevSelection = range;
     if (range) {
       const length = editor.getLength();
       range.index = Math.max(0, Math.min(range.index, length - 1));
@@ -156,55 +171,26 @@ class QlQuill {
     }
   }
 
-  onEditorChangeText(value, delta, source) {
-    if (!this.editor || this.editor.getModule("wordCount")) return;
+  insertImage(src, latex = "") {
+    const imageUploader = this.getModule("imageUploader");
 
-    this.options.onChange?.(value);
+    return imageUploader.constructor.insertImage.call(this, src, latex);
   }
-
-  onEditorChangeSelection(nextSelection, source) {
-    if (!this.editor) return;
-
-    const currentSelection = this.selection;
-    const hasGainedFocus = !currentSelection && nextSelection;
-    const hasLostFocus = currentSelection && !nextSelection;
-
-    if (isEqual(nextSelection, currentSelection)) return;
-
-    this.selection = nextSelection;
-
-    const toolbar = this.editor.getModule("toolbar");
-
-    if (hasGainedFocus) {
-      this.container.classList.add("on-focus");
-      toolbar.container.classList.add("on-focus");
-    } else if (hasLostFocus) {
-      this.container.classList.remove("on-focus");
-      toolbar.container.classList.remove("on-focus");
-    }
-  }
-
-  insertImage = (src, latex = "") => {
-    const imageUploader = this.editor.getModule("imageUploader");
-
-    return imageUploader.constructor.insertImage.call(this.editor, src, latex);
-  };
 
   // 插入公式弹窗
-  openFormulaDialog(img = null) {
-    const time = new Date().getTime();
-    const latex = img?.dataset.latex || "";
+  openFormulaDialog = (img = null) => {
+    const isImage = img instanceof HTMLImageElement;
+    const latex = isImage ? img.dataset.latex : "";
 
-    const dialog = this.editor.getModule("dialog");
+    const dialog = this.getModule("dialog");
 
     dialog.open({
       width: 888,
       title: "插入公式",
       content: `
         <iframe
-          id="kfEditorContainer-${time}"
-          src="${this.options.formula}?=${time}"
-          ${latex ? `data-latex="${latex}"` : ""}
+          src="${this.qlOptions.formula}"
+          data-latex="${latex}"
           style="border:none;height:400px;width:100%;"
         ></iframe>
       `,
@@ -214,10 +200,10 @@ class QlQuill {
         window.kfe.execCommand("get.image.data", data => {
           const sLatex = window.kfe.execCommand("get.source");
 
-          const imageUploader = this.editor.getModule("imageUploader");
+          const imageUploader = this.getModule("imageUploader");
 
           imageUploader.uploadImage(data.img, src => {
-            if (img) {
+            if (isImage) {
               img.setAttribute("src", src);
               if (sLatex) img.dataset.latex = sLatex;
               return;
@@ -228,7 +214,7 @@ class QlQuill {
         });
       },
     });
-  }
+  };
 }
 
 QlQuill.CUSTOM_TOOLS = ["import", "option", "formula", "question"];
@@ -236,17 +222,34 @@ QlQuill.CUSTOM_TOOLS = ["import", "option", "formula", "question"];
 QlQuill.CUSTOM_OPTIONS = [
   "toolbar",
   "limit",
+  "onLimit",
   "value",
-  // "onLimit",
+  "onChange",
   "image",
   "imageResize",
-  // "onChange",
   "pasteFromWord",
+  "onFocus",
+  "onBlur",
 ];
+
+function defaultConfig(options, qlOptions) {
+  return extend(
+    true,
+    {
+      theme: "snow",
+      modules: {
+        toolbar: { container: qlOptions.toolbar },
+        dialog: {},
+      },
+      custom: QlQuill.CUSTOM_TOOLS.filter(tool => !!qlOptions[tool]),
+    },
+    options
+  );
+}
 
 function extractConfig(options) {
   return QlQuill.CUSTOM_OPTIONS.concat(QlQuill.CUSTOM_TOOLS).reduce((memo, option) => {
-    memo[option] = options[option] || false;
+    memo[option] = options[option];
     delete options[option];
 
     return memo;
