@@ -134,9 +134,13 @@ class QlQuill extends Quill {
     if (hasGainedFocus) {
       this.container.classList.add("on-focus");
       toolbar.container.classList.add("on-focus");
+
+      this.qlOptions.onFocus?.();
     } else if (hasLostFocus) {
       this.container.classList.remove("on-focus");
       toolbar.container.classList.remove("on-focus");
+
+      this.qlOptions.onBlur?.();
     }
   }
 
@@ -212,7 +216,18 @@ class QlQuill extends Quill {
 
 QlQuill.CUSTOM_TOOLS = ["import", "option", "formula", "question"];
 
-QlQuill.CUSTOM_OPTIONS = ["toolbar", "limit", "value", "onLimit", "image", "imageResize", "onChange", "pasteFromWord"];
+QlQuill.CUSTOM_OPTIONS = [
+  "toolbar",
+  "limit",
+  "onLimit",
+  "value",
+  "onChange",
+  "image",
+  "imageResize",
+  "pasteFromWord",
+  "onFocus",
+  "onBlur",
+];
 
 function defaultConfig(options, qlOptions) {
   return extend(

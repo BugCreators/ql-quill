@@ -71,6 +71,12 @@
       imageResize: true,
       pasteFromWord: true,
       formula: "./static/kityformula-plugin/qlKityFormulaDialog.html",
+      onFocus: function () {
+        console.log("focus");
+      },
+      onBlur: function () {
+        console.log("blur");
+      },
     });
 
     window.btnClick = () => {
