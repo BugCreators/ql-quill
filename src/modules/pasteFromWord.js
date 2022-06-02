@@ -1,5 +1,5 @@
 import Quill from "quill";
-import * as RtfExtracter from "../worker/rtf-extracter.worker?worker";
+import RtfExtracter from "../worker/rtf-extracter.worker?worker";
 
 const BaseClipboard = Quill.import("modules/clipboard");
 
