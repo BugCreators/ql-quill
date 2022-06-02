@@ -2,8 +2,7 @@
   "name": "ql-quill",
   "version": "1.1.2",
   "description": "A wrapper for quill",
-  "main": "./dist/ql-quill.umd.js",
-  "module": "./dist/ql-quill.es.js",
+  "main": "./dist/ql-quill.js",
   "files": [
     "dist/",
     "README.md",

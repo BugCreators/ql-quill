@@ -40,8 +40,6 @@ Quill.register(
 Quill.register(ImageBlot, true);
 
 class QlQuill {
-  static Quill = Quill;
-
   constructor(container, options = {}) {
     if (typeof container === "string") {
       container = document.querySelector(container);

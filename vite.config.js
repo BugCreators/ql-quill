@@ -18,16 +18,17 @@ export default defineConfig({
     port: 8080,
   },
   build: {
-    assetsDir: "./",
     lib: {
-      entry: pathResolve("./src/index.js"),
+      entry: pathResolve("./index.js"),
       name: "QlQuill",
       fileName: format => "ql-quill.js",
       formats: ["umd"],
     },
+    minify: "terser",
     rollupOptions: {
       output: {
         assetFileNames: "ql-quill.snow.css",
+        exports: "named",
       },
     },
   },
