@@ -1,6 +1,6 @@
 import Quill from "quill";
-import { replaceMustache } from "./../i18n";
-import MoColorPicker from "@plugin/color-picker/mo.color-picker.js";
+import MoColorPicker from "@plugin/color-picker/mo.color-picker.es.js";
+import i18n from "../i18n";
 
 const Snow = Quill.import("themes/snow");
 
@@ -14,15 +14,7 @@ const DEFAULTS = {
     "clean", // 清除格式
     "image", // 插入图片
   ],
-  font: [
-    false,
-    "serif",
-    "monospace",
-    "Cursive",
-    "SimSun",
-    "SimHei",
-    "Microsoft-YaHei",
-  ],
+  font: [false, "serif", "monospace", "Cursive", "SimSun", "SimHei", "Microsoft-YaHei"],
   size: ["12", false, "14", "16", "18", "20", "22", "24", "26"],
 };
 
@@ -36,62 +28,58 @@ class SnowTheme extends Snow {
   extendToolbar(toolbar) {
     super.extendToolbar(toolbar);
 
-    this.initColorPicker(toolbar);
-  }
-
-  initColorPicker = (toolbar = this.modules.toolbar) => {
-    this.colorPicker && this.colorPicker.destroy();
-
-    const colorButton = toolbar.container.querySelector(".ql-color");
-    if (colorButton) {
-      this.colorPicker = new ColorPicker(this.quill, null, colorButton);
+    if (toolbar.container.querySelector(".ql-color")) {
+      this.colorPicker = new ColorPicker(this.quill, null);
     }
-  };
+  }
 }
 
-function expandConfig(toolbar, option) {
-  if (!toolbar) {
-    toolbar = DEFAULTS.tool;
-  } else {
-    if (!toolbar.container || !toolbar.container.length)
-      toolbar.container = DEFAULTS.tool;
+function expandConfig(toolbar, options) {
+  if (typeof toolbar.container === "string") return;
+  if (!toolbar.container) toolbar.container = DEFAULTS.tool;
 
-    toolbar = toolbar.container;
-  }
+  toolbar = toolbar.container;
 
-  setDefault(toolbar, "font", "size");
+  const twoD = Array.isArray(toolbar[0]);
+  const toolbarTemp = twoD ? toolbar : [toolbar];
 
-  option.custom.forEach(tool => {
-    if (!toolbar.includes(tool)) {
-      toolbar.push(tool);
-    }
+  let custom = {};
+
+  toolbarTemp.forEach(tool => {
+    options.custom.forEach(t => !custom[t] && (custom[t] = tool.indexOf(t) !== -1));
+
+    ["font", "size"].forEach(format => {
+      const index = tool.indexOf(format);
+      if (index !== -1) {
+        const Format = Quill.import("formats/" + format);
+        Format.whitelist = DEFAULTS[format];
+
+        tool[index] = { [format]: DEFAULTS[format] };
+      }
+    });
   });
-}
 
-function setDefault(toolbar, ...formats) {
-  formats.forEach(format => {
-    const index = toolbar.indexOf(format);
-    if (index !== -1) {
-      const Format = Quill.import("formats/" + format);
-      Format.whitelist = DEFAULTS[format];
-
-      toolbar[index] = { [format]: DEFAULTS[format] };
-    }
-  });
+  for (const key in custom) !custom[key] && toolbar.push(twoD ? [key] : key);
 }
 
 const Tooltip = Quill.import("ui/tooltip");
 
 class ColorPicker extends Tooltip {
-  constructor(quill, boundsContainer, buttonContainer) {
-    this.root.innerHTML = replaceMustache(this.constructor.TEMPLATE);
+  constructor(quill, boundsContainer) {
     super(quill, boundsContainer);
+
+    const toolbar = quill.getModule("toolbar");
+    toolbar.addHandler("color", () => {
+      const formats = quill.getFormat(quill.selection.savedRange.index);
+
+      this.edit(formats.color);
+    });
 
     this.root.classList.add("ql-color-tooltip");
 
-    this.block = this.root.querySelector(".ql-color-block");
-    this.inputContainer = this.root.querySelector(".ql-color-inputs");
-    this.standardContainer = this.root.querySelector(".ql-color-standard");
+    this.block = this.queryComponent(ColorPicker.BLOCK_CLASS_NAME);
+    this.inputContainer = this.queryComponent(ColorPicker.INPUTS_CLASS_NAME);
+    this.standardContainer = this.queryComponent(ColorPicker.STANDARD_CLASS_NAME);
 
     this.initPicker();
     this.buildSelect(this.constructor.STANDARD_COLORS);
@@ -102,7 +90,7 @@ class ColorPicker extends Tooltip {
       });
     }
 
-    this.position(buttonContainer);
+    this.position();
 
     this.inputs = [
       new RGBInput(this.inputContainer, "r"),
@@ -114,8 +102,12 @@ class ColorPicker extends Tooltip {
     this.listen();
   }
 
+  queryComponent(className) {
+    return this.root.querySelector("." + className);
+  }
+
   initPicker() {
-    const picker = this.root.querySelector(".ql-color-picker");
+    const picker = this.queryComponent(ColorPicker.PICKER_CLASS_NAME);
 
     this.instance = new MoColorPicker(picker, {
       format: "hex",
@@ -124,19 +116,27 @@ class ColorPicker extends Tooltip {
   }
 
   buildSelect(colors) {
-    let html = "";
-
-    colors.forEach(color => {
+    this.standardContainer.innerHTML = colors.reduce((html, color) => {
       html += `<span class="ql-color-item" style="background: ${color}" data-color="${color}"></span>`;
-    });
 
-    this.standardContainer.innerHTML = html;
+      return html;
+    }, "");
   }
 
   show() {
     super.show();
 
+    this.renderButton(ColorPicker.CONFIRM_BTN_CLASS_NAME, i18n.t("ok"));
+    this.renderButton(ColorPicker.DEFAULT_BTN_CLASS_NAME, i18n.t("restoreDefault"));
+
     this.quill.blur();
+  }
+
+  renderButton(className, text) {
+    const button = this.queryComponent(className);
+    if (text !== button.innerText) {
+      button.innerHTML = `<span>${text}</span>`;
+    }
   }
 
   listen() {
@@ -167,8 +167,7 @@ class ColorPicker extends Tooltip {
       () => {
         const previewColor = this.instance.getValue();
 
-        previewColor !== this.color &&
-          this.updateColor(this.color, COLOR_SELECT_HOVER);
+        previewColor !== this.color && this.updateColor(this.color, COLOR_SELECT_HOVER);
       },
       true
     );
@@ -179,13 +178,9 @@ class ColorPicker extends Tooltip {
       this.updateColor(MoColorPicker.rgb2hex(...colors), COLOR_INPUT);
     });
 
-    this.root
-      .querySelector(".ql-color-confrim")
-      .addEventListener("click", () => this.save());
+    this.queryComponent(ColorPicker.CONFIRM_BTN_CLASS_NAME).addEventListener("click", () => this.save());
 
-    this.root
-      .querySelector(".ql-color-default")
-      .addEventListener("click", () => this.updateColor());
+    this.queryComponent(ColorPicker.DEFAULT_BTN_CLASS_NAME).addEventListener("click", () => this.updateColor());
 
     this.quill.on("selection-change", range => {
       if (range == null) return;
@@ -198,14 +193,14 @@ class ColorPicker extends Tooltip {
     this.updateColor(color, this.constructor.COLOR_SET);
   }
 
-  position(container) {
-    this.root.style.left =
-      container.offsetLeft - container.parentElement.offsetLeft + "px";
+  position() {
+    const control = this.quill.getModule("toolbar").container.querySelector(".ql-color");
+
+    this.root.style.left = control.offsetLeft - control.parentElement.offsetLeft + "px";
   }
 
   updateColor(color, from = "") {
-    const { DEFAULT_COLOR, COLOR_INPUT, COLOR_PICK, COLOR_SELECT_HOVER } =
-      this.constructor;
+    const { DEFAULT_COLOR, COLOR_INPUT, COLOR_PICK, COLOR_SELECT_HOVER } = this.constructor;
 
     color = color || DEFAULT_COLOR;
 
@@ -229,17 +224,9 @@ class ColorPicker extends Tooltip {
   }
 
   save() {
-    this.quill.format(
-      "color",
-      this.color === this.constructor.DEFAULT_COLOR ? false : this.color,
-      Quill.sources.USER
-    );
+    this.quill.format("color", this.color === this.constructor.DEFAULT_COLOR ? false : this.color, Quill.sources.USER);
     this.hide();
   }
-
-  destroy = () => {
-    this.root && this.root.remove();
-  };
 }
 
 ColorPicker.COLOR_SET = "SET";
@@ -263,25 +250,31 @@ ColorPicker.STANDARD_COLORS = [
 
 ColorPicker.DEFAULT_COLOR = "#333333";
 
+ColorPicker.STANDARD_CLASS_NAME = "ql-color-standard";
+ColorPicker.PICKER_CLASS_NAME = "ql-color-picker";
+ColorPicker.CONFIRM_BTN_CLASS_NAME = "ql-color-confirm";
+ColorPicker.DEFAULT_BTN_CLASS_NAME = "ql-color-default";
+ColorPicker.INPUTS_CLASS_NAME = "ql-color-inputs";
+ColorPicker.BLOCK_CLASS_NAME = "ql-color-block";
+
 ColorPicker.TEMPLATE = [
   "<div>",
-  "  <span>{{standardColors}}</span>",
-  '  <div class="ql-color-standard"></div>',
-  '  <div class="ql-color-picker"></div>',
+  '  <div class="' + ColorPicker.STANDARD_CLASS_NAME + '"></div>',
+  '  <div class="' + ColorPicker.PICKER_CLASS_NAME + '"></div>',
   "</div>",
   '<div class="ql-color-operate">',
-  '  <button type="button" class="ql-btn ql-btn-primary ql-color-confrim">{{ok}}</button>',
-  '  <button type="button" class="ql-btn ql-color-default">{{restoreDefault}}</button>',
-  '  <div class="ql-color-inputs"></div>',
-  '  <div class="ql-color-block"></div>',
+  '  <button type="button" class="ql-btn ql-btn-primary ' + ColorPicker.CONFIRM_BTN_CLASS_NAME + '"></button>',
+  '  <button type="button" class="ql-btn ' + ColorPicker.DEFAULT_BTN_CLASS_NAME + '"></button>',
+  '  <div class="' + ColorPicker.INPUTS_CLASS_NAME + '"></div>',
+  '  <div class="' + ColorPicker.BLOCK_CLASS_NAME + '"></div>',
   "</div>",
 ].join("");
 
 class RGBInput {
-  constructor(container, key, value) {
-    this.MAX = 255;
-    this.MIN = 0;
+  static max = 255;
+  static min = 0;
 
+  constructor(container, key, value) {
     this.container = container;
     this.key = key;
     this.value = value;
@@ -295,12 +288,12 @@ class RGBInput {
     const span = document.createElement("span");
     const input = document.createElement("input");
     input.setAttribute("type", "number");
-    input.setAttribute("max", this.MAX);
-    input.setAttribute("min", this.MIN);
+    input.setAttribute("max", this.constructor.max);
+    input.setAttribute("min", this.constructor.min);
     input.dataset.key = this.key;
     input.value = this.value;
 
-    span.appendChild(new Text(this.key.toLocaleUpperCase()));
+    span.innerHTML = this.key.toLocaleUpperCase();
     span.appendChild(input);
 
     this.container.appendChild(span);
@@ -317,11 +310,11 @@ class RGBInput {
     this.input.addEventListener("change", e => {
       const { valueAsNumber } = e.target;
 
-      if (valueAsNumber > this.MAX) {
-        this.setValue(this.MAX);
+      if (valueAsNumber > this.constructor.max) {
+        this.setValue(this.constructor.max);
         return;
-      } else if (valueAsNumber < this.MIN) {
-        this.setValue(this.MIN);
+      } else if (valueAsNumber < this.constructor.min) {
+        this.setValue(this.constructor.min);
         return;
       }
 

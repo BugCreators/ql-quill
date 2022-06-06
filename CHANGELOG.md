@@ -1,8 +1,56 @@
+## v1.1.3
+
+- 使用 vite 替代 webpack 作为开发构建工具
+- editor
+  - 继承 quill
+  - 修复 v1.1.2 引起的函数传参不触发的问题
+  - 新增 onFocus、onBlur 传参
+
+## v1.1.2
+
+- imageResize 图片缩放兼容移动端
+- editor
+  - 修复函数传参无传值时默认置为 false 导致报错问题
+  - 修复 question、import 标签光标错误问题
+- dialog
+  - 渲染到 editor 中
+
+## v1.1.1
+
+- babel 配置
+  - 添加可选链语法的转换
+
+## v1.1.0
+
+- editor
+  - options 参数可传 quill 配置
+  - question、import 等模块重写
+  - wordCount 模块优化
+  - 新增 pasteFromWord 模块
+  - 使用 quill-blot-formatter 替代 quill-image-resize-module
+  - 新增 imageUploader 模块
+  - toolbar 参数支持二维数组
+- webpack 配置
+  - 修复开发环境下 debugger 失效问题
+
+## v1.0.9
+
+- editor
+  - 新增 onLimit 参数 字数限制时触发
+- webpack 配置
+  - 解决热更新失效问题
+
+## v1.0.8
+
+- webpack 配置
+  - 升级 v5
+- 部分功能兼容 IE11
+
 ## v1.0.7
 
 - editor
   - 修复编辑器内滚动时颜色选择器位置错误问题
-  - 调整默认字体为Arial
+  - 调整默认字体为 Arial
 - color-picker
   - 添加移动端的适配
 - 目录结构优化

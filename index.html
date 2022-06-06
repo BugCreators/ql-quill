@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <div id="editor"></div>
+    <button onclick="btnClick()">修改内容</button>
+    <button onclick="insertImage()">插入图片</button>
+    <button onclick="insertFormulaImage()">插入公式图片</button>
+    <button onclick="getHTML()">获取HTML</button>
+    <button onclick="changeLang()">切换语言</button>
+  </body>
+
+  <script src="./static/axios/axios.min.js"></script>
+  <script type="module">
+    import QlQuill from "./src";
+    import "./assets/index.styl";
+
+    var value = "<p>hello</p>";
+    var locales = "en-US";
+
+    var editor = new QlQuill("#editor", {
+      limit: 1000,
+      onLimit: function () {
+        console.log("超出字数限制！");
+      },
+      placeholder: "请输入作业内容...",
+      toolbar: [
+        "font",
+        "size",
+        "bold",
+        "italic",
+        "underline",
+        "color",
+        { script: "sub" },
+        { script: "super" },
+        "clean",
+        "image",
+        "import",
+        "question",
+      ],
+      image: {
+        accept: ".jpg, .jpeg, .bmp",
+        action: function (file, cb) {
+          const formData = new FormData();
+          formData.append("file", file);
+          axios({
+            method: "post",
+            url: "http://192.168.1.47:8090/webservice/file/saveOne",
+            headers: {
+              "content-type": "application/x-www-form-urlencoded;charset=utf-8",
+              token: "41643C540D74D3D636A31E27197E5A38",
+            },
+            data: formData,
+          }).then(function (res) {
+            cb(res.data.data.fullUrl);
+          });
+        },
+      },
+      // image: cb => {
+      //   console.log('custom')
+      //   cb("http://192.168.4.119/group1/M00/01/57/wKgBF19YPz6AEfqrAABTEqBfftU969.jpg")
+      // },
+      value: value,
+      onChange: function (v) {
+        console.log(v);
+        value = v;
+      },
+      imageResize: true,
+      pasteFromWord: true,
+      formula: "./static/kityformula-plugin/qlKityFormulaDialog.html",
+      onFocus: function () {
+        console.log("focus");
+      },
+      onBlur: function () {
+        console.log("blur");
+      },
+      locales,
+    });
+
+    window.btnClick = () => {
+      editor.setContents("<p>Hi</p>");
+    };
+
+    window.insertImage = () => {
+      editor.insertImage("http://192.168.1.47:8090/group1/M00/01/CC/qf5vBGKMwwKANvXmAABTEnxjJMc499.jpg");
+    };
+
+    window.insertFormulaImage = () => {
+      editor.insertImage("http://192.168.1.47:80/group1/M00/00/55/rBQAEGFT4jmARVB6AAACEGbtTVs0316102", "\\vector {A}");
+    };
+
+    window.getHTML = () => {
+      console.log(editor.getHTML());
+    };
+
+    window.changeLang = () => {
+      const newLocales = locales === "en-US" ? "zh-CN" : "en-US";
+      editor.changeLanguage(newLocales);
+      locales = newLocales;
+    };
+  </script>
+</html>

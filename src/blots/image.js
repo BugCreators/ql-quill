@@ -6,7 +6,7 @@ const ATTRIBUTES = ["src", "data-latex", "style", "width", "height"];
 
 class ImageBlot extends Image {
   static create(value) {
-    let node = super.create(value);
+    const node = super.create(value);
 
     if (typeof value === "object") {
       for (let attribute in value) {

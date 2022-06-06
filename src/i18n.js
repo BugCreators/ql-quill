@@ -16,18 +16,4 @@ export function initI18n(locales = DEFAULT_LOCALES) {
   });
 }
 
-export function replaceMustache(str) {
-  const reg = /{{(.+?)}}/g;
-
-  let result = null;
-  do {
-    result = reg.exec(str);
-    if (result) {
-      str = str.replace(result[0], i18n.t(result[1]));
-    }
-  } while (result);
-
-  return str;
-}
-
 export default i18n;
