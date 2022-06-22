@@ -14,7 +14,7 @@ const DEFAULTS = {
     "image", // 插入图片
   ],
   font: [false, "serif", "monospace", "Cursive", "SimSun", "SimHei", "Microsoft-YaHei"],
-  size: ["12", false, "14", "16", "18", "20", "22", "24", "26"],
+  size: ["12px", false, "16px", "18px", "20px", "22px", "24px", "26px"],
 };
 
 class SnowTheme extends Snow {
@@ -50,8 +50,16 @@ function expandConfig(toolbar, options) {
     ["font", "size"].forEach(format => {
       const index = tool.indexOf(format);
       if (index !== -1) {
-        const Format = Quill.import("formats/" + format);
-        Format.whitelist = DEFAULTS[format];
+        const style = Quill.import("attributors/style/" + format);
+
+        style.whitelist = DEFAULTS[format];
+
+        Quill.register(
+          {
+            ["formats/" + format]: style,
+          },
+          true
+        );
 
         tool[index] = { [format]: DEFAULTS[format] };
       }

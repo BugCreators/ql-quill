@@ -75,7 +75,7 @@
       .ql-picker-label
       .ql-picker-item
         &::before
-          content '13'
+          content "'%s'" % font-size
 
         &[data-value]::before
           content attr(data-value)
@@ -93,7 +93,7 @@
   &-Cursive
     font-family Cursive
 
-sizes = 12 14 16 18 20 22 24 26
+sizes = 12 16 18 20 22 24 26
 for size in sizes
   .ql-size-{size}
     font-size '%spx' % size
