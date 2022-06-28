@@ -141,6 +141,16 @@ class DisplaySizeAction extends Action {
 }
 
 export class ImageSpec extends BaseImageSpec {
+  init() {
+    super.init();
+
+    window.addEventListener("click", e => {
+      if (!this.formatter.quill.container.contains(e.target)) {
+        this.formatter.hide(this);
+      }
+    });
+  }
+
   getActions() {
     return [
       this.formatter.options.resizable && ResizeAction,
