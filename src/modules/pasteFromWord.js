@@ -35,11 +35,13 @@ class Clipboard extends BaseClipboard {
 
           if (/^file:\/\/[\s\S]+/.test(src)) {
             const image = e.data[index];
-            if (uploader) {
-              uploader.uploadImage(image.base64, url => el.setAttribute("src", url));
-            } else {
-              el.setAttribute("src", image.base64);
-            }
+            uploader.uploadImage(
+              image.base64,
+              url => el.setAttribute("src", url),
+              () => {
+                el.parentNode.removeChild(el);
+              }
+            );
 
             index++;
           }
