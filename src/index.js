@@ -113,14 +113,22 @@ class QlQuill extends Quill {
         const alt = "loading-" + Date.now();
 
         const uploader = this.getModule("imageUploader");
-        uploader.uploadImage(node.src, url => {
-          const image = this.root.querySelector(`[alt=${alt}]`);
+        uploader.uploadImage(
+          node.src,
+          url => {
+            const image = this.root.querySelector(`[alt=${alt}]`);
 
-          if (image) {
-            image.setAttribute("src", url);
-            image.removeAttribute("alt");
+            if (image) {
+              image.setAttribute("src", url);
+              image.removeAttribute("alt");
+            }
+          },
+          () => {
+            const image = this.root.querySelector(`[alt=${alt}]`);
+
+            image && image.parentNode.removeChild(image);
           }
-        });
+        );
 
         return new Delta().insert(
           { image: loadingIcon },

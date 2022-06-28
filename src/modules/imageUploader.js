@@ -16,28 +16,26 @@ export default class ImageUploader {
     const toolbar = this.quill.getModule("toolbar");
     toolbar.addHandler("image", this.handlerImage);
 
-    options.drop &&
-      this.quill.root.addEventListener("drop", this.handleDrop, false);
+    options.drop && this.quill.root.addEventListener("drop", this.handleDrop, false);
   }
 
-  uploadImage(file, cb) {
+  uploadImage(file, onSuccess, onError = () => {}) {
     const insertImage = src => {
       this.constructor.insertImage.call(this.quill, src);
     };
-    const callback = cb || insertImage;
+    const successCb = onSuccess || insertImage;
 
-    const isBase64 =
-      typeof file === "string" && /^data:image\/.+;base64/.test(file);
+    const isBase64 = typeof file === "string" && /^data:image\/.+;base64/.test(file);
 
     if (typeof this.options.action === "function") {
       if (isBase64) file = dataURLtoFile(file);
-      this.options.action(file, callback);
+      this.options.action(file, successCb, onError);
       return;
     }
 
-    if (isBase64) return callback(file);
+    if (isBase64) return successCb(file);
     const fr = new FileReader();
-    fr.onload = _ => callback(fr.result);
+    fr.onload = _ => successCb(fr.result);
     fr.readAsDataURL(file);
   }
 
@@ -74,22 +72,12 @@ export default class ImageUploader {
       if (document.caretRangeFromPoint) {
         const range = document.caretRangeFromPoint(e.clientX, e.clientY);
         if (selection && range) {
-          selection.setBaseAndExtent(
-            range.startContainer,
-            range.startOffset,
-            range.startContainer,
-            range.startOffset
-          );
+          selection.setBaseAndExtent(range.startContainer, range.startOffset, range.startContainer, range.startOffset);
         }
       } else {
         const range = document.caretPositionFromPoint(e.clientX, e.clientY);
         if (selection && range) {
-          selection.setBaseAndExtent(
-            range.offsetNode,
-            range.offset,
-            range.offsetNode,
-            range.offset
-          );
+          selection.setBaseAndExtent(range.offsetNode, range.offset, range.offsetNode, range.offset);
         }
       }
 
@@ -113,7 +101,7 @@ function dataURLtoFile(dataurl, filename) {
 
   const file = new Blob([u8arr], { type: mime });
   file.lastModifiedDate = new Date();
-  file.name =
-    filename || "base642image" + Date.now() + "." + mime.replace(/image\//, "");
+  file.name = filename || "base642image" + Date.now() + "." + mime.replace(/image\//, "");
+
   return file;
 }

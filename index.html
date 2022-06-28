@@ -43,9 +43,9 @@
       ],
       image: {
         accept: ".jpg, .jpeg, .bmp",
-        action: function (file, cb) {
+        action: function (file, resolve, reject) {
           const formData = new FormData();
-          formData.append("file", file);
+          formData.append("file", file, file.name);
           axios({
             method: "post",
             url: "http://192.168.1.47:8090/webservice/file/saveOne",
@@ -54,9 +54,11 @@
               token: "41643C540D74D3D636A31E27197E5A38",
             },
             data: formData,
-          }).then(function (res) {
-            cb(res.data.data.fullUrl);
-          });
+          })
+            .then(function (res) {
+              resolve(res.data.data.fullUrl);
+            })
+            .catch(reject);
         },
       },
       // image: cb => {
