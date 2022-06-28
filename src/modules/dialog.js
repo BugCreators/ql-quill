@@ -23,13 +23,10 @@ class Dialog {
   }
 
   createContainer() {
-    const container = document.createElement("div");
-    container.classList.add(Dialog.CONTAINER_CLASS_NAME);
+    const container = this.quill.addContainer(Dialog.CONTAINER_CLASS_NAME);
     container.style.display = "none";
 
     container.innerHTML = replaceSpace(Dialog.TEMPLATE);
-
-    this.quill.container.appendChild(container);
 
     return container;
   }

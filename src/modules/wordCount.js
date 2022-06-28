@@ -42,9 +42,7 @@ class WordCount {
               return length;
             }, -distance);
 
-            this.quill.updateContents(
-              new Delta().retain(retainIndex).delete(distance)
-            );
+            this.quill.updateContents(new Delta().retain(retainIndex).delete(distance));
 
             setTimeout(() => this.quill.setSelection(retainIndex));
           }
@@ -58,16 +56,12 @@ class WordCount {
   }
 
   initLimiter() {
-    this.container = document.createElement("span");
-    this.container.classList.add("ql-word-count");
-    this.quill.container.appendChild(this.container);
+    this.container = this.quill.addContainer("ql-word-count");
 
     this.initCounter();
 
     this.container.appendChild(this.counter);
-    this.container.appendChild(
-      document.createTextNode("/" + this.options.limit)
-    );
+    this.container.appendChild(document.createTextNode("/" + this.options.limit));
   }
 
   initCounter() {
