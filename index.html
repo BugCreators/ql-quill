@@ -43,6 +43,7 @@
       ],
       image: {
         accept: ".jpg, .jpeg, .bmp",
+        base64AutoUpload: true,
         action: function (file, resolve, reject) {
           const formData = new FormData();
           formData.append("file", file, file.name);
@@ -66,10 +67,10 @@
       //   cb("http://192.168.4.119/group1/M00/01/57/wKgBF19YPz6AEfqrAABTEqBfftU969.jpg")
       // },
       value: value,
-      onChange: function (v) {
-        console.log(v);
-        value = v;
-      },
+      // onChange: function (v) {
+      //   console.log(v);
+      //   value = v;
+      // },
       imageResize: true,
       pasteFromWord: true,
       formula: "./static/kityformula-plugin/qlKityFormulaDialog.html",

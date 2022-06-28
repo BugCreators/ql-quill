@@ -1,3 +1,7 @@
+import Quill from "quill";
+
+import loadingIcon from "@icons/loading.svg";
+
 export default class ImageUploader {
   static insertImage(src, latex) {
     const range = this.getSelection(true);
@@ -15,6 +19,49 @@ export default class ImageUploader {
 
     const toolbar = this.quill.getModule("toolbar");
     toolbar.addHandler("image", this.handlerImage);
+
+    if (options.clipboard || options.base64AutoUpload) {
+      this.quill.clipboard.addMatcher("IMG", (node, delta) => {
+        delta = options.clipboard?.(node, delta) || delta;
+
+        if (!options.base64AutoUpload) return delta;
+
+        const isBase64 = /^data:image/.test(node.src);
+        if (isBase64) {
+          const Delta = Quill.import("delta");
+          const alt = "loading-" + Date.now();
+
+          const uploader = this.quill.getModule("imageUploader");
+          uploader.uploadImage(
+            node.src,
+            url => {
+              if (node.src === url) return;
+
+              const image = this.quill.root.querySelector(`[alt=${alt}]`);
+
+              if (image) {
+                image.setAttribute("src", url);
+                image.removeAttribute("alt");
+              }
+            },
+            () => {
+              const image = this.quill.root.querySelector(`[alt=${alt}]`);
+
+              image && image.parentNode.removeChild(image);
+            }
+          );
+
+          delta = new Delta().insert(
+            { image: loadingIcon },
+            {
+              alt,
+            }
+          );
+        }
+
+        return delta;
+      });
+    }
 
     options.drop && this.quill.root.addEventListener("drop", this.handleDrop, false);
   }

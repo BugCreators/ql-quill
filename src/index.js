@@ -16,7 +16,6 @@ import WordCount from "./modules/wordCount";
 import Import from "./modules/import";
 import Question from "./modules/question";
 
-import loadingIcon from "@icons/loading.svg";
 import cleanIcon from "@icons/clean.svg?raw";
 
 import "../assets/index.styl";
@@ -100,45 +99,6 @@ class QlQuill extends Quill {
       const wordCount = this.theme.addModule("wordCount");
       wordCount.setOptions(qlOptions);
     }
-
-    this.clipboard.addMatcher("IMG", (node, delta) => {
-      if (image.clipboard) {
-        image.clipboard(node, delta);
-        return;
-      }
-
-      const isBase64 = /^data:image/.test(node.src);
-      if (isBase64 && typeof image?.action === "function") {
-        const Delta = Quill.import("delta");
-        const alt = "loading-" + Date.now();
-
-        const uploader = this.getModule("imageUploader");
-        uploader.uploadImage(
-          node.src,
-          url => {
-            const image = this.root.querySelector(`[alt=${alt}]`);
-
-            if (image) {
-              image.setAttribute("src", url);
-              image.removeAttribute("alt");
-            }
-          },
-          () => {
-            const image = this.root.querySelector(`[alt=${alt}]`);
-
-            image && image.parentNode.removeChild(image);
-          }
-        );
-
-        return new Delta().insert(
-          { image: loadingIcon },
-          {
-            alt,
-          }
-        );
-      }
-      return delta;
-    });
 
     formula && toolbar.addHandler("formula", this.openFormulaDialog);
 
