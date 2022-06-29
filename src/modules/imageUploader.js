@@ -98,7 +98,7 @@ export default class ImageUploader {
     if (input == null) {
       input = document.createElement("input");
       input.setAttribute("type", "file");
-      input.setAttribute("accept", this.options.accept || "image/*");
+      input.setAttribute("accept", this.options.accept || 'image/png, image/gif, image/jpeg, image/bmp, image/x-icon');
       input.classList.add("ql-image");
       input.addEventListener("change", () => {
         if (input.files != null && input.files[0] != null) {
