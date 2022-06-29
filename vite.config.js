@@ -24,6 +24,7 @@ export default defineConfig({
       fileName: format => "ql-quill.js",
       formats: ["umd"],
     },
+    cssTarget: "chrome61", // 防止vite将rgba颜色转为十六进制
     minify: "terser",
     rollupOptions: {
       output: {
