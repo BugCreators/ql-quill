@@ -74,13 +74,6 @@ class QlQuill extends Quill {
       this.theme.addModule("blotFormatter");
     }
 
-    // 添加图片上传模块
-    if (image) {
-      options.modules.imageUploader = image;
-
-      this.theme.addModule("imageUploader");
-    }
-
     const toolbar = this.getModule("toolbar");
 
     if (toolbar.container.querySelector(".ql-question") || toolbar.container.querySelector(".ql-option")) {
@@ -237,6 +230,7 @@ function defaultConfig(options, qlOptions) {
       theme: "snow",
       modules: {
         toolbar: { container: qlOptions.toolbar },
+        imageUploader: qlOptions.image || {},
         dialog: {},
       },
       custom: QlQuill.CUSTOM_TOOLS.filter(tool => !!qlOptions[tool]),
