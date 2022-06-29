@@ -26,7 +26,7 @@ class Dialog {
     const container = this.quill.addContainer(Dialog.CONTAINER_CLASS_NAME);
     container.style.display = "none";
 
-    container.innerHTML = replaceSpace(Dialog.TEMPLATE);
+    container.innerHTML = Dialog.TEMPLATE;
 
     return container;
   }
@@ -47,7 +47,7 @@ class Dialog {
   renderBody(options) {
     this.body = this.queryComponent(Dialog.BODY_CLASS_NAME);
 
-    this.body.innerHTML = replaceSpace(options.content || "");
+    this.body.innerHTML = options.content || "";
   }
 
   setTitle(options) {
@@ -97,10 +97,6 @@ class Dialog {
   }
 }
 
-function replaceSpace(string) {
-  return string.trim().replace(/(?<=[>])\s+(?=[<])/g, "");
-}
-
 Dialog.CONTAINER_CLASS_NAME = "ql-dialog-root";
 Dialog.MASK_CLASS_NAME = "ql-dialog-mask";
 Dialog.CONTENT_CLASS_NAME = "ql-dialog";
@@ -132,6 +128,8 @@ Dialog.TEMPLATE = [
   "    </div>",
   "  </div>",
   "</div>",
-].join("");
+]
+  .map(i => i.trim())
+  .join("");
 
 export default Dialog;
