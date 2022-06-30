@@ -12,7 +12,7 @@ class FormulaEditAction extends Action {
 
     const formula = this.formatter.quill.getModule("formula");
 
-    if (typeof formula.openFormulaDialog !== "function") {
+    if (typeof formula?.openFormulaDialog !== "function") {
       console.warn("[Missing config] modules/formula onFormulaEdit function is required");
       return;
     }
