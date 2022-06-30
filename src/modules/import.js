@@ -26,30 +26,40 @@ class Import extends Module {
 
   constructor(quill, options) {
     super(quill, options);
+    this.input = this.createInput();
 
-    quill.getModule("toolbar").addHandler("import", this.insert);
+    quill.getModule("toolbar").addHandler("import", this.insert.bind(this));
+  }
+
+  createInput() {
+    const input = document.createElement("input");
+    input.classList.add("ql-input", "ql-import-input");
+
+    return input;
   }
 
   insert() {
     const dialog = this.quill.getModule("dialog");
+    console.log(this.input);
 
     dialog.open({
       width: 640,
       title: "插入重点",
-      content: '<input class="ql-input ql-import-input" type="text" value="">',
-      onOk: container => {
+      contentElement: this.input,
+      onOk: close => {
         const range = this.quill.getSelection(true);
         this.quill.deleteText(range);
         let index = range.index;
 
-        container
-          .querySelector(".ql-import-input")
-          .value.split("")
-          .forEach(word => {
-            this.quill.insertEmbed(index, "import", word);
-            index++;
-          });
+        this.input.value.split("").forEach(word => {
+          this.quill.insertEmbed(index, "import", word);
+          index++;
+        });
         this.quill.setSelection(index);
+        close();
+      },
+      beforeClose: _ => {
+        this.input.value = "";
       },
     });
   }

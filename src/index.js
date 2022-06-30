@@ -15,6 +15,7 @@ import PasteFromWord from "./modules/pasteFromWord";
 import WordCount from "./modules/wordCount";
 import Import from "./modules/import";
 import Question from "./modules/question";
+import Formula from "./modules/formula";
 
 import cleanIcon from "@icons/clean.svg?raw";
 
@@ -31,6 +32,7 @@ Quill.register(
     "modules/wordCount": WordCount,
     "modules/question": Question,
     "modules/import": Import,
+    "modules/formula": Formula,
     "modules/blotFormatter": BlotFormatter,
 
     "themes/snow": SnowTheme,
@@ -59,16 +61,13 @@ class QlQuill extends Quill {
   }
 
   expandConfig(options, qlOptions) {
-    const { imageResize, formula, image, limit, pasteFromWord } = qlOptions;
+    const { imageResize, formula, limit, pasteFromWord } = qlOptions;
 
     // 添加图片缩放模块以及公式再编辑模块
     if (imageResize || formula) {
       options.modules.blotFormatter = {
         specs: [ImageSpec],
         resizable: imageResize,
-        formula: formula && {
-          onFormulaEdit: this.openFormulaDialog,
-        },
       };
 
       this.theme.addModule("blotFormatter");
@@ -92,8 +91,6 @@ class QlQuill extends Quill {
       const wordCount = this.theme.addModule("wordCount");
       wordCount.setOptions(qlOptions);
     }
-
-    formula && toolbar.addHandler("formula", this.openFormulaDialog);
 
     return options;
   }
@@ -167,45 +164,6 @@ class QlQuill extends Quill {
 
     return imageUploader.constructor.insertImage.call(this, src, latex);
   }
-
-  // 插入公式弹窗
-  openFormulaDialog = (img = null) => {
-    const isImage = img instanceof HTMLImageElement;
-    const latex = isImage ? img.dataset.latex : "";
-
-    const dialog = this.getModule("dialog");
-
-    dialog.open({
-      width: 888,
-      title: "插入公式",
-      content: `
-        <iframe
-          src="${this.qlOptions.formula}"
-          data-latex="${latex}"
-          style="border:none;height:400px;width:100%;"
-        ></iframe>
-      `,
-      onOk: _ => {
-        if (!window.kfe) return;
-
-        window.kfe.execCommand("get.image.data", data => {
-          const sLatex = window.kfe.execCommand("get.source");
-
-          const imageUploader = this.getModule("imageUploader");
-
-          imageUploader.uploadImage(data.img, src => {
-            if (isImage) {
-              img.setAttribute("src", src);
-              if (sLatex) img.dataset.latex = sLatex;
-              return;
-            }
-
-            this.insertImage(src, sLatex);
-          });
-        });
-      },
-    });
-  };
 }
 
 QlQuill.CUSTOM_TOOLS = ["import", "option", "formula", "question"];
@@ -231,6 +189,7 @@ function defaultConfig(options, qlOptions) {
       modules: {
         toolbar: { container: qlOptions.toolbar },
         imageUploader: qlOptions.image || {},
+        formula: qlOptions.formula || "",
         dialog: {},
       },
       custom: QlQuill.CUSTOM_TOOLS.filter(tool => !!qlOptions[tool]),

@@ -8,22 +8,23 @@ import {
 
 class FormulaEditAction extends Action {
   onCreate() {
-    this.options = this.formatter.options.formula;
     this.overlay = this.formatter.overlay;
 
-    if (typeof this.options.onFormulaEdit !== "function")
-      console.warn("[Missing config] formula onFormulaEdit function is required");
+    const formula = this.formatter.quill.getModule("formula");
+
+    if (typeof formula.openFormulaDialog !== "function") {
+      console.warn("[Missing config] modules/formula onFormulaEdit function is required");
+      return;
+    }
+
+    this.onFormulaEdit = formula.openFormulaDialog;
 
     this.createTime = new Date().getTime();
     // 两次单击的间隔时间
     this.timer = 500;
 
-    if (!this.overlay.dataset.formula) {
-      this.overlay.dataset.formula = true;
-
-      this.overlay.addEventListener("click", this.onOverlayClick);
-      this.overlay.addEventListener("dblclick", this.onOverlayDblclick);
-    }
+    this.overlay.addEventListener("click", this.onOverlayClick);
+    this.overlay.addEventListener("dblclick", this.onOverlayDblclick);
   }
 
   // 单击图片后再单击overlay 通过时间间隔长短模拟双击事件
@@ -32,14 +33,14 @@ class FormulaEditAction extends Action {
     if (!target?.dataset.latex || !this.timer) return;
 
     const time = new Date().getTime();
-    if (time - this.createTime < this.timer) this.options.onFormulaEdit(target);
+    if (time - this.createTime < this.timer) this.onFormulaEdit(target);
     this.timer = 0;
   };
 
   onOverlayDblclick = () => {
     const target = this.formatter.currentSpec.getTargetElement();
     if (!target?.dataset.latex) return;
-    this.options.onFormulaEdit(target);
+    this.onFormulaEdit(target);
   };
 }
 
@@ -156,7 +157,7 @@ export class ImageSpec extends BaseImageSpec {
       this.formatter.options.resizable && ResizeAction,
       this.formatter.options.resizable && DisplaySizeAction,
       DeleteAction,
-      this.formatter.options.formula && FormulaEditAction,
+      FormulaEditAction,
     ].filter(Boolean);
   }
 }
