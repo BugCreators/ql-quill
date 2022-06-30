@@ -45,9 +45,18 @@ class Dialog {
   }
 
   renderBody(options) {
-    this.body = this.queryComponent(Dialog.BODY_CLASS_NAME);
+    const body = this.queryComponent(Dialog.BODY_CLASS_NAME);
 
-    this.body.innerHTML = options.content || "";
+    if (options.content) {
+      body.innerHTML = options.content;
+      return;
+    }
+
+    if (options.contentElement && !body.contains(options.contentElement)) {
+      body.innerHTML = "";
+      body.appendChild(options.contentElement);
+      return;
+    }
   }
 
   setTitle(options) {
@@ -68,8 +77,7 @@ class Dialog {
   }
 
   handleConfirm = () => {
-    this.options.onOk?.(this.body);
-    this.close();
+    this.options.onOk ? this.options.onOk(this.close.bind(this)) : this.close();
   };
 
   handleCancel = () => {
@@ -93,6 +101,7 @@ class Dialog {
   }
 
   close() {
+    this.options.beforeClose?.();
     this.container.style.display = "none";
   }
 }
