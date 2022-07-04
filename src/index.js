@@ -58,6 +58,21 @@ class QlQuill extends Quill {
 
     // 兼容旧版本
     this.editor.root = this.root;
+
+    // 旧数据处理 类名转成内联
+    this.clipboard.addMatcher("SPAN", (node, delta) => {
+      Array.from(node.classList).forEach(className => {
+        const [, format, value] = className.match(/^ql-(size|font)-(.*)/);
+
+        delta.map((op, index) => {
+          if (!op.attributes) op.attributes = {};
+
+          op.attributes[format] = value + (format === "size" ? "px" : "");
+        });
+      });
+
+      return delta;
+    });
   }
 
   expandConfig(options, qlOptions) {

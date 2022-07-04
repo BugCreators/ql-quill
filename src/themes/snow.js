@@ -54,6 +54,7 @@ function expandConfig(toolbar, options) {
 
         style.whitelist = DEFAULTS[format];
 
+        // 设为内联
         Quill.register(
           {
             ["formats/" + format]: style,
