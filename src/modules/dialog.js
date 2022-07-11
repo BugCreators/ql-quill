@@ -40,8 +40,10 @@ class Dialog {
 
     this.setBounds(options);
 
-    this.renderButton(Dialog.CONFIRM_BTN_CLASS_NAME, "确定");
-    this.renderButton(Dialog.CANCEL_BTN_CLASS_NAME, "取消");
+    const locale = this.quill.getModule("locale");
+
+    this.renderButton(Dialog.CONFIRM_BTN_CLASS_NAME, locale.$locale("ok"));
+    this.renderButton(Dialog.CANCEL_BTN_CLASS_NAME, locale.$locale("cancel"));
   }
 
   renderBody(options) {

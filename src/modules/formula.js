@@ -33,10 +33,11 @@ class Formula extends Module {
     this.setLatex(latex);
 
     const dialog = this.quill.getModule("dialog");
+    const locale = this.quill.getModule("locale");
 
     dialog.open({
       width: 888,
-      title: "插入公式",
+      title: locale.$locale("insertFormula"),
       content: this.iframe.outerHTML,
       onOk: close => {
         if (!window.kfe) {

@@ -85,9 +85,9 @@ class ColorPicker extends Tooltip {
 
     this.root.classList.add("ql-color-tooltip");
 
-    this.block = this.root.querySelector(".ql-color-block");
-    this.inputContainer = this.root.querySelector(".ql-color-inputs");
-    this.standardContainer = this.root.querySelector(".ql-color-standard");
+    this.block = this.queryComponent(ColorPicker.BLOCK_CLASS_NAME);
+    this.inputContainer = this.queryComponent(ColorPicker.INPUTS_CLASS_NAME);
+    this.standardContainer = this.queryComponent(ColorPicker.STANDARD_CLASS_NAME);
 
     this.initPicker();
     this.buildSelect(this.constructor.STANDARD_COLORS);
@@ -110,8 +110,12 @@ class ColorPicker extends Tooltip {
     this.listen();
   }
 
+  queryComponent(className) {
+    return this.root.querySelector("." + className);
+  }
+
   initPicker() {
-    const picker = this.root.querySelector(".ql-color-picker");
+    const picker = this.queryComponent(ColorPicker.PICKER_CLASS_NAME);
 
     this.instance = new MoColorPicker(picker, {
       format: "hex",
@@ -130,7 +134,19 @@ class ColorPicker extends Tooltip {
   show() {
     super.show();
 
+    const locale = this.quill.getModule("locale").$locale();
+
+    this.renderButton(ColorPicker.CONFIRM_BTN_CLASS_NAME, locale.ok);
+    this.renderButton(ColorPicker.DEFAULT_BTN_CLASS_NAME, locale.restoreDefault);
+
     this.quill.blur();
+  }
+
+  renderButton(className, text) {
+    const button = this.queryComponent(className);
+    if (text !== button.innerText) {
+      button.innerHTML = `<span>${text}</span>`;
+    }
   }
 
   listen() {
@@ -172,9 +188,9 @@ class ColorPicker extends Tooltip {
       this.updateColor(MoColorPicker.rgb2hex(...colors), COLOR_INPUT);
     });
 
-    this.root.querySelector(".ql-color-confrim").addEventListener("click", () => this.save());
+    this.queryComponent(ColorPicker.CONFIRM_BTN_CLASS_NAME).addEventListener("click", () => this.save());
 
-    this.root.querySelector(".ql-color-default").addEventListener("click", () => this.updateColor());
+    this.queryComponent(ColorPicker.DEFAULT_BTN_CLASS_NAME).addEventListener("click", () => this.updateColor());
 
     this.quill.on("selection-change", range => {
       if (range == null) return;
@@ -244,17 +260,23 @@ ColorPicker.STANDARD_COLORS = [
 
 ColorPicker.DEFAULT_COLOR = "#333333";
 
+ColorPicker.STANDARD_CLASS_NAME = "ql-color-standard";
+ColorPicker.PICKER_CLASS_NAME = "ql-color-picker";
+ColorPicker.CONFIRM_BTN_CLASS_NAME = "ql-color-confirm";
+ColorPicker.DEFAULT_BTN_CLASS_NAME = "ql-color-default";
+ColorPicker.INPUTS_CLASS_NAME = "ql-color-inputs";
+ColorPicker.BLOCK_CLASS_NAME = "ql-color-block";
+
 ColorPicker.TEMPLATE = [
   "<div>",
-  "  <span>标准颜色</span>",
-  '  <div class="ql-color-standard"></div>',
-  '  <div class="ql-color-picker"></div>',
+  '  <div class="' + ColorPicker.STANDARD_CLASS_NAME + '"></div>',
+  '  <div class="' + ColorPicker.PICKER_CLASS_NAME + '"></div>',
   "</div>",
   '<div class="ql-color-operate">',
-  '  <button type="button" class="ql-btn ql-btn-primary ql-color-confrim">确定</button>',
-  '  <button type="button" class="ql-btn ql-color-default">恢复默认</button>',
-  '  <div class="ql-color-inputs"></div>',
-  '  <div class="ql-color-block"></div>',
+  '  <button type="button" class="ql-btn ql-btn-primary ' + ColorPicker.CONFIRM_BTN_CLASS_NAME + '"></button>',
+  '  <button type="button" class="ql-btn ' + ColorPicker.DEFAULT_BTN_CLASS_NAME + '"></button>',
+  '  <div class="' + ColorPicker.INPUTS_CLASS_NAME + '"></div>',
+  '  <div class="' + ColorPicker.BLOCK_CLASS_NAME + '"></div>',
   "</div>",
 ].join("");
 

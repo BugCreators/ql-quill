@@ -16,6 +16,7 @@ import WordCount from "./modules/wordCount";
 import Import from "./modules/import";
 import Question from "./modules/question";
 import Formula from "./modules/formula";
+import Locale from "./modules/locale";
 
 import cleanIcon from "@icons/clean.svg?raw";
 
@@ -34,6 +35,7 @@ Quill.register(
     "modules/import": Import,
     "modules/formula": Formula,
     "modules/blotFormatter": BlotFormatter,
+    "modules/locale": Locale,
 
     "themes/snow": SnowTheme,
   },
@@ -150,6 +152,12 @@ class QlQuill extends Quill {
     }
   }
 
+  locale(preset, object) {
+    const locale = this.getModule("locale");
+
+    return locale.locale(preset, object);
+  }
+
   setContents(value) {
     const sel = this.prevSelection;
     if (typeof value === "string") {
@@ -205,6 +213,7 @@ function defaultConfig(options, qlOptions) {
         toolbar: { container: qlOptions.toolbar },
         imageUploader: qlOptions.image || {},
         formula: qlOptions.formula || "",
+        locale: {},
         dialog: {},
       },
       custom: QlQuill.CUSTOM_TOOLS.filter(tool => !!qlOptions[tool]),

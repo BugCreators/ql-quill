@@ -40,11 +40,11 @@ class Import extends Module {
 
   insert() {
     const dialog = this.quill.getModule("dialog");
-    console.log(this.input);
+    const locale = this.quill.getModule("locale");
 
     dialog.open({
       width: 640,
-      title: "插入重点",
+      title: locale.$locale("insertImport"),
       contentElement: this.input,
       onOk: close => {
         const range = this.quill.getSelection(true);

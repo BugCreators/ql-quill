@@ -12,11 +12,15 @@
     <button onclick="insertImage()">插入图片</button>
     <button onclick="insertFormulaImage()">插入公式图片</button>
     <button onclick="getHTML()">获取HTML</button>
+    <button onclick="changeEn()">切换EN</button>
+    <button onclick="changeTw()">切换繁体</button>
   </body>
 
   <script src="./static/axios/axios.min.js"></script>
   <script type="module">
     import QlQuill from "./src";
+    import zhTw from "./src/locale/zh-tw";
+    import enUs from "./src/locale/en-us";
     import "./assets/index.styl";
 
     var value = "<p>hello</p>";
@@ -96,6 +100,14 @@
 
     window.getHTML = () => {
       console.log(editor.getHTML());
+    };
+
+    window.changeEn = () => {
+      editor.locale(enUs);
+    };
+
+    window.changeTw = () => {
+      editor.locale(zhTw);
     };
   </script>
 </html>
