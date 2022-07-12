@@ -1,11 +1,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <link rel="stylesheet" href="./kityformula/assets/styles/base.css">
-  <link rel="stylesheet" href="./kityformula/assets/styles/ui.css">
-  <link rel="stylesheet" href="./kityformula/assets/styles/scrollbar.css">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <link rel="stylesheet" href="./kityformula/assets/styles/base.css" />
+  <link rel="stylesheet" href="./kityformula/assets/styles/ui.css" />
+  <link rel="stylesheet" href="./kityformula/assets/styles/scrollbar.css" />
   <style type="text/css">
     html,
     body {
@@ -24,42 +23,100 @@
 <body>
   <div id="kfEditorContainer" class="kf-editor">
     <div id="tips" class="tips">
-      <div id="loading" style="text-align:center;padding-top: 100px;">
+      <div id="loading" style="text-align: center; padding-top: 100px">
         <img src="./kityformula/loading.gif" alt="loading" />
-        <p>正在加载，请耐心等待...</p>
+        <p data-i18n="正在加载，请耐心等待"></p>
       </div>
     </div>
   </div>
   <script type="text/javascript" src="./kityformula/js/jquery-1.11.0.min.js"></script>
+  <script src="./kityformula/js/jquery.i18n.min.js"></script>
+  <script src="./kityformula/js/jquery.i18n.messagestore.js"></script>
   <script src="./kityformula/js/kitygraph.all.js"></script>
   <script src="./kityformula/js/kity-formula-render.all.js"></script>
   <script src="./kityformula/js/kity-formula-parser.all.min.js"></script>
-  <script src="./kityformula/js/kityformula-editor.all.min.js"></script>
   <script type="text/javascript">
     window.top.kfe = null;
-    const tips = document.querySelector("#tips");
-    if (document.body.addEventListener) {
-      const container = document.querySelector("#kfEditorContainer");
-      const factory = kf.EditorFactory.create(container, {
-        render: {
-          fontsize: 36
-        },
-        resource: {
-          path: "./kityformula/resource/"
-        }
+    var params = getParameters();
+    var locale = params.locale || "zh_cn";
+
+    var i18n = $.i18n();
+    i18n.locale = locale;
+    i18n.load("./kityformula/i18n/" + locale + ".json", i18n.locale).done(function () {
+      $("[data-i18n]").i18n();
+
+      var tips = $("#tips");
+      if (!document.body.addEventListener) {
+        tips.html(
+          i18n.localize("sorry! Beta版本仅支持IE9及以上版本的浏览器，正式版本将会支持低版本浏览器，谢谢您的关注！")
+        );
+        return;
+      }
+
+      loadJS("./kityformula/js/kityformula-editor.all.min.js", function () {
+        var container = $("#kfEditorContainer")[0];
+        var factory = kf.EditorFactory.create(container, {
+          render: {
+            fontsize: 36,
+          },
+          resource: {
+            path: "./kityformula/resource/",
+          },
+        });
+
+        factory.ready(function (KFEditor) {
+          tips.remove();
+          var imgLatex = window.frameElement.dataset.latex || "";
+          this.execCommand("render", imgLatex || "\\placeholder");
+          this.execCommand("focus");
+          window.top.kfe = this;
+        });
       });
-      factory.ready(function (KFEditor) {
-        container.removeChild(tips);
-        const imgLatex = window.frameElement.dataset.latex || "";
-        this.execCommand("render", imgLatex || "\\placeholder");
-        this.execCommand("focus");
-        window.top.kfe = this;
-      })
-    } else {
-      tips.innerHTML = "sorry! Beta版本仅支持IE9及以上版本的浏览器，正式版本将会支持低版本浏览器，谢谢您的关注！"
+    });
+
+    function loadJS(url, callback) {
+      var script = document.createElement("script"),
+        fn = callback || function () {};
+
+      script.type = "text/javascript";
+
+      //IE
+      if (script.readyState) {
+        script.onreadystatechange = function () {
+          if (script.readyState == "loaded" || script.readyState == "complete") {
+            script.onreadystatechange = null;
+            fn();
+          }
+        };
+      } else {
+        //other
+        script.onload = function () {
+          fn();
+        };
+      }
+      script.src = url;
+      document.getElementsByTagName("head")[0].appendChild(script);
+    }
+
+    function getParameters() {
+      var search = window.location.href.split("?")[1];
+      var json = {};
+
+      if (search) {
+        var arr = search.split("&");
+        for (let i = 0; i < arr.length; i++) {
+          var data = arr[i].split("=");
+          json[data[0]] = data[1];
+        }
+      }
+
+      if (json.message) {
+        json.message = decodeURIComponent(json.message);
+      }
+
+      return json;
     }
   </script>
   <script src="./kityformula/js/kityformula-editor.config.js"></script>
 </body>
-
 </html>
