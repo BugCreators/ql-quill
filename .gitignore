@@ -60,6 +60,7 @@ typings/
 # production
 dist
 lib
+locale
 
 # misc
 .DS_Store
