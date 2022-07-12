@@ -51,24 +51,27 @@
       .ql-picker-item
         &::before
           content 'Arial'
+          text-overflow ellipsis
+          white-space nowrap
+          width 100%
+          word-break break-word
+          padding-right 14px
+          box-sizing border-box
+          overflow hidden
+
+        &[data-value]::before
+          content attr(data-value)
 
         &[data-value=SimSun]::before
-          // 宋体
-          content '\5b8b\4f53'
-          font-family 'SimSun'
+          font-family SimSun
 
         &[data-value=SimHei]::before
-          // 黑体
-          content '\9ed1\4f53'
-          font-family 'SimHei'
+          font-family SimHei
 
         &[data-value=Microsoft-YaHei]::before
-          // 微软雅黑
-          content '\5fae\8f6f\96c5\9ed1'
-          font-family 'Microsoft YaHei'
+          font-family Microsoft YaHei
 
         &[data-value=Cursive]::before
-          content 'Cursive'
           font-family Cursive
 
     &.ql-size
