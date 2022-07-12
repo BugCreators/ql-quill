@@ -21,6 +21,10 @@ class Formula extends Module {
     return iframe;
   }
 
+  setSrc(src) {
+    this.iframe.setAttribute("src", src);
+  }
+
   setLatex(latex) {
     this.iframe.dataset.latex = latex;
   }
@@ -34,9 +38,10 @@ class Formula extends Module {
 
     const dialog = this.quill.getModule("dialog");
     const locale = this.quill.getModule("locale");
+    this.setSrc(this.options + "?locale=" + locale.$L);
 
     dialog.open({
-      width: 888,
+      width: 889,
       title: locale.$locale("insertFormula"),
       content: this.iframe.outerHTML,
       onOk: close => {

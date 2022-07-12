@@ -1,6 +1,6 @@
 import Quill from "quill";
 
-import zhCn from "../locale/zh-cn";
+import zhCn from "../locale/zh_cn";
 
 let L = null; // global locale
 const Ls = {}; // global loaded locale
@@ -17,7 +17,7 @@ function parseLocale(preset, object, isLocal) {
       Ls[presetLower] = object;
       l = presetLower;
     }
-    const presetSplit = preset.split("-");
+    const presetSplit = preset.split("_");
     if (!l && presetSplit.length > 1) {
       return parseLocale(presetSplit[0]);
     }

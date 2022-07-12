@@ -1,5 +1,5 @@
 const locale = {
-  name: "en-us",
+  name: "en_us",
   insertImport: "Insert Import",
   insertFormula: "Insert Formula",
   cancel: "cancel",

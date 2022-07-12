@@ -1,5 +1,5 @@
 const locale = {
-  name: "zh-tw",
+  name: "zh_tw",
   insertImport: "插入重點",
   insertFormula: "插入公式",
   cancel: "取消",
