@@ -6,7 +6,7 @@ const locale = {
   插入公式: "Insert Formula",
   取消: "cancel",
   确定: "ok",
-  恢复默认: "restore default",
+  重置: "reset",
 };
 
 const localeModule = QlQuill.import("modules/locale");
