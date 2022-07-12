@@ -196,6 +196,24 @@ class ColorPicker extends Tooltip {
       if (range == null) return;
       this.hide();
     });
+
+    const toolbar = this.quill.getModule("toolbar");
+
+    let listener = e => {
+      if (!document.body.contains(this.quill.root)) {
+        return document.body.removeEventListener("click", listener);
+      }
+
+      if (
+        this.root != null &&
+        !this.root.contains(e.target) &&
+        !toolbar.container.contains(e.target) &&
+        !this.quill.hasFocus()
+      ) {
+        this.hide();
+      }
+    };
+    this.quill.emitter.listenDOM("click", document.body, listener);
   }
 
   edit(color) {
