@@ -42,8 +42,8 @@ class Dialog {
 
     const locale = this.quill.getModule("locale");
 
-    this.renderButton(Dialog.CONFIRM_BTN_CLASS_NAME, locale.$locale("ok"));
-    this.renderButton(Dialog.CANCEL_BTN_CLASS_NAME, locale.$locale("cancel"));
+    this.renderButton(Dialog.CONFIRM_BTN_CLASS_NAME, locale.$locale("确定"));
+    this.renderButton(Dialog.CANCEL_BTN_CLASS_NAME, locale.$locale("取消"));
   }
 
   renderBody(options) {

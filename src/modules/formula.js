@@ -42,7 +42,7 @@ class Formula extends Module {
 
     dialog.open({
       width: 889,
-      title: locale.$locale("insertFormula"),
+      title: locale.$locale("插入公式"),
       content: this.iframe.outerHTML,
       onOk: close => {
         if (!window.kfe) {

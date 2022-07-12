@@ -134,10 +134,10 @@ class ColorPicker extends Tooltip {
   show() {
     super.show();
 
-    const locale = this.quill.getModule("locale").$locale();
+    const locale = this.quill.getModule("locale");
 
-    this.renderButton(ColorPicker.CONFIRM_BTN_CLASS_NAME, locale.ok);
-    this.renderButton(ColorPicker.DEFAULT_BTN_CLASS_NAME, locale.restoreDefault);
+    this.renderButton(ColorPicker.CONFIRM_BTN_CLASS_NAME, locale.$locale("确定"));
+    this.renderButton(ColorPicker.DEFAULT_BTN_CLASS_NAME, locale.$locale("恢复默认"));
 
     this.quill.blur();
   }

@@ -1,9 +1,9 @@
 import Quill from "quill";
 
-import zhCn from "../locale/zh_cn";
-
-let L = null; // global locale
-const Ls = {}; // global loaded locale
+let L = "zh_cn"; // global locale
+const Ls = {
+  zh_cn: {},
+}; // global loaded locale
 
 function parseLocale(preset, object, isLocal) {
   let l;
@@ -36,13 +36,13 @@ class Locale extends Module {
   constructor(quill, options) {
     super(quill, options);
 
-    this.$L = parseLocale(zhCn, null, true);
+    this.$L = parseLocale(options, null, true) || "zh_cn";
   }
 
   $locale(key) {
     const locale = Ls[this.$L];
 
-    return key ? locale[key] : locale;
+    return key ? locale[key] || key : locale;
   }
 
   locale(preset, object) {
@@ -53,5 +53,8 @@ class Locale extends Module {
     return this;
   }
 }
+
+Locale.locale = parseLocale;
+Locale.Ls = Ls;
 
 export default Locale;

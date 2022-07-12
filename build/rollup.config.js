@@ -6,6 +6,7 @@ module.exports = config => {
   return {
     input: {
       input,
+      external: ["ql-quill"],
       plugins: [
         babel({
           exclude: "node_modules/**",
@@ -18,6 +19,9 @@ module.exports = config => {
       file: fileName,
       format: "umd",
       name: name || "ql-quill",
+      globals: {
+        "ql-quill": "ql-quill",
+      },
       compact: true,
     },
   };

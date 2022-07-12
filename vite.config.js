@@ -9,6 +9,7 @@ const pathResolve = dir => {
 export default defineConfig({
   resolve: {
     alias: {
+      "ql-quill": pathResolve("src/index"),
       "@icons": pathResolve("assets/icons"),
       "@plugin": pathResolve("plugin"),
     },
