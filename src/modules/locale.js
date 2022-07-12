@@ -36,7 +36,11 @@ class Locale extends Module {
   constructor(quill, options) {
     super(quill, options);
 
-    this.$L = parseLocale(options, null, true) || "zh_cn";
+    parseLocale(options, null);
+  }
+
+  get $L() {
+    return L;
   }
 
   $locale(key) {
@@ -48,9 +52,7 @@ class Locale extends Module {
   locale(preset, object) {
     if (!preset) return this.$L;
 
-    const nextLocaleName = parseLocale(preset, object, true);
-    if (nextLocaleName) this.$L = nextLocaleName;
-    return this;
+    parseLocale(preset, object);
   }
 }
 

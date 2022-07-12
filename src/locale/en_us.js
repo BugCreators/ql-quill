@@ -11,6 +11,6 @@ const locale = {
 
 const localeModule = QlQuill.import("modules/locale");
 
-localeModule.locale(locale);
+localeModule.locale(locale, null, true);
 
 export default locale;
