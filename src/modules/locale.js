@@ -22,7 +22,7 @@ function parseLocale(preset, object, isLocal) {
       return parseLocale(presetSplit[0]);
     }
   } else {
-    const { name } = preset;
+    const { name = L } = preset;
     Ls[name] = preset;
     l = name;
   }

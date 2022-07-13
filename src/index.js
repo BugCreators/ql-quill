@@ -214,7 +214,7 @@ function defaultConfig(options, qlOptions) {
         toolbar: { container: qlOptions.toolbar },
         imageUploader: qlOptions.image || {},
         formula: qlOptions.formula || "",
-        locale: qlOptions.locale || "zh_cn",
+        locale: qlOptions.locale || {},
         dialog: {},
       },
       custom: QlQuill.CUSTOM_TOOLS.filter(tool => !!qlOptions[tool]),
