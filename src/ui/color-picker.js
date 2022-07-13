@@ -129,6 +129,7 @@ class ColorPicker extends Tooltip {
     });
 
     const toolbar = this.quill.getModule("toolbar");
+    const colorButton = toolbar.container.querySelector(".ql-color");
 
     let listener = e => {
       if (!document.body.contains(this.quill.root)) {
@@ -138,7 +139,7 @@ class ColorPicker extends Tooltip {
       if (
         this.root != null &&
         !this.root.contains(e.target) &&
-        !toolbar.container.contains(e.target) &&
+        !colorButton.contains(e.target) &&
         !this.quill.hasFocus()
       ) {
         this.hide();
