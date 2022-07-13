@@ -1,3 +1,22 @@
+## v1.1.4
+
+- editor
+  - 编辑器默认字号调整为 14px
+  - imageUploader 替代默认 image handler
+  - imageUploader 添加图片上传 error 处理
+  - image 配置项添加 base64AutoUpload 属性 可自动上传粘贴的 base64 图片
+  - 点击编辑器外部隐藏图片缩放框、颜色选择器
+- 国际化
+  - 支持简体中文、繁体中文、英文
+- dialog
+  - 将类名提取为静态值
+  - 使用别的方法替代正则去除 innerHTML 多余的空格（IE11 兼容）
+  - 新增 contentElement、beforeClose 传参
+- formula
+  - 提取成 module
+- vite 配置
+  - 配置 build.cssTarget 以防止 rgba 颜色被转换成十六进制（IE11 兼容）
+
 ## v1.1.3
 
 - 使用 vite 替代 webpack 作为开发构建工具
