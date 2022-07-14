@@ -22,9 +22,11 @@ function parseLocale(preset, object, isLocal) {
       return parseLocale(presetSplit[0]);
     }
   } else {
-    const { name = L } = preset;
-    Ls[name] = preset;
-    l = name;
+    const { name } = preset;
+    if (name) {
+      Ls[name] = preset;
+      l = name;
+    }
   }
   if (!isLocal && l) L = l;
   return l || (!isLocal && L);
@@ -36,6 +38,7 @@ class Locale extends Module {
   constructor(quill, options) {
     super(quill, options);
 
+    if (typeof options === "object" && !options.name) options = Ls[L];
     parseLocale(options, null);
   }
 
