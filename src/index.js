@@ -64,7 +64,9 @@ class QlQuill extends Quill {
     // 旧数据处理 类名转成内联
     this.clipboard.addMatcher("SPAN", (node, delta) => {
       Array.from(node.classList).forEach(className => {
-        const [, format, value] = className.match(/^ql-(size|font)-(.*)/);
+        const [, format, value] = className.match(/^ql-(size|font)-(.*)/) || [];
+
+        if (!format || !value) return;
 
         delta.map((op, index) => {
           if (!op.attributes) op.attributes = {};
