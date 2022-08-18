@@ -1,6 +1,5 @@
 /* 工具栏 */
 .kf-editor-toolbar {
-    box-sizing: border-box;
     width: 100%;
     padding: 1px 10px;
     position: relative;
@@ -18,8 +17,7 @@
 
 /* 按钮 */
 .kf-editor-ui-button {
-    width: 50px;
-    padding: 8px 0;
+    padding: 8px 6px;
     height: 79px;
     font-size: 12px;
     display: inline-block;
@@ -50,17 +48,10 @@
 
 .kf-editor-ui-button-label {
     color: #666;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    text-align: center;
+    display: block;
     font-size: 12px;
     line-height: 20px;
-}
-
-.kf-editor-ui-button-span {
-    display: block;
-    text-align: center;
-    width: 3em;
 }
 
 .kf-editor-ui-overlap-button .kf-editor-ui-button-label {
@@ -76,8 +67,8 @@
     width: 0;
     height: 0;
     display: inline-block;
-    /* margin: 8px auto; */
-    vertical-align: baseline;
+    margin: 8px auto;
+    vertical-align: top;
 }
 
 .kf-editor-ui-button-mount-point {
@@ -312,20 +303,20 @@
 }
 
 .kf-editor-ui-moveup-button {
-    background: url( "../images/toolbar/btn.png" ) -304px 9px no-repeat;
+    background: url("../images/toolbar/btn.png") -304px 9px no-repeat;
 }
 
 .kf-editor-ui-movedown-button {
     border: 1px solid #D3D3D3;
     border-width: 1px 0;
-    background: url( "../images/toolbar/btn.png" ) -325px 9px no-repeat;
+    background: url("../images/toolbar/btn.png") -325px 9px no-repeat;
 }
 
 .kf-editor-ui-area-button {
     width: 100%;
     height: 50px;
     line-height: 26px;
-    background: url( "../images/toolbar/btn.png" ) -346px 0 no-repeat;
+    background: url("../images/toolbar/btn.png") -346px 0 no-repeat;
 }
 
 .kf-editor-ui-enabled .kf-editor-ui-area-button:HOVER {
@@ -381,7 +372,7 @@
 
 .kf-editor-ui-list-item {
     line-height: 24px;
-    padding: 2px 16px 2px 6px;
+    padding: 2px 6px;
     border: 1px solid transparent;
     border-width: 1px 0;
 }
@@ -395,7 +386,7 @@
     visibility: visible;
     width: 16px;
     height: 16px;
-    background: url( ../../assets/images/toolbar/btn.png ) no-repeat -367px 0;
+    background: url(../images/toolbar/btn.png) no-repeat -367px 0;
 }
 
 .kf-editor-ui-list-item:HOVER {

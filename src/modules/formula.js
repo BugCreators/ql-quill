@@ -41,7 +41,7 @@ class Formula extends Module {
     this.setSrc(this.options + "?locale=" + locale.$L);
 
     dialog.open({
-      width: 889,
+      width: 980,
       title: locale.$locale("插入公式"),
       content: this.iframe.outerHTML,
       onOk: close => {
