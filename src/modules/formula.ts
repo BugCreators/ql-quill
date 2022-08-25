@@ -1,9 +1,12 @@
-import Quill from "quill";
+import QlQuill from "../index";
 
-const Module = Quill.import("core/module");
+const Module = QlQuill.import("core/module");
 
 class Formula extends Module {
-  constructor(quill, options) {
+  iframe: HTMLIFrameElement;
+  options!: string;
+
+  constructor(quill: QlQuill, options: string) {
     super(quill, options);
     this.iframe = this.createIframe();
 
@@ -21,18 +24,18 @@ class Formula extends Module {
     return iframe;
   }
 
-  setSrc(src) {
+  setSrc(src: string) {
     this.iframe.setAttribute("src", src);
   }
 
-  setLatex(latex) {
+  setLatex(latex: string) {
     this.iframe.dataset.latex = latex;
   }
 
   // 插入公式弹窗
-  openFormulaDialog = (img = null) => {
+  openFormulaDialog = (img?: HTMLImageElement) => {
     const isImage = img instanceof HTMLImageElement;
-    const latex = isImage ? img.dataset.latex : "";
+    const latex = isImage ? img.dataset.latex || "" : "";
 
     this.setLatex(latex);
 
@@ -51,11 +54,11 @@ class Formula extends Module {
         }
 
         window.kfe.execCommand("get.image.data", data => {
-          const sLatex = window.kfe.execCommand("get.source");
+          const sLatex = window.kfe!.execCommand<string>("get.source");
 
           const imageUploader = this.quill.getModule("imageUploader");
 
-          imageUploader.uploadImage(data.img, src => {
+          imageUploader.uploadImage(data.img, (src: string) => {
             close();
             if (isImage) {
               img.setAttribute("src", src);

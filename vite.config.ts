@@ -1,8 +1,9 @@
 import path from "path";
 import { defineConfig } from "vite";
 import { getBabelOutputPlugin } from "@rollup/plugin-babel";
+import dts from "vite-plugin-dts";
 
-const pathResolve = dir => {
+const pathResolve = (dir: string) => {
   return path.resolve(__dirname, ".", dir);
 };
 
@@ -14,16 +15,16 @@ export default defineConfig({
       "@plugin": pathResolve("plugin"),
     },
   },
-  plugins: [getBabelOutputPlugin({ allowAllFormats: true, presets: [["@babel/preset-env"]] })],
+  plugins: [getBabelOutputPlugin({ allowAllFormats: true, presets: [["@babel/preset-env"]] }), dts()],
   server: {
     port: 8080,
   },
   build: {
     lib: {
-      entry: pathResolve("./index.js"),
+      entry: pathResolve("./index.ts"),
       name: "QlQuill",
-      fileName: format => "ql-quill.js",
-      formats: ["umd"],
+      fileName: format => "ql-quill." + format + ".js",
+      formats: ["umd", "es"],
     },
     cssTarget: "chrome61", // 防止vite将rgba颜色转为十六进制
     minify: "terser",

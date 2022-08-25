@@ -1,28 +1,53 @@
+import type QlQuill from "../index";
 import closeIcon from "@icons/close.svg?raw";
 
+interface DialogOptions {
+  content?: string;
+  contentElement?: Element;
+  title?: string;
+  width?: number;
+  onOk?(close: () => void): void;
+  beforeClose?(): void;
+  onCancel?(): void;
+}
+
 class Dialog {
-  constructor(quill) {
+  static CONTAINER_CLASS_NAME: string;
+  static MASK_CLASS_NAME: string;
+  static CONTENT_CLASS_NAME: string;
+  static CLOSE_BTN_CLASS_NAME: string;
+  static TITLE_CLASS_NAME: string;
+  static BODY_CLASS_NAME: string;
+  static CANCEL_BTN_CLASS_NAME: string;
+  static CONFIRM_BTN_CLASS_NAME: string;
+  static TEMPLATE: string;
+
+  quill: QlQuill;
+  options: DialogOptions;
+  container: HTMLElement;
+
+  constructor(quill: QlQuill) {
     this.quill = quill;
     this.options = {};
 
-    const root = this.quill.container.querySelector("." + Dialog.CONTAINER_CLASS_NAME);
+    const root = this.quill.container.querySelector<HTMLElement>("." + Dialog.CONTAINER_CLASS_NAME);
 
     this.container = root || this.createContainer();
 
     this.registerListener();
   }
 
-  queryComponent(className) {
-    return this.container.querySelector("." + className);
+  queryComponent(className: string): HTMLElement {
+    return this.container.querySelector("." + className)!;
   }
 
-  open(options) {
+  open(options: DialogOptions) {
     this.setOptions(options);
 
     this.show();
   }
 
-  createContainer() {
+  createContainer(): HTMLElement {
     const container = this.quill.addContainer(Dialog.CONTAINER_CLASS_NAME);
     container.style.display = "none";
 
@@ -31,7 +56,7 @@ class Dialog {
     return container;
   }
 
-  setOptions(options) {
+  setOptions(options: DialogOptions) {
     this.options = options;
 
     this.setTitle(options);
@@ -46,7 +71,7 @@ class Dialog {
     this.renderButton(Dialog.CANCEL_BTN_CLASS_NAME, locale.$locale("取消"));
   }
 
-  renderBody(options) {
+  renderBody(options: DialogOptions) {
     const body = this.queryComponent(Dialog.BODY_CLASS_NAME);
 
     if (options.content) {
@@ -61,11 +86,11 @@ class Dialog {
     }
   }
 
-  setTitle(options) {
+  setTitle(options: DialogOptions) {
     this.queryComponent(Dialog.TITLE_CLASS_NAME).innerText = options.title || "";
   }
 
-  setBounds(options) {
+  setBounds(options: DialogOptions) {
     const width = Number(options.width) || "";
 
     const dialog = this.queryComponent(Dialog.CONTENT_CLASS_NAME);
@@ -73,7 +98,7 @@ class Dialog {
     dialog.style.width = width ? `${width}px` : "";
   }
 
-  renderButton(className, text) {
+  renderButton(className: string, text: string) {
     const button = this.queryComponent(className);
     button.innerHTML = `<span>${text}</span>`;
   }
