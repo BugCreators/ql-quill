@@ -1,7 +1,6 @@
-import QlQuill from "../index";
-import type { Locale } from ".";
+import QlQuill from "ql-quill";
 
-const locale: Locale = {
+const locale = {
   name: "zh_tw",
   插入重点: "插入重點",
   插入公式: "插入公式",
