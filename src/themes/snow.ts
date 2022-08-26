@@ -1,9 +1,11 @@
-import Quill from "quill";
+import QlQuill from "../index";
+import { Toolbar, ToolbarOptionsObj } from "quill";
+import type { QlQuillOptionsStatic } from "../types";
 import ColorPicker from "../ui/color-picker";
 
-const Snow = Quill.import("themes/snow");
+const Snow = QlQuill.import("themes/snow");
 
-const DEFAULTS = {
+const DEFAULTS: Record<string, Array<any>> = {
   tool: [
     "bold", // 加粗
     "italic", // 斜体
@@ -18,13 +20,16 @@ const DEFAULTS = {
 };
 
 class SnowTheme extends Snow {
-  constructor(quill, options) {
-    expandConfig(options.modules.toolbar, options);
+  colorPicker?: ColorPicker;
+  declare options: QlQuillOptionsStatic;
+
+  constructor(quill: QlQuill, options: QlQuillOptionsStatic) {
+    expandConfig(options.modules?.toolbar as ToolbarOptionsObj, options);
 
     super(quill, options);
   }
 
-  extendToolbar(toolbar) {
+  extendToolbar(toolbar: Toolbar) {
     super.extendToolbar(toolbar);
 
     if (toolbar.container.querySelector(".ql-color")) {
@@ -33,29 +38,29 @@ class SnowTheme extends Snow {
   }
 }
 
-function expandConfig(toolbar, options) {
+function expandConfig(toolbar: ToolbarOptionsObj, options: QlQuillOptionsStatic): void {
   if (typeof toolbar.container === "string") return;
   if (!toolbar.container) toolbar.container = DEFAULTS.tool;
 
-  toolbar = toolbar.container;
+  const container = toolbar.container as any[];
 
-  const twoD = Array.isArray(toolbar[0]);
-  const toolbarTemp = twoD ? toolbar : [toolbar];
+  const twoD = Array.isArray(container[0]);
+  const toolbarTemp = twoD ? container : [container];
 
-  let custom = {};
+  let custom: { [key: string]: boolean } = {};
 
   toolbarTemp.forEach(tool => {
     options.custom.forEach(t => !custom[t] && (custom[t] = tool.indexOf(t) !== -1));
 
-    ["font", "size"].forEach(format => {
+    (["font", "size"] as (keyof typeof DEFAULTS)[]).forEach(format => {
       const index = tool.indexOf(format);
       if (index !== -1) {
-        const style = Quill.import("attributors/style/" + format);
+        const style = QlQuill.import("attributors/style/" + format);
 
         style.whitelist = DEFAULTS[format];
 
         // 设为内联
-        Quill.register(
+        QlQuill.register(
           {
             ["formats/" + format]: style,
           },
@@ -67,7 +72,7 @@ function expandConfig(toolbar, options) {
     });
   });
 
-  for (const key in custom) !custom[key] && toolbar.push(twoD ? [key] : key);
+  for (const key in custom) !custom[key] && container.push(twoD ? [key] : key);
 }
 
 export default SnowTheme;

@@ -1,17 +1,17 @@
-import Quill from "quill";
+import QlQuill from "../index";
 
-const Embed = Quill.import("blots/embed");
-const Module = Quill.import("core/module");
+const Embed = QlQuill.import("blots/embed");
+const Module = QlQuill.import("core/module");
 
 class ImportBlot extends Embed {
-  static create(value) {
-    const node = super.create(value);
+  static create(value: string) {
+    const node = super.create(value) as HTMLElement;
     node.innerText = value;
 
     return node;
   }
 
-  static value(domNode) {
+  static value(domNode: HTMLElement) {
     return domNode.innerText;
   }
 }
@@ -20,11 +20,13 @@ ImportBlot.blotName = "import";
 ImportBlot.tagName = "POINT";
 
 class Import extends Module {
+  input: HTMLInputElement;
+
   static register() {
-    Quill.register(ImportBlot, true);
+    QlQuill.register(ImportBlot, true);
   }
 
-  constructor(quill, options) {
+  constructor(quill: QlQuill, options: any) {
     super(quill, options);
     this.input = this.createInput();
 
@@ -58,7 +60,7 @@ class Import extends Module {
         this.quill.setSelection(index);
         close();
       },
-      beforeClose: _ => {
+      beforeClose: () => {
         this.input.value = "";
       },
     });

@@ -1,19 +1,18 @@
-const rollup = require("rollup");
-const configFactory = require("./rollup.config");
-const fs = require("fs");
-const util = require("util");
-const path = require("path");
+import { rollup } from "rollup";
+import configFactory from "./rollup.config";
+import type { FactoryConfig } from "./rollup.config";
+import { readdir } from "fs";
+import { promisify } from "util";
+import { join } from "path";
 
-const formatName = n => n.replace(/\.js/, "");
+const formatName = (n: string) => n.replace(/\.js/, "");
 
-const { promisify } = util;
+const promisifyReadDir = promisify(readdir);
 
-const promisifyReadDir = promisify(fs.readdir);
+const localePath = join(__dirname, "../src/locale");
 
-const localePath = path.join(__dirname, "../src/locale");
-
-async function build(option) {
-  const bundle = await rollup.rollup(option.input);
+async function build(option: FactoryConfig) {
+  const bundle = await rollup(option.input);
   await bundle.write(option.output);
 }
 
@@ -27,7 +26,7 @@ async function build(option) {
       await build(
         configFactory({
           input: `./src/locale/${l}`,
-          fileName: `./locale/${l}`,
+          fileName: `./locale/${l}`.replace("ts", "js"),
           name: `ql_quill_locale_${formatName(l)}`,
         })
       );
