@@ -1,7 +1,8 @@
 import Quill from "quill";
-import type { QuillOptionsStatic, QuillOptionsModules, RangeStatic, Sources, Clipboard, Toolbar } from "quill";
+import type { QuillOptionsStatic, RangeStatic, Sources, Delta, Clipboard, Toolbar } from "quill";
 import isEqual from "lodash.isequal";
 import extend from "extend";
+import type { CustomToolOptions, QlQuillOptionsStatic, QlOptions, QlQuillOptions } from "./types";
 
 import Dialog from "./modules/dialog";
 
@@ -20,50 +21,6 @@ const Icons = Quill.import("ui/icons");
 Object.assign(Icons, { clean: cleanIcon });
 
 Quill.register(ImageBlot, true);
-
-export interface QlQuillOptionsStatic extends QuillOptionsStatic {
-  custom: string[];
-}
-
-interface CustomToolOptions {
-  /** 开启插入重点功能 不推荐使用此配置 建议在toolbar配置 */
-  import?: boolean;
-  /** 开启插入小题(sub-option标签)功能 不推荐使用此配置 建议在toolbar配置 */
-  option?: boolean;
-  /** 开启插入小题(sub-question标签)功能 不推荐使用此配置 建议在toolbar配置 */
-  question?: boolean;
-  /** 开启插入公式 */
-  formula?: string;
-}
-
-interface QlOptions extends CustomToolOptions {
-  /** toolbar配置 */
-  toolbar?: QuillOptionsModules["toolbar"];
-  /** 文本字数限制 */
-  limit?: number;
-  /** 字数达到上限时触发 */
-  onLimit?(): void;
-  /** 编辑器默认富文本 */
-  value?: string;
-  /** 富文本值改变时触发 */
-  onChange?(value: string): void;
-  /** 图片相关配置 */
-  image?: Record<string, unknown> | Function;
-  /** 图片是否可缩放 */
-  imageResize?: boolean;
-  /** 编辑器默认语言 */
-  locale?: string;
-  /** 是否开启从 word 复制文本 */
-  pasteFromWord?: boolean;
-  /** 编辑器聚焦时触发 */
-  onFocus?(): void;
-  /** 编辑器失焦时触发 */
-  onBlur?(): void;
-}
-
-type QlQuillOptions = Partial<QlQuillOptionsStatic> & QlOptions;
-
-type Delta = ReturnType<Quill["getContents"]>;
 
 interface QlQuill {
   getModule(name: "toolbar"): Toolbar<QlQuill>;

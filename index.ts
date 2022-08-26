@@ -35,5 +35,8 @@ QlQuill.register(
 // quill
 export { default as Quill } from "quill";
 
+export * from "./src/index";
+export * from "./src/types";
+
 // ql-quill
 export default QlQuill;

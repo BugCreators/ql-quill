@@ -1,5 +1,6 @@
-import QlQuill, { QlQuillOptionsStatic } from "../index";
+import QlQuill from "../index";
 import { Toolbar, ToolbarOptionsObj } from "quill";
+import type { QlQuillOptionsStatic } from "../types";
 import ColorPicker from "../ui/color-picker";
 
 const Snow = QlQuill.import("themes/snow");

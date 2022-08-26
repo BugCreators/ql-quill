@@ -1,5 +1,5 @@
 import QlQuill from "../index";
-import MoColorPicker from "@plugin/color-picker/mo.color-picker.es.js";
+import MoColorPicker from "../../plugin/color-picker/mo.color-picker.es.js";
 
 const Tooltip = QlQuill.import("ui/tooltip");
 

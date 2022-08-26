@@ -12,7 +12,6 @@ export default defineConfig({
     alias: {
       "ql-quill": pathResolve("src/index"),
       "@icons": pathResolve("assets/icons"),
-      "@plugin": pathResolve("plugin"),
     },
   },
   plugins: [getBabelOutputPlugin({ allowAllFormats: true, presets: [["@babel/preset-env"]] }), dts()],
