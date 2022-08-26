@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "allowJs": true,
+    "outDir": "./locale",
+    "declaration": true,
+    "declarationDir": "./locale",
+    "moduleResolution": "node",
+    "types": ["node", "vite/client", "babel__core"],
+    "baseUrl": "./"
+  },
+  "include": ["./src/locale"],
+}

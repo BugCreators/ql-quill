@@ -1,10 +1,10 @@
-import path from "path";
+import { resolve } from "path";
 import { defineConfig } from "vite";
 import { getBabelOutputPlugin } from "@rollup/plugin-babel";
 import dts from "vite-plugin-dts";
 
 const pathResolve = (dir: string) => {
-  return path.resolve(__dirname, ".", dir);
+  return resolve(__dirname, ".", dir);
 };
 
 export default defineConfig({
