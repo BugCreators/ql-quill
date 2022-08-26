@@ -1,10 +1,32 @@
-import Quill from "quill";
-import MoColorPicker from "@plugin/color-picker/mo.color-picker.es.js";
+import QlQuill from "../index";
+import MoColorPicker from "../../plugin/color-picker/mo.color-picker.es.js";
 
-const Tooltip = Quill.import("ui/tooltip");
+const Tooltip = QlQuill.import("ui/tooltip");
 
 class ColorPicker extends Tooltip {
-  constructor(quill, boundsContainer) {
+  static BLOCK_CLASS_NAME: string;
+  static INPUTS_CLASS_NAME: string;
+  static STANDARD_CLASS_NAME: string;
+  static PICKER_CLASS_NAME: string;
+  static CONFIRM_BTN_CLASS_NAME: string;
+  static DEFAULT_BTN_CLASS_NAME: string;
+  static STANDARD_COLORS: string[];
+  static COLOR_SET: string;
+  static COLOR_PICK: string;
+  static COLOR_SELECT_HOVER: string;
+  static COLOR_SELECT: string;
+  static COLOR_INPUT: string;
+  static DEFAULT_COLOR: string;
+  static TEMPLATE: string;
+
+  block: HTMLElement;
+  inputContainer: HTMLElement;
+  standardContainer: HTMLElement;
+  inputs: [RGBInput<"r">, RGBInput<"g">, RGBInput<"b">];
+  instance?: MoColorPicker;
+  color?: string;
+
+  constructor(quill: QlQuill, boundsContainer: HTMLElement | null) {
     super(quill, boundsContainer);
 
     const toolbar = quill.getModule("toolbar");
@@ -21,7 +43,7 @@ class ColorPicker extends Tooltip {
     this.standardContainer = this.queryComponent(ColorPicker.STANDARD_CLASS_NAME);
 
     this.initPicker();
-    this.buildSelect(this.constructor.STANDARD_COLORS);
+    this.buildSelect(ColorPicker.STANDARD_COLORS);
 
     if (this.quill.root === this.quill.scrollingContainer) {
       this.quill.root.addEventListener("scroll", () => {
@@ -41,8 +63,8 @@ class ColorPicker extends Tooltip {
     this.listen();
   }
 
-  queryComponent(className) {
-    return this.root.querySelector("." + className);
+  queryComponent(className: string) {
+    return this.root.querySelector("." + className) as HTMLElement;
   }
 
   initPicker() {
@@ -50,11 +72,11 @@ class ColorPicker extends Tooltip {
 
     this.instance = new MoColorPicker(picker, {
       format: "hex",
-      change: color => this.updateColor(color, this.constructor.COLOR_PICK),
+      change: (color: string) => this.updateColor(color, ColorPicker.COLOR_PICK),
     });
   }
 
-  buildSelect(colors) {
+  buildSelect(colors: string[]) {
     this.standardContainer.innerHTML = colors.reduce((html, color) => {
       html += `<span class="ql-color-item" style="background: ${color}" data-color="${color}"></span>`;
 
@@ -73,7 +95,7 @@ class ColorPicker extends Tooltip {
     this.quill.blur();
   }
 
-  renderButton(className, text) {
+  renderButton(className: string, text: string) {
     const button = this.queryComponent(className);
     if (text !== button.innerText) {
       button.innerHTML = `<span>${text}</span>`;
@@ -81,11 +103,12 @@ class ColorPicker extends Tooltip {
   }
 
   listen() {
-    const { COLOR_SELECT_HOVER, COLOR_SELECT, COLOR_INPUT } = this.constructor;
+    const { COLOR_SELECT_HOVER, COLOR_SELECT, COLOR_INPUT } = ColorPicker;
 
     this.standardContainer.addEventListener(
       "mouseover",
       e => {
+        // @ts-ignore
         const { color } = e.target.dataset;
 
         color && this.updateColor(color, COLOR_SELECT_HOVER);
@@ -96,6 +119,7 @@ class ColorPicker extends Tooltip {
     this.standardContainer.addEventListener(
       "click",
       e => {
+        // @ts-ignore
         const { color } = e.target.dataset;
 
         color && this.updateColor(color, COLOR_SELECT);
@@ -106,7 +130,7 @@ class ColorPicker extends Tooltip {
     this.standardContainer.addEventListener(
       "mouseout",
       () => {
-        const previewColor = this.instance.getValue();
+        const previewColor = this.instance?.getValue();
 
         previewColor !== this.color && this.updateColor(this.color, COLOR_SELECT_HOVER);
       },
@@ -114,7 +138,7 @@ class ColorPicker extends Tooltip {
     );
 
     this.inputContainer.addEventListener("change", () => {
-      const colors = this.inputs.map(input => input.value);
+      const colors = this.inputs.map(input => input.value) as [number, number, number];
 
       this.updateColor(MoColorPicker.rgb2hex(...colors), COLOR_INPUT);
     });
@@ -129,16 +153,18 @@ class ColorPicker extends Tooltip {
     });
 
     const toolbar = this.quill.getModule("toolbar");
-    const colorButton = toolbar.container.querySelector(".ql-color");
+    const colorButton = toolbar.container.querySelector(".ql-color")!;
 
-    let listener = e => {
+    const listener = (e: MouseEvent): void => {
       if (!document.body.contains(this.quill.root)) {
         return document.body.removeEventListener("click", listener);
       }
 
       if (
         this.root != null &&
+        //@ts-ignore
         !this.root.contains(e.target) &&
+        //@ts-ignore
         !colorButton.contains(e.target) &&
         !this.quill.hasFocus()
       ) {
@@ -148,34 +174,34 @@ class ColorPicker extends Tooltip {
     this.quill.emitter.listenDOM("click", document.body, listener);
   }
 
-  edit(color) {
+  edit(color: string) {
     this.show();
-    this.updateColor(color, this.constructor.COLOR_SET);
+    this.updateColor(color, ColorPicker.COLOR_SET);
   }
 
   position() {
-    const control = this.quill.getModule("toolbar").container.querySelector(".ql-color");
+    const control = this.quill.getModule("toolbar").container.querySelector(".ql-color") as HTMLElement;
 
-    this.root.style.left = control.offsetLeft - control.parentElement.offsetLeft + "px";
+    this.root.style.left = control.offsetLeft - control.parentElement!.offsetLeft + "px";
   }
 
-  updateColor(color, from = "") {
-    const { DEFAULT_COLOR, COLOR_INPUT, COLOR_PICK, COLOR_SELECT_HOVER } = this.constructor;
+  updateColor(color?: string, from = "") {
+    const { DEFAULT_COLOR, COLOR_INPUT, COLOR_PICK, COLOR_SELECT_HOVER } = ColorPicker;
 
     color = color || DEFAULT_COLOR;
 
-    this.block.style.background = color;
+    this.block.style.background = color as string;
 
     if (from !== COLOR_INPUT) {
       const colors = MoColorPicker.hex2rgb(color);
 
       this.inputs.forEach(input => {
-        input.setValue(colors[input.key.toLocaleLowerCase()]);
+        input.setValue(colors[input.key]);
       });
     }
 
     if (from !== COLOR_PICK) {
-      this.instance.setValue(color);
+      this.instance?.setValue(color);
     }
 
     if (from !== COLOR_SELECT_HOVER) {
@@ -184,7 +210,7 @@ class ColorPicker extends Tooltip {
   }
 
   save() {
-    this.quill.format("color", this.color === this.constructor.DEFAULT_COLOR ? false : this.color, Quill.sources.USER);
+    this.quill.format("color", this.color === ColorPicker.DEFAULT_COLOR ? false : this.color, QlQuill.sources.USER);
     this.hide();
   }
 }
@@ -230,11 +256,16 @@ ColorPicker.TEMPLATE = [
   "</div>",
 ].join("");
 
-class RGBInput {
+class RGBInput<T extends "r" | "g" | "b"> {
   static max = 255;
   static min = 0;
 
-  constructor(container, key, value) {
+  container: HTMLElement;
+  value?: number | string;
+  key: T;
+  input: HTMLInputElement;
+
+  constructor(container: HTMLElement, key: T, value?: number | string) {
     this.container = container;
     this.key = key;
     this.value = value;
@@ -248,10 +279,10 @@ class RGBInput {
     const span = document.createElement("span");
     const input = document.createElement("input");
     input.setAttribute("type", "number");
-    input.setAttribute("max", this.constructor.max);
-    input.setAttribute("min", this.constructor.min);
+    input.setAttribute("max", String(RGBInput.max));
+    input.setAttribute("min", String(RGBInput.min));
     input.dataset.key = this.key;
-    input.value = this.value;
+    input.value = String(this.value) || "";
 
     span.innerHTML = this.key.toLocaleUpperCase();
     span.appendChild(input);
@@ -261,20 +292,21 @@ class RGBInput {
     return input;
   }
 
-  setValue(value) {
-    this.input.value = value;
+  setValue(value: number | string) {
+    this.input.value = String(value);
     this.value = value;
   }
 
   listen() {
     this.input.addEventListener("change", e => {
+      //@ts-ignore
       const { valueAsNumber } = e.target;
 
-      if (valueAsNumber > this.constructor.max) {
-        this.setValue(this.constructor.max);
+      if (valueAsNumber > RGBInput.max) {
+        this.setValue(RGBInput.max);
         return;
-      } else if (valueAsNumber < this.constructor.min) {
-        this.setValue(this.constructor.min);
+      } else if (valueAsNumber < RGBInput.min) {
+        this.setValue(RGBInput.min);
         return;
       }
 

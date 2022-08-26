@@ -1,0 +1,2 @@
+declare const _default: "\n<div class=\"mo-color-sat-val\">\n  <div class=\"mo-color-thumb\" role=\"slider\" tabindex=\"0\">\n    <span></span>\n  </div>\n</div>\n<div class=\"mo-color-hue\">\n  <div class=\"mo-color-rail\"></div>\n  <div class=\"mo-color-thumb\" role=\"slider\" tabindex=\"0\">\n    <span></span>\n  </div>\n</div>\n<div class=\"mo-color-alpha\">\n  <div class=\"mo-color-rail\"></div>\n  <div class=\"mo-color-thumb\" role=\"slider\" tabindex=\"0\">\n    <span></span>\n  </div>\n</div>\n";
+export default _default;

@@ -1,6 +1,8 @@
+//@ts-ignore
 import QlQuill from "ql-quill";
+import type { Locale } from ".";
 
-const locale = {
+const locale: Locale = {
   name: "zh_tw",
   插入重点: "插入重點",
   插入公式: "插入公式",

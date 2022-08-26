@@ -7,6 +7,11 @@ import {
 } from "quill-blot-formatter";
 
 class FormulaEditAction extends Action {
+  overlay?: HTMLElement;
+  onFormulaEdit?(target: HTMLElement): void;
+  createTime?: number;
+  timer?: number;
+
   onCreate() {
     this.overlay = this.formatter.overlay;
 
@@ -29,23 +34,23 @@ class FormulaEditAction extends Action {
 
   // 单击图片后再单击overlay 通过时间间隔长短模拟双击事件
   onOverlayClick = () => {
-    const target = this.formatter.currentSpec.getTargetElement();
+    const target = this.formatter.currentSpec?.getTargetElement();
     if (!target?.dataset.latex || !this.timer) return;
 
     const time = new Date().getTime();
-    if (time - this.createTime < this.timer) this.onFormulaEdit(target);
+    if (time - this.createTime! < this.timer) this.onFormulaEdit?.(target);
     this.timer = 0;
   };
 
   onOverlayDblclick = () => {
-    const target = this.formatter.currentSpec.getTargetElement();
+    const target = this.formatter.currentSpec?.getTargetElement();
     if (!target?.dataset.latex) return;
-    this.onFormulaEdit(target);
+    this.onFormulaEdit?.(target);
   };
 }
 
 class ResizeAction extends BaseResizeAction {
-  createHandle(position, cursor) {
+  createHandle(position: string, cursor: string) {
     const box = super.createHandle(position, cursor);
 
     box.addEventListener("touchstart", e => this.onTouchStart(e));
@@ -53,8 +58,8 @@ class ResizeAction extends BaseResizeAction {
     return box;
   }
 
-  onTouchStart = e => {
-    this.dragHandle = e.target;
+  onTouchStart = (e: TouchEvent) => {
+    this.dragHandle = e.target as HTMLElement;
     this.setCursor(this.dragHandle.style.cursor);
 
     const target = this.formatter.currentSpec?.getTargetElement();
@@ -70,7 +75,8 @@ class ResizeAction extends BaseResizeAction {
     document.addEventListener("touchend", this.onTouchEnd);
   };
 
-  onTouchMove = e => {
+  onTouchMove = (e: TouchEvent) => {
+    // @ts-ignore
     this.onDrag(e.touches[0]);
   };
 
@@ -82,6 +88,8 @@ class ResizeAction extends BaseResizeAction {
 }
 
 class DisplaySizeAction extends Action {
+  display?: HTMLElement;
+
   onCreate() {
     this.display = document.createElement("div");
 
@@ -96,24 +104,26 @@ class DisplaySizeAction extends Action {
       boxSizing: "border-box",
       opacity: "0.80",
       cursor: "default",
-    });
+    } as CSSStyleDeclaration);
 
     this.formatter.overlay.appendChild(this.display);
     this.position();
   }
 
   onUpdate() {
-    const target = this.formatter.currentSpec.getTargetElement();
+    const target = this.formatter.currentSpec?.getTargetElement();
     if (!this.display || !target) return;
 
     this.position();
   }
 
   onDestroy() {
-    this.formatter.overlay.removeChild(this.display);
+    this.formatter.overlay.removeChild(this.display!);
   }
 
   position() {
+    if (!this.display) return;
+
     const size = this.getCurrentSize();
     this.display.innerHTML = size.join(" &times; ");
     if (size[0] > 120 && size[1] > 30) {
@@ -122,7 +132,7 @@ class DisplaySizeAction extends Action {
         right: "4px",
         bottom: "4px",
         left: "auto",
-      });
+      } as CSSStyleDeclaration);
     } else {
       // position off bottom right
       const dispRect = this.display.getBoundingClientRect();
@@ -130,12 +140,16 @@ class DisplaySizeAction extends Action {
         right: `-${dispRect.width + 4}px`,
         bottom: `-${dispRect.height + 4}px`,
         left: "auto",
-      });
+      } as CSSStyleDeclaration);
     }
   }
 
-  getCurrentSize() {
-    const target = this.formatter.currentSpec.getTargetElement();
+  getCurrentSize(): [number, number] {
+    const target = this.formatter.currentSpec!.getTargetElement()! as HTMLElement & {
+      width: number;
+      naturalWidth: number;
+      naturalHeight: number;
+    };
 
     return [target.width, Math.round((target.width / target.naturalWidth) * target.naturalHeight)];
   }
@@ -147,7 +161,7 @@ export class ImageSpec extends BaseImageSpec {
 
     window.addEventListener("click", e => {
       if (!this.formatter.quill.container.contains(e.target)) {
-        this.formatter.hide(this);
+        this.formatter.hide();
       }
     });
   }
@@ -158,7 +172,7 @@ export class ImageSpec extends BaseImageSpec {
       this.formatter.options.resizable && DisplaySizeAction,
       DeleteAction,
       FormulaEditAction,
-    ].filter(Boolean);
+    ].filter(Boolean) as Array<typeof Action>;
   }
 }
 
