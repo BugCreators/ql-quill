@@ -2,7 +2,7 @@ import { DEFAULT_EXTENSIONS } from "@babel/core";
 import type { RollupOptions, OutputOptions } from "rollup";
 import { resolve } from "path";
 import { babel } from "@rollup/plugin-babel";
-import { terser } from "rollup-plugin-terser";
+// import { terser } from "rollup-plugin-terser";
 import typescript from "rollup-plugin-typescript2";
 
 export interface Config {

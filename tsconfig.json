@@ -20,5 +20,5 @@
       "@icons/*": ["./assets/icons/*"]
     }
   },
-  "include": ["./src/**/*"]
+  "exclude": ["./locale/**/*", "**/*.js", "node_modules"]
 }
