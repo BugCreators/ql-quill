@@ -19,5 +19,6 @@
       "@/*": ["./src/*"],
       "@icons/*": ["./assets/icons/*"]
     }
-  }
+  },
+  "include": ["./src/**/*"]
 }

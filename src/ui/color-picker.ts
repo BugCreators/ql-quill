@@ -155,8 +155,7 @@ class ColorPicker extends Tooltip {
     const toolbar = this.quill.getModule("toolbar");
     const colorButton = toolbar.container.querySelector(".ql-color")!;
 
-    let listener = (e: MouseEvent): void => {
-      console.log(e);
+    const listener = (e: MouseEvent): void => {
       if (!document.body.contains(this.quill.root)) {
         return document.body.removeEventListener("click", listener);
       }
