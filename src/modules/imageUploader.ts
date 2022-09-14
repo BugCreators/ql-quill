@@ -1,14 +1,14 @@
-import Quill from "quill";
+import QlQuill from "../index";
 import type { ImageOptions, FileLike, ImageObjOptions } from "../types";
 
 import loadingIcon from "@icons/loading.svg";
 
-const Module = Quill.import("core/module");
+const Module = QlQuill.import("core/module");
 
 export default class ImageUploader extends Module {
   options!: ImageOptions;
 
-  static insertImage(this: Quill, src: string, latex?: string) {
+  static insertImage(this: QlQuill, src: string, latex?: string) {
     const range = this.getSelection(true);
     this.deleteText(range);
     this.insertEmbed(range.index, "image", {
@@ -18,7 +18,7 @@ export default class ImageUploader extends Module {
     this.setSelection(range.index + 1);
   }
 
-  constructor(quill: Quill, options: ImageOptions) {
+  constructor(quill: QlQuill, options: ImageOptions) {
     super(quill, options);
 
     const toolbar = this.quill.getModule("toolbar");
@@ -36,7 +36,7 @@ export default class ImageUploader extends Module {
 
         const isBase64 = /^data:image/.test(node.src);
         if (isBase64) {
-          const Delta = Quill.import("delta");
+          const Delta = QlQuill.import("delta");
           const alt = "loading-" + Date.now();
 
           this.uploadImage(
@@ -107,7 +107,7 @@ export default class ImageUploader extends Module {
 
     const toolbar = this.quill.getModule("toolbar");
 
-    let input = toolbar.container.querySelector("input.ql-image[type=file]");
+    let input = toolbar.container.querySelector("input.ql-image[type=file]") as HTMLInputElement;
     if (input == null) {
       input = document.createElement("input");
       input.setAttribute("type", "file");

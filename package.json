@@ -4,7 +4,7 @@
   "description": "A wrapper for quill",
   "main": "./dist/ql-quill.umd.js",
   "module": "./dist/ql-quill.es.js",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/main.d.ts",
   "files": [
     "dist/",
     "locale/",
@@ -13,6 +13,7 @@
     "LICENSE"
   ],
   "scripts": {
+    "preinstall": "npx npm-force-resolutions@0.0.3 || echo 1",
     "build": "tsx build && vite build",
     "dev": "vite --host"
   },
@@ -25,6 +26,9 @@
   ],
   "license": "MIT",
   "homepage": "https://github.com/BugCreators/ql-quill",
+  "resolutions": {
+    "ts-morph": "16.0.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.18.2",
     "@babel/preset-env": "^7.18.2",
@@ -33,6 +37,7 @@
     "@types/extend": "^3.0.1",
     "@types/lodash.isequal": "^4.5.6",
     "@types/node": "^18.7.13",
+    "@types/quill": "^1.3.10",
     "extend": "^3.0.2",
     "lodash.isequal": "^4.5.0",
     "quill": "^1.3.7",
@@ -40,9 +45,9 @@
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.33.0",
     "stylus": "^0.54.8",
-    "tsx": "^3.8.2",
+    "tsx": "^3.9.0",
     "typescript": "^4.7.4",
-    "vite": "^2.9.5",
+    "vite": "^2.9.15",
     "vite-plugin-dts": "^1.4.1"
   },
   "browserslist": [

@@ -16,9 +16,8 @@
     "types": ["node", "vite/client"],
     "baseUrl": "./",
     "paths": {
-      "@/*": ["./src/*"],
       "@icons/*": ["./assets/icons/*"]
     }
   },
-  "exclude": ["./locale/**/*", "**/*.js", "node_modules"]
+  "exclude": ["./locale/**/*", "**/*.js", "node_modules", "dist"]
 }

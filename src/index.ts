@@ -1,8 +1,9 @@
 import Quill from "quill";
-import type { QuillOptionsStatic, RangeStatic, Sources, Delta, Clipboard, Toolbar } from "quill";
+import type { QuillOptionsStatic, RangeStatic, Sources, Delta, DeltaStatic } from "quill";
 import isEqual from "lodash.isequal";
 import extend from "extend";
 import type { CustomToolOptions, QlQuillOptionsStatic, QlOptions, QlQuillOptions } from "./types";
+import type { Toolbar, Clipboard, SnowTheme, Module, Emitter, Tooltip, Embed, Selection } from "../types";
 
 import Dialog from "./modules/dialog";
 
@@ -10,7 +11,7 @@ import { ImageSpec } from "./modules/blotFormatter";
 
 import ImageBlot from "./blots/image";
 
-import ImageUploader from "./modules/imageUploader";
+import type ImageUploader from "./modules/imageUploader";
 import Locale from "./modules/locale";
 
 import cleanIcon from "@icons/clean.svg?raw";
@@ -29,9 +30,24 @@ interface QlQuill {
   getModule(name: "dialog"): Dialog;
   getModule(name: "locale"): Locale;
   getModule(name: string): any;
+
+  container: HTMLElement;
+  selection: Selection;
+  scrollingContainer: HTMLElement;
+  emitter: Emitter;
+
+  deleteText(index: RangeStatic): DeltaStatic;
+  deleteText(index: number, length: number, source?: Sources): DeltaStatic;
+
+  setSelection(index: number): void;
+  setSelection(index: number, length: number, source?: Sources): void;
+  setSelection(range: RangeStatic, source?: Sources): void;
+
+  getModule<T = any>(name: string): T;
+  getModule(name: string): any;
 }
 
-class QlQuill extends Quill implements QlQuill {
+class QlQuill extends Quill {
   static readonly CUSTOM_TOOLS: Array<keyof CustomToolOptions> = ["import", "option", "formula", "question"];
   static readonly CUSTOM_OPTIONS: Array<keyof QlOptions> = [
     "toolbar",
@@ -46,10 +62,23 @@ class QlQuill extends Quill implements QlQuill {
     "onFocus",
     "onBlur",
   ];
+  static sources: typeof Emitter.sources;
+
+  static import<T>(this: T, path: "ui/tooltip"): typeof Tooltip<InstanceType<T>>;
+  static import<T>(this: T, path: "themes/snow"): typeof SnowTheme<InstanceType<T>>;
+  static import<T>(this: T, path: "delta"): typeof Delta;
+  static import<T>(this: T, path: "modules/clipboard"): typeof Clipboard<InstanceType<T>>;
+  static import<T>(this: T, path: "core/module"): typeof Module<InstanceType<T>>;
+  static import(path: "blots/embed"): typeof Embed;
+  static import(path: "modules/dialog"): typeof Dialog;
+  static import<T = any>(path: string): T;
+  static import(path: string) {
+    return super.import(path);
+  }
 
   qlOptions: QlOptions;
   options!: QlQuillOptionsStatic;
-  declare editor: this;
+  editor!: this;
   theme: any;
   prevSelection?: RangeStatic;
 
@@ -207,7 +236,10 @@ class QlQuill extends Quill implements QlQuill {
   }
 
   insertImage(src: string, latex = "") {
-    return ImageUploader.insertImage.call(this, src, latex);
+    const ImageUploader = this.getModule("imageUploader");
+
+    //@ts-ignore
+    return ImageUploader.constructor.insertImage.call(this, src, latex);
   }
 }
 

@@ -1,4 +1,5 @@
-import type { QuillOptionsStatic, QuillOptionsModules, DeltaStatic } from "quill";
+import type { QuillOptionsStatic, DeltaStatic } from "quill";
+import type { QuillOptionsModules } from "../types";
 
 export interface QlQuillOptionsStatic extends QuillOptionsStatic {
   custom: string[];
@@ -62,7 +63,6 @@ export interface QlOptions extends CustomToolOptions {
 
 export type QlQuillOptions = Partial<QlQuillOptionsStatic> & QlOptions;
 
-export * from "quill";
 export * from "../plugin/color-picker/mo.color-picker.es";
 
 export interface Locale {
