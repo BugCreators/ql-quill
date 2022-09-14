@@ -1,3 +1,9 @@
+## 1.2.0-alpha.1
+
+- 添加 ts 支持
+- formulaEditor
+  - 宽度适配英文界面
+
 ## v1.1.7
 
 - editor
