@@ -1,6 +1,6 @@
 {
   "name": "ql-quill",
-  "version": "1.2.0-alpha.1",
+  "version": "1.2.0-alpha.2",
   "description": "A wrapper for quill",
   "main": "./dist/ql-quill.umd.js",
   "module": "./dist/ql-quill.es.js",
