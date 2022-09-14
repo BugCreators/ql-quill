@@ -1,7 +1,12 @@
-import type { QuillOptionsStatic, QuillOptionsModules } from "quill";
+import type { QuillOptionsStatic, QuillOptionsModules, DeltaStatic } from "quill";
 
 export interface QlQuillOptionsStatic extends QuillOptionsStatic {
   custom: string[];
+}
+
+export interface FileLike extends Blob {
+  name: string;
+  lastModified: number;
 }
 
 export interface CustomToolOptions {
@@ -15,6 +20,21 @@ export interface CustomToolOptions {
   formula?: string;
 }
 
+export interface ImageObjOptions {
+  /** 图片上传accept */
+  accept?: string;
+  /** 是否自动上传粘贴的base64图片 */
+  base64AutoUpload?: boolean;
+  /** 剪贴板中的图片回调 */
+  clipboard?(node: HTMLElement, delta: DeltaStatic): DeltaStatic;
+  /** 是否开启拖拽上传  */
+  drop?: boolean;
+  /** 文件上传时触发 */
+  action?(file: FileLike, resolce: (file: string) => void, reject: () => void): void;
+}
+
+export type ImageOptions = () => void | ImageObjOptions;
+
 export interface QlOptions extends CustomToolOptions {
   /** toolbar配置 */
   toolbar?: QuillOptionsModules["toolbar"];
@@ -27,7 +47,7 @@ export interface QlOptions extends CustomToolOptions {
   /** 富文本值改变时触发 */
   onChange?(value: string): void;
   /** 图片相关配置 */
-  image?: Record<string, unknown> | Function;
+  image?: ImageOptions;
   /** 图片是否可缩放 */
   imageResize?: boolean;
   /** 编辑器默认语言 */

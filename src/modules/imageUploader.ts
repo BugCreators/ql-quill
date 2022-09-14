@@ -1,25 +1,12 @@
 import Quill from "quill";
-import type { DeltaStatic } from "quill";
+import type { ImageOptions, FileLike, ImageObjOptions } from "../types";
 
 import loadingIcon from "@icons/loading.svg";
 
 const Module = Quill.import("core/module");
 
-interface ImageOptions {
-  /** 图片上传accept */
-  accept?: string;
-  /** 是否自动上传粘贴的base64图片 */
-  base64AutoUpload?: boolean;
-  /** 剪贴板中的图片回调 */
-  clipboard?(node: HTMLElement, delta: DeltaStatic): DeltaStatic;
-  /** 是否开启拖拽上传  */
-  drop?: boolean;
-  /** 文件上传时触发 */
-  action?(file: FileLike, resolce: (file: string) => void, reject: () => void): void;
-}
-
 export default class ImageUploader extends Module {
-  options!: () => void | ImageOptions;
+  options!: ImageOptions;
 
   static insertImage(this: Quill, src: string, latex?: string) {
     const range = this.getSelection(true);
@@ -31,7 +18,7 @@ export default class ImageUploader extends Module {
     this.setSelection(range.index + 1);
   }
 
-  constructor(quill: Quill, options: () => void | ImageOptions) {
+  constructor(quill: Quill, options: ImageOptions) {
     super(quill, options);
 
     const toolbar = this.quill.getModule("toolbar");
@@ -39,7 +26,7 @@ export default class ImageUploader extends Module {
 
     if (typeof options === "function") return;
 
-    const { clipboard, base64AutoUpload, drop } = options as ImageOptions;
+    const { clipboard, base64AutoUpload, drop } = options as ImageObjOptions;
 
     if (clipboard || base64AutoUpload) {
       this.quill.clipboard.addMatcher("IMG", (node, delta) => {
@@ -89,7 +76,7 @@ export default class ImageUploader extends Module {
   uploadImage(file: string | FileLike, onSuccess?: (file: string) => void, onError = () => {}) {
     if (typeof this.options === "function") return;
 
-    const { action } = this.options as ImageOptions;
+    const { action } = this.options as ImageObjOptions;
 
     const insertImage = (src: string) => {
       ImageUploader.insertImage.call(this.quill, src);
@@ -116,7 +103,7 @@ export default class ImageUploader extends Module {
       return;
     }
 
-    const { accept } = this.options as ImageOptions;
+    const { accept } = this.options as ImageObjOptions;
 
     const toolbar = this.quill.getModule("toolbar");
 
@@ -159,11 +146,6 @@ export default class ImageUploader extends Module {
       setTimeout(() => this.uploadImage(file));
     }
   };
-}
-
-interface FileLike extends Blob {
-  name: string;
-  lastModified: number;
 }
 
 function dataURLtoFile(dataurl: string, filename?: string): FileLike {
