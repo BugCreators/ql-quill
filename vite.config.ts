@@ -14,7 +14,12 @@ export default defineConfig({
       "@icons": pathResolve("assets/icons"),
     },
   },
-  plugins: [getBabelOutputPlugin({ allowAllFormats: true, presets: [["@babel/preset-env"]] }), dts()],
+  plugins: [
+    getBabelOutputPlugin({ allowAllFormats: true, presets: [["@babel/preset-env"]] }),
+    dts({
+      rollupTypes: true,
+    }),
+  ],
   server: {
     port: 8080,
   },
