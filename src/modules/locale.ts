@@ -1,4 +1,4 @@
-import type { Locale } from "../locale/index";
+import type { Locale } from "../types";
 
 type PartialLocale = Partial<Locale>;
 
