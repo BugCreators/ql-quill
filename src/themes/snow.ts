@@ -1,5 +1,5 @@
 import QlQuill from "../index";
-import type { Toolbar, ToolbarOptionsObj } from "quill";
+import type { Toolbar, ToolbarOptionsObj } from "../quill";
 import type { QlQuillOptionsStatic } from "../types";
 import ColorPicker from "../ui/color-picker";
 

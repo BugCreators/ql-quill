@@ -1,4 +1,3 @@
-/// <reference path="./types/index.d.ts" />
 import QlQuill from "./src/index";
 
 import Dialog from "./src/modules/dialog";
@@ -38,6 +37,7 @@ export { default as Quill } from "quill";
 
 export * from "./src/index";
 export * from "./src/types";
+export * from "./src/quill";
 
 // ql-quill
 export default QlQuill;

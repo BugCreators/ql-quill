@@ -1,6 +1,6 @@
 // @ts-ignore
 import QlQuill from "ql-quill";
-import type { Locale } from "src/types";
+import type { Locale } from "./";
 
 const locale: Locale = {
   name: "en_us",

@@ -1,22 +1,9 @@
 import Quill from "quill";
-import type {
-  QuillOptionsStatic,
-  RangeStatic,
-  Sources,
-  Delta,
-  DeltaStatic,
-  Toolbar,
-  Clipboard,
-  SnowTheme,
-  Module,
-  Emitter,
-  Tooltip,
-  Embed,
-  Selection,
-} from "quill";
+import type { QuillOptionsStatic, RangeStatic, Sources, Delta, DeltaStatic } from "quill";
 import isEqual from "lodash.isequal";
 import extend from "extend";
 import type { CustomToolOptions, QlQuillOptionsStatic, QlOptions, QlQuillOptions } from "./types";
+import type { Toolbar, Clipboard, SnowTheme, Module, Emitter, Tooltip, Embed, Selection } from "./quill";
 
 import Dialog from "./modules/dialog";
 
