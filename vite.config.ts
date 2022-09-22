@@ -17,13 +17,7 @@ export default defineConfig({
   plugins: [
     getBabelOutputPlugin({ allowAllFormats: true, presets: [["@babel/preset-env"]] }),
     dts({
-      // rollupTypes: true,
-      beforeWriteFile: (filePath, content) => {
-        return {
-          filePath,
-          content: content.replace('<reference types="types" />', '<reference path="./types/index.d.ts" />'),
-        };
-      },
+      rollupTypes: true,
     }),
   ],
   server: {
