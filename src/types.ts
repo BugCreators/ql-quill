@@ -1,5 +1,4 @@
-import type { QuillOptionsStatic, DeltaStatic } from "quill";
-import type { QuillOptionsModules } from "../types";
+import type { QuillOptionsStatic, DeltaStatic, QuillOptionsModules } from "quill";
 
 export interface QlQuillOptionsStatic extends QuillOptionsStatic {
   custom: string[];

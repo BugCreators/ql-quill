@@ -1,3 +1,4 @@
+/// <reference path="./types/index.d.ts" />
 import QlQuill from "./src/index";
 
 import Dialog from "./src/modules/dialog";
