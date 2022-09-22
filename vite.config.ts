@@ -17,7 +17,13 @@ export default defineConfig({
   plugins: [
     getBabelOutputPlugin({ allowAllFormats: true, presets: [["@babel/preset-env"]] }),
     dts({
-      rollupTypes: true,
+      // rollupTypes: true,
+      beforeWriteFile: (filePath, content) => {
+        return {
+          filePath,
+          content: content.replace('<reference types="types" />', '<reference path="./types/index.d.ts" />'),
+        };
+      },
     }),
   ],
   server: {
@@ -28,14 +34,19 @@ export default defineConfig({
       entry: pathResolve("./index.ts"),
       name: "QlQuill",
       fileName: format => "ql-quill." + format + ".js",
-      formats: ["umd", "es"],
+      formats: ["umd", "cjs", "es"],
     },
     cssTarget: "chrome61", // 防止vite将rgba颜色转为十六进制
     minify: "terser",
     rollupOptions: {
+      external: ["quill"],
       output: {
         assetFileNames: "ql-quill.snow.css",
         exports: "named",
+        // 在 UMD 构建模式下为这些外部化的依赖提供一个全局变量
+        globals: {
+          quill: "Quill",
+        },
       },
     },
   },
