@@ -1,10 +1,10 @@
 {
   "name": "ql-quill",
-  "version": "1.2.0-alpha.2",
+  "version": "1.2.0-alpha.3",
   "description": "A wrapper for quill",
   "main": "./dist/ql-quill.cjs.js",
   "module": "./dist/ql-quill.es.js",
-  "types": "./dist/main.d.ts",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist/",
     "locale/",
