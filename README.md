@@ -91,3 +91,23 @@ qlQuilllocale.locale("custom", { ... });
 ### onBlur `() => void`
 
 编辑器失焦时触发
+
+## 实例 API
+
+### locale `preset: string, object?: Record<string, string`
+
+切换当前实例语言
+
+### setContents `(value: string | Delta): Delta`
+
+设置内容
+
+### getHTML `() => string`
+
+获取内容 HTML 字符串
+
+### insertImage `(src: string, latex?) => void`
+
+插入图片
+
+更多配置及方法可见[Quill](https://quilljs.com/docs/quickstart/)

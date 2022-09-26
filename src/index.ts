@@ -202,7 +202,7 @@ class QlQuill extends Quill {
     }
   }
 
-  locale(preset: string, object: Record<string, string>) {
+  locale(preset: string, object?: Record<string, string>) {
     const locale = this.getModule("locale");
 
     return locale.locale(preset, object);
