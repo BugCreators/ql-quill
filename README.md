@@ -11,14 +11,17 @@ import enUs from "ql-quill/locale/en_us";
 
 const qlQuilllocale = QlQuill.import("modules/locale");
 
+// 打印当前语言环境
+qlQuilllocale.locale(); // zh_cn
+
 // 切换繁体
 qlQuilllocale.locale(zhTw);
 
 // 切换英文
 qlQuilllocale.locale(enUs);
 
-// 创建新的语言配置
-qlQuilllocale.locale("custom", { ... })
+// 创建并切换新的语言
+qlQuilllocale.locale("custom", { ... });
 ```
 
 ## [配置示例](https://github.com/BugCreators/ql-quill/blob/master/index.html)
@@ -75,7 +78,7 @@ qlQuilllocale.locale("custom", { ... })
 
 ### locale `"zh_cn" | "en_us" | "zh_tw"`
 
-编辑器默认语言
+编辑器默认语言（默认中文，设置为其它语言时需提前导入语言包）
 
 ### pasteFromWord `boolean`
 
