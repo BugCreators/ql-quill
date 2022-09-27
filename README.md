@@ -94,7 +94,7 @@ qlQuilllocale.locale("custom", { ... });
 
 ## 实例 API
 
-### locale `preset: string, object?: Record<string, string`
+### locale `(preset: string, object?: Record<string, string) => void`
 
 切换当前实例语言
 
