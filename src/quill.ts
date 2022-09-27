@@ -32,8 +32,6 @@ export declare interface Module<T, U = any> {
 
 export declare class Embed extends Parchment["Embed"] {
   restore(node: Node): Range | undefined;
-
-  static tagName: any;
 }
 
 type Selector = string;

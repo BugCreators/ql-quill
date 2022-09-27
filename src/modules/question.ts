@@ -3,7 +3,7 @@ import QlQuill from "../index";
 const Embed = QlQuill.import("blots/embed");
 const Module = QlQuill.import("core/module");
 
-class QuestionBlot extends Embed {
+class SubjectBlot extends Embed {
   static create(value: string) {
     const node = super.create("sub-" + value) as HTMLElement;
     node.innerText = "(1)";
@@ -18,12 +18,20 @@ class QuestionBlot extends Embed {
   }
 }
 
+class QuestionBlot extends SubjectBlot {}
+
 QuestionBlot.blotName = "question";
-QuestionBlot.tagName = ["SUB-QUESTION", "SUB-OPTION"];
+QuestionBlot.tagName = "SUB-QUESTION";
+
+class OptionBlot extends SubjectBlot {}
+
+OptionBlot.blotName = "option";
+OptionBlot.tagName = "SUB-OPTION";
 
 class Question extends Module {
   static register() {
     QlQuill.register(QuestionBlot, true);
+    QlQuill.register(OptionBlot, true);
   }
 
   constructor(quill: QlQuill, options: any) {
@@ -42,12 +50,12 @@ class Question extends Module {
   insert(type: string) {
     const range = this.quill.getSelection(true);
     this.quill.deleteText(range);
-    this.quill.insertEmbed(range.index, "question", type);
+    this.quill.insertEmbed(range.index, type, type);
     this.quill.setSelection(range.index + 1);
   }
 
   format() {
-    (QuestionBlot.tagName as string[]).forEach(tag => {
+    [QuestionBlot.tagName, OptionBlot.tagName].forEach(tag => {
       const elements = this.quill.root.querySelectorAll(tag);
       elements.forEach((el, index) => ((el.children[0] as HTMLElement).innerText = "(" + (index + 1) + ")"));
     });
