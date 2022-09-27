@@ -44,9 +44,9 @@ export interface QlOptions extends CustomToolOptions {
   /** 字数达到上限时触发 */
   onLimit?(): void;
   /** 编辑器默认富文本 */
-  value?: string;
+  value?: string | DeltaStatic;
   /** 富文本值改变时触发 */
-  onChange?(value: string): void;
+  onChange?(value: string, delta: DeltaStatic): void;
   /** 图片相关配置 */
   image?: ImageOptions;
   /** 图片是否可缩放 */

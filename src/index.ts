@@ -175,7 +175,7 @@ class QlQuill extends Quill {
   onEditorChangeText(value: string, delta: Delta, source: Sources) {
     if (this.getModule("wordCount")) return;
 
-    this.qlOptions.onChange?.(value);
+    this.qlOptions.onChange?.(value, delta);
   }
 
   onEditorChangeSelection(nextSelection: RangeStatic, source: Sources) {

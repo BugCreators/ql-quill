@@ -1,13 +1,12 @@
 import QlQuill from "../index";
+import type { QlOptions } from "../types";
 import type { Delta, Sources } from "quill";
 
-interface WordCountOptions {
+interface WordCountOptions extends Pick<QlOptions, "onChange"> {
   /** 文本字数限制 */
   limit?: number;
   /** 字数超出限制时触发 */
   onLimit?(): void;
-  /** 富文本改变时触发 */
-  onChange?(html: string): void;
 }
 
 class WordCount {
@@ -64,7 +63,7 @@ class WordCount {
               setTimeout(() => this.quill.setSelection(retainIndex));
             }
           } else {
-            onChange?.(this.quill.root.innerHTML);
+            onChange?.(this.quill.root.innerHTML, delta);
           }
 
           this.update();
