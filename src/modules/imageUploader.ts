@@ -1,12 +1,16 @@
 import QlQuill from "../index";
 import type { ImageOptions, FileLike, ImageObjOptions } from "../types";
+import type { Module as ModuleType } from "../quill";
 
 import loadingIcon from "@icons/loading.svg";
 
 const Module = QlQuill.import("core/module");
 
-export default class ImageUploader extends Module {
-  options!: ImageOptions;
+export default class ImageUploader
+  extends Module
+  implements ModuleType<QlQuill, ImageOptions>
+{
+  declare options: ImageOptions;
 
   static insertImage(this: QlQuill, src: string, latex?: string) {
     const range = this.getSelection(true);
@@ -41,7 +45,7 @@ export default class ImageUploader extends Module {
 
           this.uploadImage(
             node.src,
-            url => {
+            (url) => {
               if (node.src === url) return;
 
               const image = this.quill.root.querySelector(`[alt=${alt}]`);
@@ -73,7 +77,11 @@ export default class ImageUploader extends Module {
     drop && this.quill.root.addEventListener("drop", this.handleDrop, false);
   }
 
-  uploadImage(file: string | FileLike, onSuccess?: (file: string) => void, onError = () => {}) {
+  uploadImage(
+    file: string | FileLike,
+    onSuccess?: (file: string) => void,
+    onError = () => {}
+  ) {
     if (typeof this.options === "function") return;
 
     const { action } = this.options as ImageObjOptions;
@@ -83,18 +91,16 @@ export default class ImageUploader extends Module {
     };
     const successCb = onSuccess || insertImage;
 
-    const isBase64 = typeof file === "string" && /^data:image\/.+;base64/.test(file);
-
     if (typeof action === "function") {
-      if (isBase64) file = dataURLtoFile(file as string);
-      action(file as FileLike, successCb, onError);
+      if (isBase64(file)) file = dataURLtoFile(file);
+      action(file, successCb, onError);
       return;
     }
 
-    if (isBase64) return successCb(file as string);
+    if (isBase64(file)) return successCb(file);
     const fr = new FileReader();
-    fr.onload = e => successCb(fr.result as string);
-    fr.readAsDataURL(file as Blob);
+    fr.onload = (e) => successCb(fr.result as string);
+    fr.readAsDataURL(file);
   }
 
   handlerImage = () => {
@@ -107,11 +113,16 @@ export default class ImageUploader extends Module {
 
     const toolbar = this.quill.getModule("toolbar");
 
-    let input = toolbar.container.querySelector("input.ql-image[type=file]") as HTMLInputElement;
+    let input = toolbar.container.querySelector(
+      "input.ql-image[type=file]"
+    ) as HTMLInputElement;
     if (input == null) {
       input = document.createElement("input");
       input.setAttribute("type", "file");
-      input.setAttribute("accept", accept || "image/png, image/gif, image/jpeg, image/bmp, image/x-icon");
+      input.setAttribute(
+        "accept",
+        accept || "image/png, image/gif, image/jpeg, image/bmp, image/x-icon"
+      );
       input.classList.add("ql-image");
       input.addEventListener("change", () => {
         if (input.files != null && input.files[0] != null) {
@@ -132,12 +143,22 @@ export default class ImageUploader extends Module {
       if (document.caretRangeFromPoint) {
         const range = document.caretRangeFromPoint(e.clientX, e.clientY);
         if (selection && range) {
-          selection.setBaseAndExtent(range.startContainer, range.startOffset, range.startContainer, range.startOffset);
+          selection.setBaseAndExtent(
+            range.startContainer,
+            range.startOffset,
+            range.startContainer,
+            range.startOffset
+          );
         }
       } else {
         const range = document.caretPositionFromPoint(e.clientX, e.clientY);
         if (selection && range) {
-          selection.setBaseAndExtent(range.offsetNode, range.offset, range.offsetNode, range.offset);
+          selection.setBaseAndExtent(
+            range.offsetNode,
+            range.offset,
+            range.offsetNode,
+            range.offset
+          );
         }
       }
 
@@ -146,6 +167,10 @@ export default class ImageUploader extends Module {
       setTimeout(() => this.uploadImage(file));
     }
   };
+}
+
+function isBase64(file: any): file is string {
+  return typeof file === "string" && /^data:image\/.+;base64/.test(file);
 }
 
 function dataURLtoFile(dataurl: string, filename?: string): FileLike {
@@ -161,7 +186,8 @@ function dataURLtoFile(dataurl: string, filename?: string): FileLike {
 
   const file = new Blob([u8arr], { type: mime }) as FileLike;
   file.lastModified = Date.now();
-  file.name = filename || "base642image" + Date.now() + "." + mime.replace(/image\//, "");
+  file.name =
+    filename || "base642image" + Date.now() + "." + mime.replace(/image\//, "");
 
   return file;
 }

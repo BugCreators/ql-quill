@@ -15,7 +15,15 @@ const DEFAULTS: Record<string, Array<any>> = {
     "clean", // 清除格式
     "image", // 插入图片
   ],
-  font: [false, "serif", "monospace", "Cursive", "SimSun", "SimHei", "Microsoft-YaHei"],
+  font: [
+    false,
+    "serif",
+    "monospace",
+    "Cursive",
+    "SimSun",
+    "SimHei",
+    "Microsoft-YaHei",
+  ],
   size: ["12px", false, "16px", "18px", "20px", "22px", "24px", "26px"],
 };
 
@@ -29,7 +37,7 @@ class SnowTheme extends Snow {
     super(quill, options);
   }
 
-  extendToolbar(toolbar: Toolbar) {
+  extendToolbar(toolbar: Toolbar<QlQuill>) {
     super.extendToolbar(toolbar);
 
     if (toolbar.container.querySelector(".ql-color")) {
@@ -38,7 +46,10 @@ class SnowTheme extends Snow {
   }
 }
 
-function expandConfig(toolbar: ToolbarOptionsObj, options: QlQuillOptionsStatic): void {
+function expandConfig(
+  toolbar: ToolbarOptionsObj,
+  options: QlQuillOptionsStatic
+): void {
   if (typeof toolbar.container === "string") return;
   if (!toolbar.container) toolbar.container = DEFAULTS.tool;
 
@@ -49,10 +60,12 @@ function expandConfig(toolbar: ToolbarOptionsObj, options: QlQuillOptionsStatic)
 
   let custom: { [key: string]: boolean } = {};
 
-  toolbarTemp.forEach(tool => {
-    options.custom.forEach(t => !custom[t] && (custom[t] = tool.indexOf(t) !== -1));
+  toolbarTemp.forEach((tool) => {
+    options.custom.forEach(
+      (t) => !custom[t] && (custom[t] = tool.indexOf(t) !== -1)
+    );
 
-    (["font", "size"] as (keyof typeof DEFAULTS)[]).forEach(format => {
+    (["font", "size"] as (keyof typeof DEFAULTS)[]).forEach((format) => {
       const index = tool.indexOf(format);
       if (index !== -1) {
         const style = QlQuill.import("attributors/style/" + format);

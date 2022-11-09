@@ -1,11 +1,20 @@
 import type Quill from "quill";
-import type { DeltaStatic, RangeStatic, ClipboardStatic, Sources, QuillOptionsStatic } from "quill";
+import type {
+  DeltaStatic,
+  RangeStatic,
+  ClipboardStatic,
+  Sources,
+  QuillOptionsStatic,
+} from "quill";
 import type EventEmitter from "eventemitter3";
 import type Parchment from "parchment";
 import type { Blot } from "parchment/dist/src/blot/abstract/blot";
 
 export declare type ToolbarContainer = string | HTMLElement;
-export declare type ToolbarOptions = string[] | Record<string, any>[] | (string | Record<string, any>)[];
+export declare type ToolbarOptions =
+  | string[]
+  | Record<string, any>[]
+  | (string | Record<string, any>)[];
 
 export declare interface ToolbarOptionsObj {
   container: ToolbarOptions | ToolbarContainer;
@@ -19,15 +28,12 @@ export declare interface QuillOptionsModules {
   [key: string]: any;
 }
 
-export declare class Module<T = Quill, U = any> {
+export declare class Module<T extends Quill, U> {
   static DEFAULTS: any;
-
-  constructor(quill: T, options: U);
-}
-
-export declare interface Module<T, U = any> {
   quill: T;
   options: U;
+
+  constructor(quill: T, options: U);
 }
 
 export declare class Embed extends Parchment["Embed"] {
@@ -42,7 +48,10 @@ export declare interface ClipboardOptions {
   matchers: Matchers;
 }
 
-export declare class Toolbar<T = Quill> extends Module<T, ToolbarOptions> {
+export declare class Toolbar<
+  T extends Quill,
+  U extends ToolbarOptions = ToolbarOptions
+> extends Module<T, U> {
   container: HTMLElement;
   controls: [string, HTMLElement][];
   handlers?: Record<string, Function>;
@@ -54,7 +63,13 @@ export declare class Toolbar<T = Quill> extends Module<T, ToolbarOptions> {
   update(range: null | RangeStatic): void;
 }
 
-export declare class Clipboard<T> extends Module<T> implements ClipboardStatic {
+export declare class Clipboard<
+    T extends Quill,
+    U extends ClipboardOptions = ClipboardOptions
+  >
+  extends Module<T, U>
+  implements ClipboardStatic
+{
   container: HTMLElement;
 
   addMatcher(selector: Selector, matcher: Matcher): void;
@@ -90,7 +105,11 @@ export declare class Emitter extends EventEmitter.EventEmitter {
 
   handleDOM(event: string, ...args: any): void;
 
-  listenDOM(eventName: string, node: Element, handler: (event: MouseEvent, ...args: any) => void): void;
+  listenDOM(
+    eventName: string,
+    node: Element,
+    handler: (event: MouseEvent, ...args: any) => void
+  ): void;
 }
 
 interface NativeRange {
@@ -143,7 +162,9 @@ export declare class Selection {
 
   getNativeRange(): NativeRange | null;
 
-  getRange(): [null, null] | [SelectionRange | NativeRange, SelectionRange | NativeRange];
+  getRange():
+    | [null, null]
+    | [SelectionRange | NativeRange, SelectionRange | NativeRange];
 
   hasFocus(): boolean;
 
@@ -163,12 +184,16 @@ export declare class Selection {
     force?: boolean
   ): void;
 
-  setRange(range: NativeRange, force?: boolean, source?: keyof typeof Emitter.sources): void;
+  setRange(
+    range: NativeRange,
+    force?: boolean,
+    source?: keyof typeof Emitter.sources
+  ): void;
 
   update(source: keyof typeof Emitter.sources): void;
 }
 
-export declare class Theme<T, U> {
+export declare class Theme<T extends Quill, U> {
   static DEFAULTS: Pick<QuillOptionsStatic, "modules">;
   static themes: Record<string, Theme<any, any>>;
 
@@ -183,7 +208,7 @@ export declare class Theme<T, U> {
   addModule(name: string): any;
 }
 
-export declare class BaseTheme<T, U> extends Theme<T, U> {
+export declare class BaseTheme<T extends Quill, U> extends Theme<T, U> {
   static DEFAULTS: typeof Theme.DEFAULTS & {
     toolbar: {
       handlers: {
@@ -199,14 +224,17 @@ export declare class BaseTheme<T, U> extends Theme<T, U> {
   buildPickers(selects: HTMLElement[], icons: Record<string, any>): void;
 }
 
-export declare class SnowTheme<T, U = any> extends BaseTheme<T, U> {
+export declare class SnowTheme<T extends Quill, U = any> extends BaseTheme<
+  T,
+  U
+> {
   static DEFAULTS: typeof BaseTheme.DEFAULTS & {
     toolbar: {
       handlers: { link: (value: any) => void };
     };
   };
 
-  extendToolbar(toolbar: Toolbar): void;
+  extendToolbar(toolbar: Toolbar<T>): void;
 }
 
 interface Reference {
@@ -216,7 +244,7 @@ interface Reference {
   width: number;
 }
 
-export declare class Tooltip<T = Quill> {
+export declare class Tooltip<T extends Quill> {
   quill: T;
   boundsContainer: HTMLElement;
   root: HTMLElement;

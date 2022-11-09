@@ -30,7 +30,7 @@ function extractImageDataFromRtf(rtfData: string): Image[] {
 
   const images = rtfData.match?.(regexPicture) || [];
 
-  return images.reduce((result, image) => {
+  return [...images].reduce((result, image) => {
     let imageType = "";
 
     if (image.includes("\\pngblip")) {
@@ -40,7 +40,12 @@ function extractImageDataFromRtf(rtfData: string): Image[] {
     }
 
     const hex = image
-      .replace(new RegExp(`${regexPictureHeaderOffice.source}|${regexPictureHeaderWPS.source}`), "")
+      .replace(
+        new RegExp(
+          `${regexPictureHeaderOffice.source}|${regexPictureHeaderWPS.source}`
+        ),
+        ""
+      )
       .replace(/[^\da-fA-F]/g, "");
     const base64 = "data:" + imageType + ";base64," + hex2Base64(hex);
 
@@ -60,7 +65,7 @@ function hex2Base64(hexString: string) {
   return btoa(
     hexString
       .match(/\w{2}/g)
-      ?.map(char => String.fromCharCode(parseInt(char, 16)))
+      ?.map((char) => String.fromCharCode(parseInt(char, 16)))
       ?.join("") || ""
   );
 }

@@ -4,7 +4,7 @@ const Module = QlQuill.import("core/module");
 
 class Formula extends Module {
   iframe: HTMLIFrameElement;
-  options!: string;
+  declare options: string;
 
   constructor(quill: QlQuill, options: string) {
     super(quill, options);
@@ -47,13 +47,13 @@ class Formula extends Module {
       width: 980,
       title: locale.$locale("插入公式"),
       content: this.iframe.outerHTML,
-      onOk: close => {
+      onOk: (close) => {
         if (!window.kfe) {
           close();
           return;
         }
 
-        window.kfe.execCommand("get.image.data", data => {
+        window.kfe.execCommand("get.image.data", (data) => {
           const sLatex = window.kfe!.execCommand<string>("get.source");
 
           const imageUploader = this.quill.getModule("imageUploader");

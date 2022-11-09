@@ -1,9 +1,29 @@
 import Quill from "quill";
-import type { QuillOptionsStatic, RangeStatic, Sources, Delta, DeltaStatic } from "quill";
+import type {
+  QuillOptionsStatic,
+  RangeStatic,
+  Sources,
+  Delta,
+  DeltaStatic,
+} from "quill";
 import isEqual from "lodash.isequal";
 import extend from "extend";
-import type { CustomToolOptions, QlQuillOptionsStatic, QlOptions, QlQuillOptions } from "./types";
-import type { Toolbar, Clipboard, SnowTheme, Module, Emitter, Tooltip, Embed, Selection } from "./quill";
+import type {
+  CustomToolOptions,
+  QlQuillOptionsStatic,
+  QlOptions,
+  QlQuillOptions,
+} from "./types";
+import type {
+  Toolbar,
+  Clipboard,
+  SnowTheme,
+  Module,
+  Emitter,
+  Tooltip,
+  Embed,
+  Selection,
+} from "./quill";
 
 import Dialog from "./modules/dialog";
 
@@ -22,6 +42,8 @@ const Icons = Quill.import("ui/icons");
 Object.assign(Icons, { clean: cleanIcon });
 
 Quill.register(ImageBlot, true);
+
+type QuillType = typeof Quill;
 
 interface QlQuill {
   getModule(name: "toolbar"): Toolbar<QlQuill>;
@@ -48,7 +70,12 @@ interface QlQuill {
 }
 
 class QlQuill extends Quill {
-  static readonly CUSTOM_TOOLS: Array<keyof CustomToolOptions> = ["import", "option", "formula", "question"];
+  static readonly CUSTOM_TOOLS: Array<keyof CustomToolOptions> = [
+    "import",
+    "option",
+    "formula",
+    "question",
+  ];
   static readonly CUSTOM_OPTIONS: Array<keyof QlOptions> = [
     "toolbar",
     "limit",
@@ -64,13 +91,25 @@ class QlQuill extends Quill {
   ];
   static sources: typeof Emitter.sources;
 
-  static import<T>(this: T, path: "ui/tooltip"): typeof Tooltip<InstanceType<T>>;
-  static import<T>(this: T, path: "themes/snow"): typeof SnowTheme<InstanceType<T>>;
-  static import<T>(this: T, path: "delta"): typeof Delta;
-  static import<T>(this: T, path: "modules/clipboard"): typeof Clipboard<InstanceType<T>>;
-  static import<T>(this: T, path: "core/module"): typeof Module<InstanceType<T>>;
   static import(path: "blots/embed"): typeof Embed;
   static import(path: "modules/dialog"): typeof Dialog;
+  static import(path: "delta"): typeof Delta;
+  static import<T extends QuillType>(
+    this: T,
+    path: "ui/tooltip"
+  ): typeof Tooltip<InstanceType<T>>;
+  static import<T extends QuillType>(
+    this: T,
+    path: "themes/snow"
+  ): typeof SnowTheme<InstanceType<T>>;
+  static import<T extends QuillType>(
+    this: T,
+    path: "modules/clipboard"
+  ): typeof Clipboard<InstanceType<T>>;
+  static import<T extends QuillType>(
+    this: T,
+    path: "core/module"
+  ): typeof Module<InstanceType<T>, any>;
   static import<T = any>(path: string): T;
   static import(path: string) {
     return super.import(path);
@@ -101,12 +140,12 @@ class QlQuill extends Quill {
 
     // 旧数据处理 类名转成内联
     this.clipboard.addMatcher("SPAN", (node: HTMLSpanElement, delta) => {
-      Array.from(node.classList).forEach(className => {
+      Array.from(node.classList).forEach((className) => {
         const [, format, value] = className.match(/^ql-(size|font)-(.*)/) || [];
 
         if (!format || !value) return;
 
-        delta.forEach(op => {
+        delta.forEach((op) => {
           if (!op.attributes) op.attributes = {};
 
           op.attributes[format] = value + (format === "size" ? "px" : "");
@@ -117,7 +156,10 @@ class QlQuill extends Quill {
     });
   }
 
-  expandConfig(options: QlQuillOptionsStatic, qlOptions: QlOptions): QlQuillOptionsStatic {
+  expandConfig(
+    options: QlQuillOptionsStatic,
+    qlOptions: QlOptions
+  ): QlQuillOptionsStatic {
     const { imageResize, formula, limit, pasteFromWord } = qlOptions;
 
     if (!options.modules) options.modules = {};
@@ -134,7 +176,10 @@ class QlQuill extends Quill {
 
     const toolbar = this.getModule("toolbar");
 
-    if (toolbar.container.querySelector(".ql-question") || toolbar.container.querySelector(".ql-option")) {
+    if (
+      toolbar.container.querySelector(".ql-question") ||
+      toolbar.container.querySelector(".ql-option")
+    ) {
       this.theme.addModule("question");
     }
 
@@ -164,7 +209,11 @@ class QlQuill extends Quill {
         source: Sources
       ) => {
         if (eventName === "text-change") {
-          this.onEditorChangeText(this.root.innerHTML, rangeOrDelta as Delta, source);
+          this.onEditorChangeText(
+            this.root.innerHTML,
+            rangeOrDelta as Delta,
+            source
+          );
         } else if (eventName === "selection-change") {
           this.onEditorChangeSelection(rangeOrDelta as RangeStatic, source);
         }
@@ -230,7 +279,10 @@ class QlQuill extends Quill {
     if (range) {
       const length = editor.getLength();
       range.index = Math.max(0, Math.min(range.index, length - 1));
-      range.length = Math.max(0, Math.min(range.length, length - 1 - range.index));
+      range.length = Math.max(
+        0,
+        Math.min(range.length, length - 1 - range.index)
+      );
       editor.setSelection(range);
     }
   }
@@ -243,7 +295,10 @@ class QlQuill extends Quill {
   }
 }
 
-function defaultConfig(options: QlQuillOptions, qlOptions: QlOptions): QuillOptionsStatic {
+function defaultConfig(
+  options: QlQuillOptions,
+  qlOptions: QlOptions
+): QuillOptionsStatic {
   return extend(
     true,
     {
@@ -255,19 +310,22 @@ function defaultConfig(options: QlQuillOptions, qlOptions: QlOptions): QuillOpti
         locale: qlOptions.locale || {},
         dialog: {},
       },
-      custom: QlQuill.CUSTOM_TOOLS.filter(tool => !!qlOptions[tool]),
+      custom: QlQuill.CUSTOM_TOOLS.filter((tool) => !!qlOptions[tool]),
     },
     options
   );
 }
 
 function extractConfig(options: QlQuillOptions): QlOptions {
-  return QlQuill.CUSTOM_OPTIONS.concat(QlQuill.CUSTOM_TOOLS).reduce((memo, option) => {
-    memo[option] = options[option] as any;
-    delete options[option];
+  return QlQuill.CUSTOM_OPTIONS.concat(QlQuill.CUSTOM_TOOLS).reduce(
+    (memo, option) => {
+      memo[option] = options[option] as any;
+      delete options[option];
 
-    return memo;
-  }, {} as any as QlOptions);
+      return memo;
+    },
+    {} as any as QlOptions
+  );
 }
 
 function postpone(fn: () => void) {

@@ -31,10 +31,14 @@ export interface ImageObjOptions {
   /** 是否开启拖拽上传  */
   drop?: boolean;
   /** 文件上传时触发 */
-  action?(file: FileLike, resolce: (file: string) => void, reject: () => void): void;
+  action?(
+    file: FileLike,
+    resolce: (file: string) => void,
+    reject: () => void
+  ): void;
 }
 
-export type ImageOptions = () => void | ImageObjOptions;
+export type ImageOptions = (() => void) | ImageObjOptions;
 
 export interface QlOptions extends CustomToolOptions {
   /** toolbar配置 */
