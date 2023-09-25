@@ -35,7 +35,7 @@ class Import extends Module {
 
   createInput() {
     const input = document.createElement("input");
-    input.classList.add("ql-input", "ql-import-input");
+    input.classList.add("ql-quill-input", "ql-import-input");
 
     return input;
   }
@@ -48,12 +48,12 @@ class Import extends Module {
       width: 640,
       title: locale.$locale("插入重点"),
       contentElement: this.input,
-      onOk: close => {
+      onOk: (close) => {
         const range = this.quill.getSelection(true);
         this.quill.deleteText(range);
         let index = range.index;
 
-        this.input.value.split("").forEach(word => {
+        this.input.value.split("").forEach((word) => {
           this.quill.insertEmbed(index, "import", word);
           index++;
         });
