@@ -12,12 +12,16 @@ export default class ImageUploader
 {
   declare options: ImageOptions;
 
-  static insertImage(this: QlQuill, src: string, latex?: string) {
+  static insertImage(
+    this: QlQuill,
+    src: string,
+    attr?: Record<string, string | number>
+  ) {
     const range = this.getSelection(true);
     this.deleteText(range);
     this.insertEmbed(range.index, "image", {
       src,
-      "data-latex": latex,
+      ...attr,
     });
     this.setSelection(range.index + 1);
   }

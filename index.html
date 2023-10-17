@@ -91,11 +91,20 @@
     };
 
     window.insertImage = () => {
-      editor.insertImage("http://192.168.1.47:8090/group1/M00/01/CC/qf5vBGKMwwKANvXmAABTEnxjJMc499.jpg");
+      editor.insertImage(
+        "http://192.168.1.47:8090/group1/M00/01/CC/qf5vBGKMwwKANvXmAABTEnxjJMc499.jpg"
+      );
     };
 
     window.insertFormulaImage = () => {
-      editor.insertImage("http://192.168.1.47:80/group1/M00/00/55/rBQAEGFT4jmARVB6AAACEGbtTVs0316102", "\\vector {A}");
+      editor.insertImage(
+        "http://192.168.1.47:80/group1/M00/00/55/rBQAEGFT4jmARVB6AAACEGbtTVs0316102",
+        "\\vector {A}",
+        {
+          width: 20,
+          height: 20,
+        }
+      );
     };
 
     window.getHTML = () => {

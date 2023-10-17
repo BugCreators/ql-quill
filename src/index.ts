@@ -287,11 +287,18 @@ class QlQuill extends Quill {
     }
   }
 
-  insertImage(src: string, latex = "") {
+  insertImage(
+    src: string,
+    latex = "",
+    attributes: Record<string, string | number> = {}
+  ) {
     const ImageUploader = this.getModule("imageUploader");
 
     //@ts-ignore
-    return ImageUploader.constructor.insertImage.call(this, src, latex);
+    return ImageUploader.constructor.insertImage.call(this, src, {
+      "data-latex": latex,
+      ...attributes,
+    });
   }
 }
 

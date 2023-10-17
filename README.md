@@ -106,7 +106,7 @@ qlQuilllocale.locale("custom", { ... });
 
 获取内容 HTML 字符串
 
-### insertImage `(src: string, latex?) => void`
+### insertImage `(src: string, latex?: string, attributes?: Record<string, string | number>) => void`
 
 插入图片
 
