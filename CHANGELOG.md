@@ -1,4 +1,9 @@
-## 1.2.0-alpha.6
+## 1.2.0-alpha.8
+
+- editor
+  - imageUploader 修复宽高设置无效问题、粘贴图片时设置其初始宽高
+
+## 1.2.0-alpha.7
 
 - editor
   - imageUploader 支持设置插入图片的宽高
