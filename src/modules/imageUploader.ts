@@ -70,6 +70,8 @@ export default class ImageUploader
             { image: loadingIcon },
             {
               alt,
+              width: node.width,
+              height: node.height,
             }
           );
         }
@@ -90,8 +92,8 @@ export default class ImageUploader
 
     const { action } = this.options as ImageObjOptions;
 
-    const insertImage = (src: string) => {
-      ImageUploader.insertImage.call(this.quill, src);
+    const insertImage = (src: string, attrs?: Record<string, any>) => {
+      ImageUploader.insertImage.call(this.quill, src, attrs);
     };
     const successCb = onSuccess || insertImage;
 
