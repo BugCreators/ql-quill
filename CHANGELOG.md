@@ -1,5 +1,10 @@
 ## 1.2.0-alpha.6
 
+- editor
+  - imageUploader 支持设置插入图片的宽高
+
+## 1.2.0-alpha.6
+
 - 替换输入框类名
 
 ## 1.2.0-alpha.5
