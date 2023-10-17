@@ -33,7 +33,7 @@ export interface ImageObjOptions {
   /** 文件上传时触发 */
   action?(
     file: FileLike,
-    resolce: (file: string) => void,
+    resolce: (file: string, atts?: Record<string, any>) => void,
     reject: () => void
   ): void;
 }
