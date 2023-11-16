@@ -1,3 +1,9 @@
+## 1.2.0-alpha.9
+
+- editor
+  - 默认注册字号、字体及对齐内联样式
+  - blot-formatter overlay 随容器滚动
+
 ## 1.2.0-alpha.8
 
 - editor
