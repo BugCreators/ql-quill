@@ -16,7 +16,7 @@ const DEFAULTS: Record<string, Array<any>> = {
     "image", // 插入图片
   ],
   font: [
-    false,
+    "Arial",
     "serif",
     "monospace",
     "Cursive",
@@ -24,8 +24,25 @@ const DEFAULTS: Record<string, Array<any>> = {
     "SimHei",
     "Microsoft-YaHei",
   ],
-  size: ["12px", false, "16px", "18px", "20px", "22px", "24px", "26px"],
+  size: ["12px", "14px", "16px", "18px", "20px", "22px", "24px", "26px"],
 };
+
+const AlignStyle = QlQuill.import("attributors/style/align");
+
+const FontStyle = QlQuill.import("attributors/style/font");
+FontStyle.whitelist = DEFAULTS.font;
+
+const SizeStyle = QlQuill.import("attributors/style/size");
+SizeStyle.whitelist = DEFAULTS.size;
+
+QlQuill.register(
+  {
+    "formats/align": AlignStyle,
+    "formats/size": SizeStyle,
+    "formats/font": FontStyle,
+  },
+  true
+);
 
 class SnowTheme extends Snow {
   colorPicker?: ColorPicker;
@@ -58,29 +75,27 @@ function expandConfig(
   const twoD = Array.isArray(container[0]);
   const toolbarTemp = twoD ? container : [container];
 
-  let custom: { [key: string]: boolean } = {};
+  const custom = options.custom.reduce((obj, key) => {
+    obj[key] = false;
+
+    return obj;
+  }, {} as { [key: string]: boolean });
 
   toolbarTemp.forEach((tool) => {
-    options.custom.forEach(
-      (t) => !custom[t] && (custom[t] = tool.indexOf(t) !== -1)
-    );
+    tool.forEach((t: string | Record<string, any[]>, index: number) => {
+      if (typeof t === "string") {
+        if (options.custom.includes(t)) {
+          custom[t] = true;
+        }
 
-    (["font", "size"] as (keyof typeof DEFAULTS)[]).forEach((format) => {
-      const index = tool.indexOf(format);
-      if (index !== -1) {
-        const style = QlQuill.import("attributors/style/" + format);
-
-        style.whitelist = DEFAULTS[format];
-
-        // 设为内联
-        QlQuill.register(
-          {
-            ["formats/" + format]: style,
-          },
-          true
-        );
-
-        tool[index] = { [format]: DEFAULTS[format] };
+        if (["font", "size"].includes(t)) {
+          tool[index] = {
+            [t]: DEFAULTS[t].map((item) =>
+              ["14px", "Arial"].includes(item) ? false : item
+            ),
+          };
+          t = tool[index];
+        }
       }
     });
   });
