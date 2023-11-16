@@ -1,5 +1,6 @@
-import BlotFormatter from "quill-blot-formatter/dist/BlotFormatter";
+import BaseBlotFormatter from "quill-blot-formatter/dist/BlotFormatter";
 import {
+  Options,
   ImageSpec as BaseImageSpec,
   Action,
   ResizeAction as BaseResizeAction,
@@ -18,7 +19,9 @@ class FormulaEditAction extends Action {
     const formula = this.formatter.quill.getModule("formula");
 
     if (typeof formula?.openFormulaDialog !== "function") {
-      console.warn("[Missing config] modules/formula onFormulaEdit function is required");
+      console.warn(
+        "[Missing config] modules/formula onFormulaEdit function is required"
+      );
       return;
     }
 
@@ -50,10 +53,14 @@ class FormulaEditAction extends Action {
 }
 
 class ResizeAction extends BaseResizeAction {
+  constructor(formatter: BaseBlotFormatter) {
+    super(formatter);
+  }
+
   createHandle(position: string, cursor: string) {
     const box = super.createHandle(position, cursor);
 
-    box.addEventListener("touchstart", e => this.onTouchStart(e));
+    box.addEventListener("touchstart", (e) => this.onTouchStart(e));
 
     return box;
   }
@@ -145,13 +152,17 @@ class DisplaySizeAction extends Action {
   }
 
   getCurrentSize(): [number, number] {
-    const target = this.formatter.currentSpec!.getTargetElement()! as HTMLElement & {
-      width: number;
-      naturalWidth: number;
-      naturalHeight: number;
-    };
+    const target =
+      this.formatter.currentSpec!.getTargetElement()! as HTMLElement & {
+        width: number;
+        naturalWidth: number;
+        naturalHeight: number;
+      };
 
-    return [target.width, Math.round((target.width / target.naturalWidth) * target.naturalHeight)];
+    return [
+      target.width,
+      Math.round((target.width / target.naturalWidth) * target.naturalHeight),
+    ];
   }
 }
 
@@ -159,7 +170,7 @@ export class ImageSpec extends BaseImageSpec {
   init() {
     super.init();
 
-    window.addEventListener("click", e => {
+    window.addEventListener("click", (e) => {
       if (!this.formatter.quill.container.contains(e.target)) {
         this.formatter.hide();
       }
@@ -173,6 +184,27 @@ export class ImageSpec extends BaseImageSpec {
       DeleteAction,
       FormulaEditAction,
     ].filter(Boolean) as Array<typeof Action>;
+  }
+}
+
+class BlotFormatter extends BaseBlotFormatter {
+  scrollTop: number;
+
+  constructor(quill: any, options: Options) {
+    super(quill, options);
+
+    this.scrollTop = quill.scrollingContainer.scrollTop;
+
+    if (quill.root === quill.scrollingContainer) {
+      quill.root.addEventListener("scroll", () => {
+        this.overlay.style.top =
+          Number(this.overlay.style.top.replace("px", "")) +
+          (this.scrollTop - quill.scrollingContainer.scrollTop) +
+          "px";
+
+        this.scrollTop = quill.scrollingContainer.scrollTop;
+      });
+    }
   }
 }
 
