@@ -24,7 +24,19 @@ const DEFAULTS: Record<string, Array<any>> = {
     "SimHei",
     "Microsoft-YaHei",
   ],
-  size: ["12px", "14px", "16px", "18px", "20px", "22px", "24px", "26px"],
+  size: [
+    "6px",
+    "8px",
+    "10px",
+    "12px",
+    "14px",
+    "16px",
+    "18px",
+    "20px",
+    "22px",
+    "24px",
+    "26px",
+  ],
 };
 
 const AlignStyle = QlQuill.import("attributors/style/align");
