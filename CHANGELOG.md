@@ -1,3 +1,9 @@
+## 1.2.0-alpha.11
+
+- editor
+  - 处理图片选中后无法滚动问题
+  - toolbar 圆角
+
 ## 1.2.0-alpha.10
 
 - editor
