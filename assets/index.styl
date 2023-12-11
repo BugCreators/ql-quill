@@ -34,6 +34,8 @@ font-size = 14px
   img
     display inline-block
     vertical-align middle
+    cursor default
+    user-select none
 
 point
   position relative
@@ -60,3 +62,11 @@ sub-option
   border-bottom 1px solid #000
   padding 0 5px
   white-space nowrap
+
+.blot-formatter__overlay 
+  pointer-events none
+  z-index 1
+
+.blot-formatter__resize-handle 
+  pointer-events auto
+    
