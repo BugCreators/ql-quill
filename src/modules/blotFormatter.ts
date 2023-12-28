@@ -8,14 +8,9 @@ import {
 } from "quill-blot-formatter";
 
 class FormulaEditAction extends Action {
-  overlay?: HTMLElement;
   onFormulaEdit?(target: HTMLElement): void;
-  createTime?: number;
-  timer?: number;
 
   onCreate() {
-    this.overlay = this.formatter.overlay;
-
     const formula = this.formatter.quill.getModule("formula");
 
     if (typeof formula?.openFormulaDialog !== "function") {
@@ -27,23 +22,12 @@ class FormulaEditAction extends Action {
 
     this.onFormulaEdit = formula.openFormulaDialog;
 
-    this.createTime = new Date().getTime();
-    // 两次单击的间隔时间
-    this.timer = 500;
-
-    this.overlay.addEventListener("click", this.onOverlayClick);
-    this.overlay.addEventListener("dblclick", this.onOverlayDblclick);
+    // @ts-ignore
+    this.formatter.currentSpec.img.addEventListener(
+      "dblclick",
+      this.onOverlayDblclick
+    );
   }
-
-  // 单击图片后再单击overlay 通过时间间隔长短模拟双击事件
-  onOverlayClick = () => {
-    const target = this.formatter.currentSpec?.getTargetElement();
-    if (!target?.dataset.latex || !this.timer) return;
-
-    const time = new Date().getTime();
-    if (time - this.createTime! < this.timer) this.onFormulaEdit?.(target);
-    this.timer = 0;
-  };
 
   onOverlayDblclick = () => {
     const target = this.formatter.currentSpec?.getTargetElement();
