@@ -18,9 +18,15 @@
           padding = 3,
           arrowWidth = 10;
         // 绘制箭头
-        this.addOperatorShape(new kity.Rect(arrowWidth, 1, 0, 0).fill("black").rotate(30));
-        this.addOperatorShape(new kity.Rect(arrowWidth, 1, 0, 0).fill("black").rotate(-30));
-        var shape = this.addOperatorShape(new kity.Rect(width, 1).fill("black"));
+        this.addOperatorShape(
+          new kity.Rect(arrowWidth, 1, 0, 0).fill("black").rotate(30)
+        );
+        this.addOperatorShape(
+          new kity.Rect(arrowWidth, 1, 0, 0).fill("black").rotate(-30)
+        );
+        var shape = this.addOperatorShape(
+          new kity.Rect(width, 1).fill("black")
+        );
         shape.rotate(180).translate(width, -7);
         this.parentExpression.expand(padding * 2, padding * 2);
         this.parentExpression.translateElement(padding * 2, padding * 5);
@@ -75,7 +81,7 @@
   appendTimeout();
 
   function appendTimeout() {
-    if (window.top.kfe) {
+    if (window.parent.kfe) {
       append();
     } else {
       setTimeout(function () {
@@ -85,7 +91,7 @@
   }
 
   function append() {
-    window.top.kfe.requestService("ui.toolbar.append", {
+    window.parent.kfe.requestService("ui.toolbar.append", {
       type: 1, // 1: 下拉框 2: 区域 3: 分割线
       options: {
         button: {
@@ -127,6 +133,6 @@
         },
       },
     });
-    window.top.kfe.requestService("ui.toolbar.enable");
+    window.parent.kfe.requestService("ui.toolbar.enable");
   }
 })();
