@@ -33,6 +33,12 @@ class FormulaEditAction extends Action {
     const target = this.formatter.currentSpec?.getTargetElement();
     if (!target?.dataset.latex) return;
     this.onFormulaEdit?.(target);
+
+    // @ts-ignore
+    this.formatter.currentSpec.img.removeEventListener(
+      "dblclick",
+      this.onOverlayDblclick
+    );
   };
 }
 
