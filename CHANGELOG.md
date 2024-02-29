@@ -9,9 +9,21 @@
   - 支持表格编辑
   - 字数统计 使用 modules 形式实现
   - 修复空格无法显示问题
+  - 配置集成完善
+  - setContent 方法改名为 setContents
+  - 新增 getHTML 方法
+  - 新增颜色选择器
+- toolbar
+  - 使用原生 toolbar
+  - 更新默认字体
+  - 更新默认文字大小
 - webpack 配置
+  - 升级v5
   - 新增 raw-loader 读取 svg 文件源文本
   - 使用 terser-webpack-plugin 替换 uglifyjs-webpack-plugin 压缩 js 文件
+  - 新增 devServer
+  - 新增 第三方插件及 icons 别名
+- 目录结构优化
 
 ## v1.0.2
 
