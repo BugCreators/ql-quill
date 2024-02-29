@@ -1,5 +1,6 @@
 import type QlQuill from "../index";
 import closeIcon from "@icons/close.svg?raw";
+import { LocaleInstance } from "./locale";
 
 interface DialogOptions {
   content?: string;
@@ -30,7 +31,9 @@ class Dialog {
     this.quill = quill;
     this.options = {};
 
-    const root = this.quill.container.querySelector<HTMLElement>("." + Dialog.CONTAINER_CLASS_NAME);
+    const root = this.quill.container.querySelector<HTMLElement>(
+      "." + Dialog.CONTAINER_CLASS_NAME
+    );
 
     this.container = root || this.createContainer();
 
@@ -65,7 +68,7 @@ class Dialog {
 
     this.setBounds(options);
 
-    const locale = this.quill.getModule("locale");
+    const locale = this.quill.getModule("locale") as LocaleInstance;
 
     this.renderButton(Dialog.CONFIRM_BTN_CLASS_NAME, locale.$locale("确定"));
     this.renderButton(Dialog.CANCEL_BTN_CLASS_NAME, locale.$locale("取消"));
@@ -87,7 +90,8 @@ class Dialog {
   }
 
   setTitle(options: DialogOptions) {
-    this.queryComponent(Dialog.TITLE_CLASS_NAME).innerText = options.title || "";
+    this.queryComponent(Dialog.TITLE_CLASS_NAME).innerText =
+      options.title || "";
   }
 
   setBounds(options: DialogOptions) {
@@ -156,16 +160,22 @@ Dialog.TEMPLATE = [
   '      <div class="ql-dialog-header">',
   '        <div class="' + Dialog.TITLE_CLASS_NAME + '"></div>',
   "      </div>",
-  '      <div class="' + Dialog.BODY_CLASS_NAME + '" style="padding-top: 0px;"></div>',
+  '      <div class="' +
+    Dialog.BODY_CLASS_NAME +
+    '" style="padding-top: 0px;"></div>',
   '      <div class="ql-dialog-footer">',
-  '       <button type="button" class="ql-btn ' + Dialog.CANCEL_BTN_CLASS_NAME + '"></button>',
-  '       <button type="button" class="ql-btn ql-btn-primary ' + Dialog.CONFIRM_BTN_CLASS_NAME + '"></button>',
+  '       <button type="button" class="ql-btn ' +
+    Dialog.CANCEL_BTN_CLASS_NAME +
+    '"></button>',
+  '       <button type="button" class="ql-btn ql-btn-primary ' +
+    Dialog.CONFIRM_BTN_CLASS_NAME +
+    '"></button>',
   "      </div>",
   "    </div>",
   "  </div>",
   "</div>",
 ]
-  .map(i => i.trim())
+  .map((i) => i.trim())
   .join("");
 
 export default Dialog;

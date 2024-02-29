@@ -1,7 +1,8 @@
+import type BaseTooltip from "quill/ui/tooltip";
 import QlQuill from "../index";
 import MoColorPicker from "../../plugin/color-picker/mo.color-picker.es";
 
-const Tooltip = QlQuill.import("ui/tooltip");
+const Tooltip = QlQuill.import("ui/tooltip") as typeof BaseTooltip;
 
 class ColorPicker extends Tooltip {
   static BLOCK_CLASS_NAME: string;
@@ -25,27 +26,30 @@ class ColorPicker extends Tooltip {
   inputs: [RGBInput<"r">, RGBInput<"g">, RGBInput<"b">];
   instance?: MoColorPicker;
   color?: string;
+  declare quill: QlQuill;
 
-  constructor(quill: QlQuill, boundsContainer: HTMLElement | null) {
+  constructor(quill: QlQuill, boundsContainer: HTMLElement | undefined) {
     super(quill, boundsContainer);
 
     const toolbar = quill.getModule("toolbar");
     toolbar.addHandler("color", () => {
       const formats = quill.getFormat(quill.selection.savedRange.index);
 
-      this.edit(formats.color);
+      this.edit(formats.color as string);
     });
 
     this.root.classList.add("ql-color-tooltip");
 
     this.block = this.queryComponent(ColorPicker.BLOCK_CLASS_NAME);
     this.inputContainer = this.queryComponent(ColorPicker.INPUTS_CLASS_NAME);
-    this.standardContainer = this.queryComponent(ColorPicker.STANDARD_CLASS_NAME);
+    this.standardContainer = this.queryComponent(
+      ColorPicker.STANDARD_CLASS_NAME
+    );
 
     this.initPicker();
     this.buildSelect(ColorPicker.STANDARD_COLORS);
 
-    if (this.quill.root === this.quill.scrollingContainer) {
+    if (this.quill.root === this.quill.scroll.domNode) {
       this.quill.root.addEventListener("scroll", () => {
         this.root.style.top = this.quill.root.scrollTop + "px";
       });
@@ -72,7 +76,8 @@ class ColorPicker extends Tooltip {
 
     this.instance = new MoColorPicker(picker, {
       format: "hex",
-      change: (color: string) => this.updateColor(color, ColorPicker.COLOR_PICK),
+      change: (color: string) =>
+        this.updateColor(color, ColorPicker.COLOR_PICK),
     });
   }
 
@@ -89,8 +94,14 @@ class ColorPicker extends Tooltip {
 
     const locale = this.quill.getModule("locale");
 
-    this.renderButton(ColorPicker.CONFIRM_BTN_CLASS_NAME, locale.$locale("确定"));
-    this.renderButton(ColorPicker.DEFAULT_BTN_CLASS_NAME, locale.$locale("重置"));
+    this.renderButton(
+      ColorPicker.CONFIRM_BTN_CLASS_NAME,
+      locale.$locale("确定")
+    );
+    this.renderButton(
+      ColorPicker.DEFAULT_BTN_CLASS_NAME,
+      locale.$locale("重置")
+    );
 
     this.quill.blur();
   }
@@ -107,7 +118,7 @@ class ColorPicker extends Tooltip {
 
     this.standardContainer.addEventListener(
       "mouseover",
-      e => {
+      (e) => {
         // @ts-ignore
         const { color } = e.target.dataset;
 
@@ -118,7 +129,7 @@ class ColorPicker extends Tooltip {
 
     this.standardContainer.addEventListener(
       "click",
-      e => {
+      (e) => {
         // @ts-ignore
         const { color } = e.target.dataset;
 
@@ -132,30 +143,41 @@ class ColorPicker extends Tooltip {
       () => {
         const previewColor = this.instance?.getValue();
 
-        previewColor !== this.color && this.updateColor(this.color, COLOR_SELECT_HOVER);
+        previewColor !== this.color &&
+          this.updateColor(this.color, COLOR_SELECT_HOVER);
       },
       true
     );
 
     this.inputContainer.addEventListener("change", () => {
-      const colors = this.inputs.map(input => input.value) as [number, number, number];
+      const colors = this.inputs.map((input) => input.value) as [
+        number,
+        number,
+        number
+      ];
 
       this.updateColor(MoColorPicker.rgb2hex(...colors), COLOR_INPUT);
     });
 
-    this.queryComponent(ColorPicker.CONFIRM_BTN_CLASS_NAME).addEventListener("click", () => this.save());
+    this.queryComponent(ColorPicker.CONFIRM_BTN_CLASS_NAME).addEventListener(
+      "click",
+      () => this.save()
+    );
 
-    this.queryComponent(ColorPicker.DEFAULT_BTN_CLASS_NAME).addEventListener("click", () => this.updateColor());
+    this.queryComponent(ColorPicker.DEFAULT_BTN_CLASS_NAME).addEventListener(
+      "click",
+      () => this.updateColor()
+    );
 
-    this.quill.on("selection-change", range => {
+    this.quill.on("selection-change", (range) => {
       if (range == null) return;
       this.hide();
     });
 
     const toolbar = this.quill.getModule("toolbar");
-    const colorButton = toolbar.container.querySelector(".ql-color")!;
+    const colorButton = toolbar.container!.querySelector(".ql-color")!;
 
-    const listener = (e: MouseEvent): void => {
+    const listener: EventListener = (e) => {
       if (!document.body.contains(this.quill.root)) {
         return document.body.removeEventListener("click", listener);
       }
@@ -180,13 +202,19 @@ class ColorPicker extends Tooltip {
   }
 
   position() {
-    const control = this.quill.getModule("toolbar").container.querySelector(".ql-color") as HTMLElement;
+    const control = this.quill
+      .getModule("toolbar")
+      .container!.querySelector(".ql-color") as HTMLElement;
 
-    this.root.style.left = control.offsetLeft - control.parentElement!.offsetLeft + "px";
+    this.root.style.left =
+      control.offsetLeft - control.parentElement!.offsetLeft + "px";
+
+    return 0;
   }
 
   updateColor(color?: string, from = "") {
-    const { DEFAULT_COLOR, COLOR_INPUT, COLOR_PICK, COLOR_SELECT_HOVER } = ColorPicker;
+    const { DEFAULT_COLOR, COLOR_INPUT, COLOR_PICK, COLOR_SELECT_HOVER } =
+      ColorPicker;
 
     color = color || DEFAULT_COLOR;
 
@@ -195,7 +223,7 @@ class ColorPicker extends Tooltip {
     if (from !== COLOR_INPUT) {
       const colors = MoColorPicker.hex2rgb(color);
 
-      this.inputs.forEach(input => {
+      this.inputs.forEach((input) => {
         input.setValue(colors[input.key]);
       });
     }
@@ -210,7 +238,11 @@ class ColorPicker extends Tooltip {
   }
 
   save() {
-    this.quill.format("color", this.color === ColorPicker.DEFAULT_COLOR ? false : this.color, QlQuill.sources.USER);
+    this.quill.format(
+      "color",
+      this.color === ColorPicker.DEFAULT_COLOR ? false : this.color,
+      QlQuill.sources.USER
+    );
     this.hide();
   }
 }
@@ -249,8 +281,12 @@ ColorPicker.TEMPLATE = [
   '  <div class="' + ColorPicker.PICKER_CLASS_NAME + '"></div>',
   "</div>",
   '<div class="ql-color-operate">',
-  '  <button type="button" class="ql-btn ql-btn-primary ' + ColorPicker.CONFIRM_BTN_CLASS_NAME + '"></button>',
-  '  <button type="button" class="ql-btn ' + ColorPicker.DEFAULT_BTN_CLASS_NAME + '"></button>',
+  '  <button type="button" class="ql-btn ql-btn-primary ' +
+    ColorPicker.CONFIRM_BTN_CLASS_NAME +
+    '"></button>',
+  '  <button type="button" class="ql-btn ' +
+    ColorPicker.DEFAULT_BTN_CLASS_NAME +
+    '"></button>',
   '  <div class="' + ColorPicker.INPUTS_CLASS_NAME + '"></div>',
   '  <div class="' + ColorPicker.BLOCK_CLASS_NAME + '"></div>',
   "</div>",
@@ -298,7 +334,7 @@ class RGBInput<T extends "r" | "g" | "b"> {
   }
 
   listen() {
-    this.input.addEventListener("change", e => {
+    this.input.addEventListener("change", (e) => {
       //@ts-ignore
       const { valueAsNumber } = e.target;
 

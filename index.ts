@@ -37,7 +37,6 @@ export { default as Quill } from "quill";
 
 export * from "./src/index";
 export * from "./src/types";
-export * from "./src/quill";
 
 // ql-quill
 export default QlQuill;

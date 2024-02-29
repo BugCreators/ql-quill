@@ -1,6 +1,7 @@
+import type BaseEmbed from "quill/blots/embed";
 import QlQuill from "../index";
 
-const Embed = QlQuill.import("blots/embed");
+const Embed = QlQuill.import("blots/embed") as typeof BaseEmbed;
 const Module = QlQuill.import("core/module");
 
 class ImportBlot extends Embed {
@@ -21,6 +22,7 @@ ImportBlot.tagName = "POINT";
 
 class Import extends Module {
   input: HTMLInputElement;
+  declare quill: QlQuill;
 
   static register() {
     QlQuill.register(ImportBlot, true);

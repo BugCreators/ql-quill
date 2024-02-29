@@ -183,16 +183,16 @@ class BlotFormatter extends BaseBlotFormatter {
   constructor(quill: any, options: Options) {
     super(quill, options);
 
-    this.scrollTop = quill.scrollingContainer.scrollTop;
+    this.scrollTop = quill.scroll.domNode.scrollTop;
 
     if (quill.root === quill.scrollingContainer) {
       quill.root.addEventListener("scroll", () => {
         this.overlay.style.top =
           Number(this.overlay.style.top.replace("px", "")) +
-          (this.scrollTop - quill.scrollingContainer.scrollTop) +
+          (this.scrollTop - quill.scroll.domNode.scrollTop) +
           "px";
 
-        this.scrollTop = quill.scrollingContainer.scrollTop;
+        this.scrollTop = quill.scroll.domNode.scrollTop;
       });
     }
   }

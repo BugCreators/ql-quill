@@ -1,29 +1,18 @@
 import Quill from "quill";
-import type {
-  QuillOptionsStatic,
-  RangeStatic,
-  Sources,
-  Delta,
-  DeltaStatic,
-} from "quill";
+import type { Delta, Op } from "quill/core";
+import type { EmitterSource } from "quill/core/emitter";
+import type { Range } from "quill/core/selection";
+import type IconType from "quill/ui/icons";
+import type Toolbar from "quill/modules/toolbar";
 import isEqual from "lodash.isequal";
 import extend from "extend";
 import type {
+  Options,
   CustomToolOptions,
-  QlQuillOptionsStatic,
+  QlExpandedOptions,
   QlOptions,
   QlQuillOptions,
 } from "./types";
-import type {
-  Toolbar,
-  Clipboard,
-  SnowTheme,
-  Module,
-  Emitter,
-  Tooltip,
-  Embed,
-  Selection,
-} from "./quill";
 
 import Dialog from "./modules/dialog";
 
@@ -32,41 +21,25 @@ import { ImageSpec } from "./modules/blotFormatter";
 import ImageBlot from "./blots/image";
 
 import type ImageUploader from "./modules/imageUploader";
-import Locale from "./modules/locale";
+import type Locale from "./modules/locale";
+import type WordCount from "./modules/wordCount";
 
 import cleanIcon from "@icons/clean.svg?raw";
 
 import "../assets/index.styl";
 
-const Icons = Quill.import("ui/icons");
+const Icons = Quill.import("ui/icons") as typeof IconType;
 Object.assign(Icons, { clean: cleanIcon });
 
 Quill.register(ImageBlot, true);
 
-type QuillType = typeof Quill;
-
 interface QlQuill {
-  getModule(name: "toolbar"): Toolbar<QlQuill>;
-  getModule(name: "clipboard"): Clipboard<QlQuill>;
-  getModule(name: "imageUploader"): ImageUploader;
   getModule(name: "dialog"): Dialog;
+  getModule(name: "toolbar"): Toolbar;
+  getModule(name: "wordCount"): WordCount;
   getModule(name: "locale"): Locale;
-  getModule(name: string): any;
-
-  container: HTMLElement;
-  selection: Selection;
-  scrollingContainer: HTMLElement;
-  emitter: Emitter;
-
-  deleteText(index: RangeStatic): DeltaStatic;
-  deleteText(index: number, length: number, source?: Sources): DeltaStatic;
-
-  setSelection(index: number): void;
-  setSelection(index: number, length: number, source?: Sources): void;
-  setSelection(range: RangeStatic, source?: Sources): void;
-
-  getModule<T = any>(name: string): T;
-  getModule(name: string): any;
+  getModule(name: "imageUploader"): ImageUploader;
+  getModule(name: string): unknown;
 }
 
 class QlQuill extends Quill {
@@ -89,39 +62,12 @@ class QlQuill extends Quill {
     "onFocus",
     "onBlur",
   ];
-  static sources: typeof Emitter.sources;
-
-  static import(path: "blots/embed"): typeof Embed;
-  static import(path: "modules/dialog"): typeof Dialog;
-  static import(path: "delta"): typeof Delta;
-  static import<T extends QuillType>(
-    this: T,
-    path: "ui/tooltip"
-  ): typeof Tooltip<InstanceType<T>>;
-  static import<T extends QuillType>(
-    this: T,
-    path: "themes/snow"
-  ): typeof SnowTheme<InstanceType<T>>;
-  static import<T extends QuillType>(
-    this: T,
-    path: "modules/clipboard"
-  ): typeof Clipboard<InstanceType<T>>;
-  static import<T extends QuillType>(
-    this: T,
-    path: "core/module"
-  ): typeof Module<InstanceType<T>, any>;
-  static import<T = any>(path: string): T;
-  static import(path: string) {
-    return super.import(path);
-  }
 
   qlOptions: QlOptions;
-  options!: QlQuillOptionsStatic;
-  editor!: this;
-  theme: any;
-  prevSelection?: RangeStatic;
+  declare options: QlExpandedOptions;
+  prevSelection?: Range;
 
-  constructor(container: string | Element, options: QlQuillOptions = {}) {
+  constructor(container: string | HTMLElement, options: QlQuillOptions = {}) {
     const qlOptions = extractConfig(options);
 
     super(container, defaultConfig(options, qlOptions));
@@ -135,12 +81,9 @@ class QlQuill extends Quill {
 
     qlOptions.value && this.setContents(qlOptions.value);
 
-    // 兼容旧版本
-    this.editor.root = this.root;
-
     // 旧数据处理 类名转成内联
-    this.clipboard.addMatcher("SPAN", (node: HTMLSpanElement, delta) => {
-      Array.from(node.classList).forEach((className) => {
+    this.clipboard.addMatcher("SPAN", (node, delta) => {
+      Array.from((node as HTMLSpanElement).classList).forEach((className) => {
         const [, format, value] = className.match(/^ql-(size|font)-(.*)/) || [];
 
         if (!format || !value) return;
@@ -157,9 +100,9 @@ class QlQuill extends Quill {
   }
 
   expandConfig(
-    options: QlQuillOptionsStatic,
+    options: QlExpandedOptions,
     qlOptions: QlOptions
-  ): QlQuillOptionsStatic {
+  ): QlExpandedOptions {
     const { imageResize, formula, limit, pasteFromWord } = qlOptions;
 
     if (!options.modules) options.modules = {};
@@ -177,13 +120,13 @@ class QlQuill extends Quill {
     const toolbar = this.getModule("toolbar");
 
     if (
-      toolbar.container.querySelector(".ql-question") ||
-      toolbar.container.querySelector(".ql-option")
+      toolbar.container!.querySelector(".ql-question") ||
+      toolbar.container!.querySelector(".ql-option")
     ) {
       this.theme.addModule("question");
     }
 
-    if (toolbar.container.querySelector(".ql-import")) {
+    if (toolbar.container!.querySelector(".ql-import")) {
       this.theme.addModule("import");
     }
 
@@ -192,7 +135,7 @@ class QlQuill extends Quill {
     }
 
     if (limit) {
-      const wordCount = this.theme.addModule("wordCount");
+      const wordCount = this.theme.addModule("wordCount") as WordCount;
       wordCount.setOptions(qlOptions);
     }
 
@@ -202,32 +145,23 @@ class QlQuill extends Quill {
   onEditorChange() {
     this.on(
       "editor-change",
-      (
-        eventName: "text-change" | "selection-change",
-        rangeOrDelta: Delta | RangeStatic,
-        oldRangeOrDelta: Delta | RangeStatic,
-        source: Sources
-      ) => {
+      (eventName, rangeOrDelta, oldRangeOrDelta, source) => {
         if (eventName === "text-change") {
-          this.onEditorChangeText(
-            this.root.innerHTML,
-            rangeOrDelta as Delta,
-            source
-          );
+          this.onEditorChangeText(this.root.innerHTML, rangeOrDelta, source);
         } else if (eventName === "selection-change") {
-          this.onEditorChangeSelection(rangeOrDelta as RangeStatic, source);
+          this.onEditorChangeSelection(rangeOrDelta, source);
         }
       }
     );
   }
 
-  onEditorChangeText(value: string, delta: Delta, source: Sources) {
+  onEditorChangeText(value: string, delta: Delta, source: EmitterSource) {
     if (this.getModule("wordCount")) return;
 
     this.qlOptions.onChange?.(value, delta);
   }
 
-  onEditorChangeSelection(nextSelection: RangeStatic, source: Sources) {
+  onEditorChangeSelection(nextSelection: Range, source: EmitterSource) {
     const currentSelection = this.prevSelection;
     const hasGainedFocus = !currentSelection && nextSelection;
     const hasLostFocus = currentSelection && !nextSelection;
@@ -240,12 +174,12 @@ class QlQuill extends Quill {
 
     if (hasGainedFocus) {
       this.container.classList.add("on-focus");
-      toolbar.container.classList.add("on-focus");
+      toolbar.container!.classList.add("on-focus");
 
       this.qlOptions.onFocus?.();
     } else if (hasLostFocus) {
       this.container.classList.remove("on-focus");
-      toolbar.container.classList.remove("on-focus");
+      toolbar.container!.classList.remove("on-focus");
 
       this.qlOptions.onBlur?.();
     }
@@ -257,24 +191,21 @@ class QlQuill extends Quill {
     return locale.locale(preset, object);
   }
 
-  setContents(value: string | Delta): Delta {
-    let delta: Delta;
+  setContents(value: string | Delta | Op[]) {
     const sel = this.prevSelection;
     if (typeof value === "string") {
-      delta = super.setContents(this.clipboard.convert(value));
+      this.clipboard.dangerouslyPasteHTML(value);
     } else {
-      delta = super.setContents(value);
+      super.setContents(value);
     }
     postpone(() => this.setEditorSelection(this, sel!));
-
-    return delta;
   }
 
   getHTML(): string {
     return this.root.innerHTML;
   }
 
-  setEditorSelection(editor: this, range: RangeStatic) {
+  setEditorSelection(editor: this, range: Range) {
     this.prevSelection = range;
     if (range) {
       const length = editor.getLength();
@@ -302,10 +233,7 @@ class QlQuill extends Quill {
   }
 }
 
-function defaultConfig(
-  options: QlQuillOptions,
-  qlOptions: QlOptions
-): QuillOptionsStatic {
+function defaultConfig(options: QlQuillOptions, qlOptions: QlOptions): Options {
   return extend(
     true,
     {

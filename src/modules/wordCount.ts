@@ -1,6 +1,5 @@
 import QlQuill from "../index";
 import type { QlOptions } from "../types";
-import type { Delta, Sources } from "quill";
 
 interface WordCountOptions extends Pick<QlOptions, "onChange"> {
   /** 文本字数限制 */
@@ -32,44 +31,43 @@ class WordCount {
   }
 
   registerListener() {
-    this.quill.on(
-      "editor-change",
-      (eventName: "text-change" | "selection-change", delta: Delta, oldDelta: Delta, source: Sources) => {
-        if (eventName === "text-change") {
-          const { limit, onLimit, onChange } = this.options;
+    this.quill.on("editor-change", (eventName, delta, oldDelta, source) => {
+      if (eventName === "text-change") {
+        const { limit, onLimit, onChange } = this.options;
 
-          const distance = this.calculate() - limit!;
+        const distance = this.calculate() - limit!;
 
-          if (distance > 0) {
-            onLimit?.();
+        if (distance > 0) {
+          onLimit?.();
 
-            if (!this.quill.selection.composing) {
-              const Delta = QlQuill.import("delta");
+          if (!this.quill.selection.composing) {
+            const Delta = QlQuill.import("delta");
 
-              const retainIndex = delta.reduce((length, op) => {
-                if (typeof op.retain === "number") {
-                  length += op.retain;
-                } else if (typeof op.insert === "string") {
-                  length += op.insert.length;
-                } else if (typeof op.insert === "object") {
-                  length += 1;
-                }
+            const retainIndex = delta.reduce((length, op) => {
+              if (typeof op.retain === "number") {
+                length += op.retain;
+              } else if (typeof op.insert === "string") {
+                length += op.insert.length;
+              } else if (typeof op.insert === "object") {
+                length += 1;
+              }
 
-                return length;
-              }, -distance);
+              return length;
+            }, -distance);
 
-              this.quill.updateContents(new Delta().retain(retainIndex).delete(distance));
+            this.quill.updateContents(
+              new Delta().retain(retainIndex).delete(distance)
+            );
 
-              setTimeout(() => this.quill.setSelection(retainIndex));
-            }
-          } else {
-            onChange?.(this.quill.root.innerHTML, delta);
+            setTimeout(() => this.quill.setSelection(retainIndex));
           }
-
-          this.update();
+        } else {
+          onChange?.(this.quill.root.innerHTML, delta);
         }
+
+        this.update();
       }
-    );
+    });
   }
 
   initLimiter() {
@@ -78,7 +76,9 @@ class WordCount {
     this.initCounter();
 
     this.container.appendChild(this.counter!);
-    this.container.appendChild(document.createTextNode("/" + this.options.limit));
+    this.container.appendChild(
+      document.createTextNode("/" + this.options.limit)
+    );
   }
 
   initCounter() {

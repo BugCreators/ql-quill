@@ -1,6 +1,6 @@
-//@ts-ignore
-import QlQuill from "ql-quill";
+import Quill from "quill";
 import type { Locale } from "./";
+import type { LocaleInstance } from "../modules/locale";
 
 const locale: Locale = {
   name: "zh_tw",
@@ -11,8 +11,8 @@ const locale: Locale = {
   重置: "重置",
 };
 
-const localeModule = QlQuill.import("modules/locale");
+const localeModule = Quill.import("modules/locale") as LocaleInstance;
 
-localeModule.locale(locale, null, true);
+localeModule.locale(locale);
 
 export default locale;

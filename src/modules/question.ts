@@ -1,6 +1,7 @@
+import type BaseEmbed from "quill/blots/embed";
 import QlQuill from "../index";
 
-const Embed = QlQuill.import("blots/embed");
+const Embed = QlQuill.import("blots/embed") as typeof BaseEmbed;
 const Module = QlQuill.import("core/module");
 
 class SubjectBlot extends Embed {
@@ -18,12 +19,16 @@ class SubjectBlot extends Embed {
   }
 }
 
-class QuestionBlot extends SubjectBlot {}
+class QuestionBlot extends SubjectBlot {
+  static tagName: string;
+}
 
 QuestionBlot.blotName = "question";
 QuestionBlot.tagName = "SUB-QUESTION";
 
-class OptionBlot extends SubjectBlot {}
+class OptionBlot extends SubjectBlot {
+  static tagName: string;
+}
 
 OptionBlot.blotName = "option";
 OptionBlot.tagName = "SUB-OPTION";
@@ -37,9 +42,12 @@ class Question extends Module {
   constructor(quill: QlQuill, options: any) {
     super(quill, options);
 
-    quill.on("editor-change", (eventName: "text-change" | "selection-change"): void => {
-      if (eventName === "text-change") this.format();
-    });
+    quill.on(
+      "editor-change",
+      (eventName: "text-change" | "selection-change"): void => {
+        if (eventName === "text-change") this.format();
+      }
+    );
 
     const toolbar = quill.getModule("toolbar");
 
@@ -55,9 +63,12 @@ class Question extends Module {
   }
 
   format() {
-    [QuestionBlot.tagName, OptionBlot.tagName].forEach(tag => {
+    [QuestionBlot.tagName, OptionBlot.tagName].forEach((tag) => {
       const elements = this.quill.root.querySelectorAll(tag);
-      elements.forEach((el, index) => ((el.children[0] as HTMLElement).innerText = "(" + (index + 1) + ")"));
+      elements.forEach(
+        (el, index) =>
+          ((el.children[0] as HTMLElement).innerText = "(" + (index + 1) + ")")
+      );
     });
   }
 }

@@ -7,9 +7,21 @@ const Ls: Record<string, PartialLocale> = {
   zh_cn: {},
 }; // global loaded locale
 
-function parseLocale(preset: undefined, object?: PartialLocale, isLocal?: boolean): string;
-function parseLocale(preset?: string | PartialLocale, object?: PartialLocale, isLocal?: boolean): boolean;
-function parseLocale(preset?: string | PartialLocale, object?: PartialLocale, isLocal?: boolean): string | boolean {
+function parseLocale(
+  preset: undefined,
+  object?: PartialLocale,
+  isLocal?: boolean
+): string;
+function parseLocale(
+  preset?: string | PartialLocale,
+  object?: PartialLocale,
+  isLocal?: boolean
+): boolean;
+function parseLocale(
+  preset?: string | PartialLocale,
+  object?: PartialLocale,
+  isLocal?: boolean
+): string | boolean {
   let l;
   if (!preset) return L;
   if (typeof preset === "string") {
@@ -63,5 +75,7 @@ class LocaleModule {
     parseLocale(preset, object);
   }
 }
+
+export type LocaleInstance = InstanceType<typeof LocaleModule>;
 
 export default LocaleModule;

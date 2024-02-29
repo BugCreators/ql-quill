@@ -5,6 +5,7 @@ const Module = QlQuill.import("core/module");
 class Formula extends Module {
   iframe: HTMLIFrameElement;
   declare options: string;
+  declare quill: QlQuill;
 
   constructor(quill: QlQuill, options: string) {
     super(quill, options);

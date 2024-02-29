@@ -1,7 +1,11 @@
-import type { QuillOptionsStatic, DeltaStatic } from "quill";
-import type { QuillOptionsModules } from "./quill";
+import type Quill from "quill";
+import { Delta } from "quill/core";
+import { ToolbarConfig } from "quill/modules/toolbar";
 
-export interface QlQuillOptionsStatic extends QuillOptionsStatic {
+export type Options = typeof Quill.DEFAULTS;
+export type ExpandedOptions = InstanceType<typeof Quill>["options"];
+
+export interface QlExpandedOptions extends ExpandedOptions {
   custom: string[];
 }
 
@@ -27,7 +31,7 @@ export interface ImageObjOptions {
   /** 是否自动上传粘贴的base64图片 */
   base64AutoUpload?: boolean;
   /** 剪贴板中的图片回调 */
-  clipboard?(node: HTMLElement, delta: DeltaStatic): DeltaStatic;
+  clipboard?(node: HTMLElement, delta: Delta): Delta;
   /** 是否开启拖拽上传  */
   drop?: boolean;
   /** 文件上传时触发 */
@@ -42,15 +46,15 @@ export type ImageOptions = (() => void) | ImageObjOptions;
 
 export interface QlOptions extends CustomToolOptions {
   /** toolbar配置 */
-  toolbar?: QuillOptionsModules["toolbar"];
+  toolbar?: ToolbarConfig;
   /** 文本字数限制 */
   limit?: number;
   /** 字数达到上限时触发 */
   onLimit?(): void;
   /** 编辑器默认富文本 */
-  value?: string | DeltaStatic;
+  value?: string | Delta;
   /** 富文本值改变时触发 */
-  onChange?(value: string, delta: DeltaStatic): void;
+  onChange?(value: string, delta: Delta): void;
   /** 图片相关配置 */
   image?: ImageOptions;
   /** 图片是否可缩放 */
@@ -65,7 +69,7 @@ export interface QlOptions extends CustomToolOptions {
   onBlur?(): void;
 }
 
-export type QlQuillOptions = Partial<QlQuillOptionsStatic> & QlOptions;
+export type QlQuillOptions = Partial<QlExpandedOptions> & QlOptions;
 
 export * from "../plugin/color-picker/mo.color-picker.es";
 

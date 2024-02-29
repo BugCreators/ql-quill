@@ -1,16 +1,13 @@
 import QlQuill from "../index";
 import type { ImageOptions, FileLike, ImageObjOptions } from "../types";
-import type { Module as ModuleType } from "../quill";
 
 import loadingIcon from "@icons/loading.svg";
 
 const Module = QlQuill.import("core/module");
 
-export default class ImageUploader
-  extends Module
-  implements ModuleType<QlQuill, ImageOptions>
-{
+export default class ImageUploader extends Module {
   declare options: ImageOptions;
+  declare quill: QlQuill;
 
   static insertImage(
     this: QlQuill,
@@ -38,19 +35,21 @@ export default class ImageUploader
 
     if (clipboard || base64AutoUpload) {
       this.quill.clipboard.addMatcher("IMG", (node, delta) => {
-        delta = clipboard?.(node, delta) || delta;
+        delta = clipboard?.(node as HTMLElement, delta) || delta;
 
         if (!base64AutoUpload) return delta;
 
-        const isBase64 = /^data:image/.test(node.src);
+        const { src, width, height } = node as HTMLImageElement;
+
+        const isBase64 = /^data:image/.test(src);
         if (isBase64) {
           const Delta = QlQuill.import("delta");
           const alt = "loading-" + Date.now();
 
           this.uploadImage(
-            node.src,
+            src,
             (url) => {
-              if (node.src === url) return;
+              if (src === url) return;
 
               const image = this.quill.root.querySelector(`[alt=${alt}]`);
 
@@ -70,8 +69,8 @@ export default class ImageUploader
             { image: loadingIcon },
             {
               alt,
-              width: node.width,
-              height: node.height,
+              width,
+              height,
             }
           );
         }
@@ -119,7 +118,7 @@ export default class ImageUploader
 
     const toolbar = this.quill.getModule("toolbar");
 
-    let input = toolbar.container.querySelector(
+    let input = toolbar.container!.querySelector(
       "input.ql-image[type=file]"
     ) as HTMLInputElement;
     if (input == null) {
@@ -136,7 +135,7 @@ export default class ImageUploader
           input.value = "";
         }
       });
-      toolbar.container.appendChild(input);
+      toolbar.container!.appendChild(input);
     }
     input.click();
   };
