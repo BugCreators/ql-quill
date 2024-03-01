@@ -20,6 +20,8 @@ import { ImageSpec } from "./modules/blotFormatter";
 
 import ImageBlot from "./blots/image";
 
+// @ts-ignore
+import QuillBetterTable from "quill-better-table";
 import type ImageUploader from "./modules/imageUploader";
 import type Locale from "./modules/locale";
 import type WordCount from "./modules/wordCount";
@@ -118,6 +120,32 @@ class QlQuill extends Quill {
     }
 
     const toolbar = this.getModule("toolbar");
+
+    if (toolbar.container!.querySelector(".ql-table")) {
+      options.modules.table = false;
+
+      options.modules["better-table"] = {
+        operationMenu: {
+          items: {
+            insertColumnRight: { text: "右插入列" },
+            insertColumnLeft: { text: "左插入列" },
+            insertRowUp: { text: "上插入行" },
+            insertRowDown: { text: "下插入行" },
+            mergeCells: { text: "合并单元格" },
+            unmergeCells: { text: "取消合并" },
+            deleteColumn: { text: "删除列" },
+            deleteRow: { text: "删除行" },
+            deleteTable: { text: "删除表格" },
+          },
+        },
+      };
+
+      options.modules.keyboard = {
+        bindings: QuillBetterTable.keyboardBindings,
+      };
+
+      this.theme.addModule("better-table");
+    }
 
     if (
       toolbar.container!.querySelector(".ql-question") ||

@@ -14,9 +14,11 @@ import WordCount from "./src/modules/wordCount";
 import Import from "./src/modules/import";
 import Question from "./src/modules/question";
 import Formula from "./src/modules/formula";
+import Table from "./src/modules/table";
 
 QlQuill.register(
   {
+    "modules/better-table": Table,
     "modules/dialog": Dialog,
     "modules/imageUploader": ImageUploader,
     "modules/blotFormatter": BlotFormatter,
