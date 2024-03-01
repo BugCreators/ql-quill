@@ -54,21 +54,21 @@ class Formula extends Module {
           return;
         }
 
-        window.kfe.execCommand("get.image.data", (data) => {
+        window.kfe.execCommand("get.image.data", async (data) => {
           const sLatex = window.kfe!.execCommand<string>("get.source");
 
-          const imageUploader = this.quill.getModule("imageUploader");
+          const uploader = this.quill.getModule("uploader");
 
-          imageUploader.uploadImage(data.img, (src: string) => {
-            close();
-            if (isImage) {
-              img.setAttribute("src", src);
-              if (sLatex) img.dataset.latex = sLatex;
-              return;
-            }
+          const url = await uploader.uploadImage(data.img);
 
-            this.quill.insertImage(src, sLatex);
-          });
+          close();
+          if (isImage) {
+            img.setAttribute("src", url);
+            if (sLatex) img.dataset.latex = sLatex;
+            return;
+          }
+
+          this.quill.insertImage(url, sLatex);
         });
       },
     });

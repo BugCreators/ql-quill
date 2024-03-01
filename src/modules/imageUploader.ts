@@ -1,12 +1,13 @@
+import Uploader from "quill/modules/uploader";
 import QlQuill from "../index";
-import type { ImageOptions, FileLike, ImageObjOptions } from "../types";
+import type { ImageObjOptions } from "../types";
 
 import loadingIcon from "@icons/loading.svg";
+import { Delta } from "quill/core";
+import Emitter from "quill/core/emitter";
 
-const Module = QlQuill.import("core/module");
-
-export default class ImageUploader extends Module {
-  declare options: ImageOptions;
+export default class ImageUploader extends Uploader {
+  declare options: ImageObjOptions & typeof Uploader.DEFAULTS;
   declare quill: QlQuill;
 
   static insertImage(
@@ -23,15 +24,23 @@ export default class ImageUploader extends Module {
     this.setSelection(range.index + 1);
   }
 
-  constructor(quill: QlQuill, options: ImageOptions) {
+  constructor(
+    quill: QlQuill,
+    options: (() => void) | (ImageObjOptions & typeof Uploader.DEFAULTS)
+  ) {
+    if (typeof options === "function") {
+      super(quill, {});
+
+      setTimeout(() => {
+        const toolbar = this.quill.getModule("toolbar");
+        toolbar.addHandler("image", options);
+      });
+      return;
+    }
+
     super(quill, options);
 
-    const toolbar = this.quill.getModule("toolbar");
-    toolbar.addHandler("image", this.handlerImage);
-
-    if (typeof options === "function") return;
-
-    const { clipboard, base64AutoUpload, drop } = options as ImageObjOptions;
+    const { clipboard, base64AutoUpload } = options;
 
     if (clipboard || base64AutoUpload) {
       this.quill.clipboard.addMatcher("IMG", (node, delta) => {
@@ -46,9 +55,8 @@ export default class ImageUploader extends Module {
           const Delta = QlQuill.import("delta");
           const alt = "loading-" + Date.now();
 
-          this.uploadImage(
-            src,
-            (url) => {
+          this.uploadImage(src)
+            .then((url) => {
               if (src === url) return;
 
               const image = this.quill.root.querySelector(`[alt=${alt}]`);
@@ -57,13 +65,12 @@ export default class ImageUploader extends Module {
                 image.setAttribute("src", url);
                 image.removeAttribute("alt");
               }
-            },
-            () => {
+            })
+            .catch(() => {
               const image = this.quill.root.querySelector(`[alt=${alt}]`);
 
               image?.parentNode?.removeChild(image);
-            }
-          );
+            });
 
           delta = new Delta().insert(
             { image: loadingIcon },
@@ -78,107 +85,56 @@ export default class ImageUploader extends Module {
         return delta;
       });
     }
-
-    drop && this.quill.root.addEventListener("drop", this.handleDrop, false);
   }
 
-  uploadImage(
-    file: string | FileLike,
-    onSuccess?: (file: string) => void,
-    onError = () => {}
-  ) {
-    if (typeof this.options === "function") return;
+  async uploadImage(file: string | File): Promise<string> {
+    if (typeof this.options === "function") return "";
 
     const { action } = this.options as ImageObjOptions;
 
-    const insertImage = (src: string, attrs?: Record<string, any>) => {
-      ImageUploader.insertImage.call(this.quill, src, attrs);
-    };
-    const successCb = onSuccess || insertImage;
-
     if (typeof action === "function") {
-      if (isBase64(file)) file = dataURLtoFile(file);
-      action(file, successCb, onError);
-      return;
-    }
+      const url = await new Promise<string>((resolve, reject) => {
+        file = isBase64(file) ? dataURLtoFile(file) : file;
 
-    if (isBase64(file)) return successCb(file);
-    const fr = new FileReader();
-    fr.onload = (e) => successCb(fr.result as string);
-    fr.readAsDataURL(file);
-  }
-
-  handlerImage = () => {
-    if (typeof this.options === "function") {
-      this.options();
-      return;
-    }
-
-    const { accept } = this.options as ImageObjOptions;
-
-    const toolbar = this.quill.getModule("toolbar");
-
-    let input = toolbar.container!.querySelector(
-      "input.ql-image[type=file]"
-    ) as HTMLInputElement;
-    if (input == null) {
-      input = document.createElement("input");
-      input.setAttribute("type", "file");
-      input.setAttribute(
-        "accept",
-        accept || "image/png, image/gif, image/jpeg, image/bmp, image/x-icon"
-      );
-      input.classList.add("ql-image");
-      input.addEventListener("change", () => {
-        if (input.files != null && input.files[0] != null) {
-          this.uploadImage(input.files[0]);
-          input.value = "";
-        }
+        action(file, resolve, reject);
       });
-      toolbar.container!.appendChild(input);
-    }
-    input.click();
-  };
 
-  handleDrop = (e: DragEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    if (e.dataTransfer?.files?.length) {
-      const selection = document.getSelection();
-      if (document.caretRangeFromPoint) {
-        const range = document.caretRangeFromPoint(e.clientX, e.clientY);
-        if (selection && range) {
-          selection.setBaseAndExtent(
-            range.startContainer,
-            range.startOffset,
-            range.startContainer,
-            range.startOffset
-          );
-        }
-      } else {
-        const range = document.caretPositionFromPoint(e.clientX, e.clientY);
-        if (selection && range) {
-          selection.setBaseAndExtent(
-            range.offsetNode,
-            range.offset,
-            range.offsetNode,
-            range.offset
-          );
-        }
+      return url;
+    }
+
+    return new Promise((resolve, reject) => {
+      if (isBase64(file)) {
+        ImageUploader.insertImage.call(this.quill, file, {});
+        return file;
       }
 
-      const file = e.dataTransfer.files[0];
-
-      setTimeout(() => this.uploadImage(file));
-    }
-  };
+      const fr = new FileReader();
+      fr.onload = (e) => resolve(fr.result as string);
+      fr.onerror = reject;
+      fr.readAsDataURL(file);
+    });
+  }
 }
+
+ImageUploader.DEFAULTS.handler = function (range, files) {
+  // @ts-ignore
+  Promise.all(files.map((file) => this.uploadImage(file))).then((images) => {
+    const update = images.reduce((delta: Delta, image: string) => {
+      return delta.insert({ image });
+    }, new Delta().retain(range.index).delete(range.length)) as Delta;
+    this.quill.updateContents(update, Emitter.sources.USER);
+    this.quill.setSelection(
+      range.index + images.length,
+      Emitter.sources.SILENT
+    );
+  });
+};
 
 function isBase64(file: any): file is string {
   return typeof file === "string" && /^data:image\/.+;base64/.test(file);
 }
 
-function dataURLtoFile(dataurl: string, filename?: string): FileLike {
+function dataURLtoFile(dataurl: string, filename?: string) {
   const arr = dataurl.split(","),
     mime = arr[0]!.match(/:(.*?);/)![1],
     bstr = atob(arr[1]);
@@ -189,10 +145,9 @@ function dataURLtoFile(dataurl: string, filename?: string): FileLike {
     u8arr[n] = bstr.charCodeAt(n);
   }
 
-  const file = new Blob([u8arr], { type: mime }) as FileLike;
-  file.lastModified = Date.now();
-  file.name =
-    filename || "base642image" + Date.now() + "." + mime.replace(/image\//, "");
-
-  return file;
+  return new File(
+    [u8arr],
+    filename || `base64ToFile-${Date.now()}.${mime.replace(/image\//, "")}`,
+    { type: mime }
+  );
 }

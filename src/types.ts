@@ -9,11 +9,6 @@ export interface QlExpandedOptions extends ExpandedOptions {
   custom: string[];
 }
 
-export interface FileLike extends Blob {
-  name: string;
-  lastModified: number;
-}
-
 export interface CustomToolOptions {
   /** 开启插入重点功能 不推荐使用此配置 建议在toolbar配置 */
   import?: boolean;
@@ -36,7 +31,7 @@ export interface ImageObjOptions {
   drop?: boolean;
   /** 文件上传时触发 */
   action?(
-    file: FileLike,
+    file: File,
     resolce: (file: string, atts?: Record<string, any>) => void,
     reject: () => void
   ): void;

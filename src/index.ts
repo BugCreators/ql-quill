@@ -40,7 +40,7 @@ interface QlQuill {
   getModule(name: "toolbar"): Toolbar;
   getModule(name: "wordCount"): WordCount;
   getModule(name: "locale"): Locale;
-  getModule(name: "imageUploader"): ImageUploader;
+  getModule(name: "uploader"): ImageUploader;
   getModule(name: string): unknown;
 }
 
@@ -251,7 +251,7 @@ class QlQuill extends Quill {
     latex = "",
     attributes: Record<string, string | number> = {}
   ) {
-    const ImageUploader = this.getModule("imageUploader");
+    const ImageUploader = this.getModule("uploader");
 
     //@ts-ignore
     return ImageUploader.constructor.insertImage.call(this, src, {
@@ -268,7 +268,7 @@ function defaultConfig(options: QlQuillOptions, qlOptions: QlOptions): Options {
       theme: "snow",
       modules: {
         toolbar: { container: qlOptions.toolbar },
-        imageUploader: qlOptions.image || {},
+        uploader: qlOptions.image || {},
         formula: qlOptions.formula || "",
         locale: qlOptions.locale || {},
         dialog: {},

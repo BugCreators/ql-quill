@@ -20,7 +20,7 @@ QlQuill.register(
   {
     "modules/better-table": Table,
     "modules/dialog": Dialog,
-    "modules/imageUploader": ImageUploader,
+    "modules/uploader": ImageUploader,
     "modules/blotFormatter": BlotFormatter,
     "modules/locale": Locale,
     "modules/pasteFromWord": PasteFromWord,

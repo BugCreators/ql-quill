@@ -21,7 +21,7 @@ export class Clipboard extends BaseClipboard {
       worker.onmessage = (e) => {
         if (!e.data.length) return;
 
-        const uploader = this.quill.getModule("imageUploader");
+        const uploader = this.quill.getModule("uploader");
 
         let index = 0;
         [...this.quill.container.querySelectorAll("img")].forEach((el) => {
@@ -29,13 +29,15 @@ export class Clipboard extends BaseClipboard {
 
           if (/^file:\/\/[\s\S]+|^\/\/:0/.test(src!)) {
             const image = e.data[index];
-            uploader.uploadImage(
-              image.base64,
-              (url) => el.setAttribute("src", url),
-              () => {
+
+            uploader
+              .uploadImage(image.base64)
+              .then((url) => {
+                el.setAttribute("src", url);
+              })
+              .catch(() => {
                 el.parentNode!.removeChild(el);
-              }
-            );
+              });
 
             index++;
           }
