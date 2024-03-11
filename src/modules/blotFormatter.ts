@@ -5,6 +5,7 @@ import {
   Action,
   ResizeAction as BaseResizeAction,
   DeleteAction,
+  BlotSpec,
 } from "quill-blot-formatter";
 
 class FormulaEditAction extends Action {
@@ -179,22 +180,47 @@ export class ImageSpec extends BaseImageSpec {
 
 class BlotFormatter extends BaseBlotFormatter {
   scrollTop: number;
+  wrapper: Element;
 
   constructor(quill: any, options: Options) {
     super(quill, options);
 
-    this.scrollTop = quill.scrollingContainer.scrollTop;
+    this.wrapper = document.createElement("div");
+    this.wrapper.classList.add("blot-formatter__wrapper");
+    this.quill.root.parentNode.appendChild(this.wrapper);
 
-    if (quill.root === quill.scrollingContainer) {
+    this.scrollTop = quill.scroll.domNode.scrollTop;
+
+    if (quill.root === quill.scroll.domNode) {
       quill.root.addEventListener("scroll", () => {
         this.overlay.style.top =
           Number(this.overlay.style.top.replace("px", "")) +
-          (this.scrollTop - quill.scrollingContainer.scrollTop) +
+          (this.scrollTop - quill.scroll.domNode.scrollTop) +
           "px";
 
-        this.scrollTop = quill.scrollingContainer.scrollTop;
+        this.scrollTop = quill.scroll.domNode.scrollTop;
       });
     }
+  }
+
+  show(spec: BlotSpec) {
+    super.show(spec);
+
+    this.quill.root.parentNode.removeChild(this.overlay);
+    this.wrapper.appendChild(this.overlay);
+  }
+
+  hide() {
+    if (!this.currentSpec) {
+      return;
+    }
+
+    this.currentSpec.onHide();
+    this.currentSpec = undefined;
+    this.wrapper.removeChild(this.overlay);
+    this.overlay.style.setProperty("display", "none");
+    this.setUserSelect("");
+    this.destroyActions();
   }
 }
 
