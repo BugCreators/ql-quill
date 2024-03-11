@@ -1,3 +1,13 @@
+## 1.2.0-alpha.13
+
+- kityformula-plugin
+
+  - 处理多层嵌套跨域问题
+
+- editor
+  - 修复 color-picker 在编辑器固定高度时被遮挡问题
+  - FormulaEditAction 清除 dblclick 事件
+
 ## 1.2.0-alpha.12
 
 - editor
