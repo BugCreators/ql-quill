@@ -1,7 +1,15 @@
+## 1.2.0-alpha.14
+
+- dialog
+  - 添加禁用/启用确认按钮方法
+
+- editor
+  - blotFormatter 清除 click 监听器
+  - import 优化插入性能
+
 ## 1.2.0-alpha.13
 
 - kityformula-plugin
-
   - 处理多层嵌套跨域问题
 
 - editor
