@@ -160,12 +160,6 @@ class DisplaySizeAction extends Action {
 export class ImageSpec extends BaseImageSpec {
   init() {
     super.init();
-
-    window.addEventListener("click", (e) => {
-      if (!this.formatter.quill.container.contains(e.target)) {
-        this.formatter.hide();
-      }
-    });
   }
 
   getActions() {
@@ -203,11 +197,19 @@ class BlotFormatter extends BaseBlotFormatter {
     }
   }
 
+  onClickOutSide = (e: MouseEvent) => {
+    if (!this.quill.container.contains(e.target)) {
+      this.hide();
+    }
+  }
+
   show(spec: BlotSpec) {
     super.show(spec);
 
     this.quill.root.parentNode.removeChild(this.overlay);
     this.wrapper.appendChild(this.overlay);
+
+    window.addEventListener("click", this.onClickOutSide);
   }
 
   hide() {
@@ -221,6 +223,8 @@ class BlotFormatter extends BaseBlotFormatter {
     this.overlay.style.setProperty("display", "none");
     this.setUserSelect("");
     this.destroyActions();
+
+    window.removeEventListener("click", this.onClickOutSide);
   }
 }
 
