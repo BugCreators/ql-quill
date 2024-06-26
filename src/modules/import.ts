@@ -37,12 +37,32 @@ class Import extends Module {
     const input = document.createElement("input");
     input.classList.add("ql-quill-input", "ql-import-input");
 
+    input.autofocus = true;
+
+    const dialog = this.quill.getModule("dialog");
+
+    input.addEventListener("input", (e) => {
+      const { value } = e.target as HTMLInputElement;
+
+      if (value.trim()) {
+        dialog.enableConfirmBtn();
+      } else {
+        dialog.disabledConfirmBtn();
+      }
+    });
+
     return input;
   }
 
   insert() {
     const dialog = this.quill.getModule("dialog");
     const locale = this.quill.getModule("locale");
+
+    dialog.disabledConfirmBtn();
+
+    setTimeout(() => {
+      this.input.focus();
+    });
 
     dialog.open({
       width: 640,
@@ -53,10 +73,18 @@ class Import extends Module {
         this.quill.deleteText(range);
         let index = range.index;
 
+        const Delta = QlQuill.import("delta");
+
+        const delta = new Delta().retain(index);
+
         this.input.value.split("").forEach((word) => {
-          this.quill.insertEmbed(index, "import", word);
+          if (word.match(/^\s$/)) return;
+
+          delta.insert({ import: word });
           index++;
         });
+
+        this.quill.updateContents(delta);
         this.quill.setSelection(index);
         close();
       },
