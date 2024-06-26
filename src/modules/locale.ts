@@ -69,10 +69,10 @@ class LocaleModule {
     return key ? locale[key] || key : locale;
   }
 
-  locale(preset?: string | PartialLocale, object?: PartialLocale) {
+  locale(preset?: string | PartialLocale, object?: PartialLocale, isLocal?: boolean) {
     if (!preset) return this.$L;
 
-    parseLocale(preset, object);
+    parseLocale(preset, object, isLocal);
   }
 }
 

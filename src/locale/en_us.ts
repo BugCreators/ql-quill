@@ -13,6 +13,6 @@ const locale: Locale = {
 
 const localeModule = Quill.import("modules/locale") as LocaleInstance;
 
-localeModule.locale(locale);
+localeModule.locale(locale, undefined, true);
 
 export default locale;
