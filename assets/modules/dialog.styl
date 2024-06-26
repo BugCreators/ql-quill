@@ -209,6 +209,9 @@
   > span
     display inline-block
 
+  &[disabled]
+    cursor not-allowed;
+
   &:hover
     color #5dcfae
     background #fff
@@ -221,6 +224,11 @@
     text-shadow 0 -1px 0 rgba(0, 0, 0, 0.12)
     -webkit-box-shadow 0 2px 0 rgba(0, 0, 0, 0.045)
     box-shadow 0 2px 0 rgba(0, 0, 0, 0.045)
+
+    &[disabled]
+      border none;
+      color #fff;
+      opacity .2;
 
     &:hover
       color #fff
