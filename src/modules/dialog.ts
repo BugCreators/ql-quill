@@ -26,6 +26,7 @@ class Dialog {
   quill: QlQuill;
   options: DialogOptions;
   container: HTMLElement;
+  confrimBtn?: HTMLElement;
 
   constructor(quill: QlQuill) {
     this.quill = quill;
@@ -117,14 +118,22 @@ class Dialog {
   };
 
   registerListener() {
-    const confrimBtn = this.queryComponent(Dialog.CONFIRM_BTN_CLASS_NAME);
-    confrimBtn.addEventListener("click", this.handleConfirm);
+    this.confrimBtn = this.queryComponent(Dialog.CONFIRM_BTN_CLASS_NAME);
+    this.confrimBtn.addEventListener("click", this.handleConfirm);
 
     const closeBtn = this.queryComponent(Dialog.CLOSE_BTN_CLASS_NAME);
     closeBtn.addEventListener("click", this.handleCancel);
 
     const cancelBtn = this.queryComponent(Dialog.CANCEL_BTN_CLASS_NAME);
     cancelBtn.addEventListener("click", this.handleCancel);
+  }
+
+  disabledConfirmBtn() {
+    this.confrimBtn?.setAttribute("disabled", "disabled");
+  }
+
+  enableConfirmBtn() {
+    this.confrimBtn?.removeAttribute("disabled");
   }
 
   show() {
@@ -134,6 +143,7 @@ class Dialog {
   close() {
     this.options.beforeClose?.();
     this.container.style.display = "none";
+    this.enableConfirmBtn();
   }
 }
 
