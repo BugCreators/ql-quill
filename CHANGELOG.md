@@ -1,3 +1,8 @@
+## 1.2.0-alpha.15
+
+- editor
+  - 支持 blob 协议图片自动上传
+
 ## 1.2.0-alpha.14
 
 - dialog
