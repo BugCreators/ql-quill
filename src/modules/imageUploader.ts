@@ -42,8 +42,7 @@ export default class ImageUploader
 
         if (!base64AutoUpload) return delta;
 
-        const isBase64 = /^data:image/.test(node.src);
-        if (isBase64) {
+        if (isBase64(node.src) || isBlobUrl(node.src)) {
           const Delta = QlQuill.import("delta");
           const alt = "loading-" + Date.now();
 
@@ -98,6 +97,13 @@ export default class ImageUploader
     const successCb = onSuccess || insertImage;
 
     if (typeof action === "function") {
+      if (isBlobUrl(file)) {
+        blobURLtoFile(file).then((file) => {
+          action(file, successCb, onError);
+        });
+        return;
+      }
+
       if (isBase64(file)) file = dataURLtoFile(file);
       action(file, successCb, onError);
       return;
@@ -179,6 +185,10 @@ function isBase64(file: any): file is string {
   return typeof file === "string" && /^data:image\/.+;base64/.test(file);
 }
 
+function isBlobUrl(file: any): file is string {
+  return typeof file === "string" && /^blob:/.test(file);
+}
+
 function dataURLtoFile(dataurl: string, filename?: string): FileLike {
   const arr = dataurl.split(","),
     mime = arr[0]!.match(/:(.*?);/)![1],
@@ -196,4 +206,17 @@ function dataURLtoFile(dataurl: string, filename?: string): FileLike {
     filename || "base642image" + Date.now() + "." + mime.replace(/image\//, "");
 
   return file;
+}
+
+function blobURLtoFile(url: string, filename?: string): Promise<FileLike> {
+  return fetch(url)
+    .then((res) => res.blob())
+    .then((blob) => {
+      return Object.assign(blob, {
+        lastModified: Date.now(),
+        name:
+          filename ||
+          "base642image" + Date.now() + "." + blob.type.replace(/image\//, ""),
+      });
+    });
 }
