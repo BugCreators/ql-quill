@@ -50,13 +50,12 @@ export default class ImageUploader extends Uploader {
 
         const { src, width, height } = node as HTMLImageElement;
 
-        const isBase64 = /^data:image/.test(src);
-        if (isBase64) {
+        if (isBase64(src) || isBlobUrl(src)) {
           const Delta = QlQuill.import("delta");
           const alt = "loading-" + Date.now();
 
           this.uploadImage(src)
-            .then((url) => {
+            .then(url => {
               if (src === url) return;
 
               const image = this.quill.root.querySelector(`[alt=${alt}]`);
@@ -93,8 +92,12 @@ export default class ImageUploader extends Uploader {
     const { action } = this.options as ImageObjOptions;
 
     if (typeof action === "function") {
-      const url = await new Promise<string>((resolve, reject) => {
-        file = isBase64(file) ? dataURLtoFile(file) : file;
+      const url = await new Promise<string>(async (resolve, reject) => {
+        file = isBlobUrl(file)
+          ? await blobURLtoFile(file)
+          : isBase64(file)
+          ? dataURLtoFile(file)
+          : file;
 
         action(file, resolve, reject);
       });
@@ -109,7 +112,7 @@ export default class ImageUploader extends Uploader {
       }
 
       const fr = new FileReader();
-      fr.onload = (e) => resolve(fr.result as string);
+      fr.onload = e => resolve(fr.result as string);
       fr.onerror = reject;
       fr.readAsDataURL(file);
     });
@@ -118,7 +121,7 @@ export default class ImageUploader extends Uploader {
 
 ImageUploader.DEFAULTS.handler = function (range, files) {
   // @ts-ignore
-  Promise.all(files.map((file) => this.uploadImage(file))).then((images) => {
+  Promise.all(files.map(file => this.uploadImage(file))).then(images => {
     const update = images.reduce((delta: Delta, image: string) => {
       return delta.insert({ image });
     }, new Delta().retain(range.index).delete(range.length)) as Delta;
@@ -132,6 +135,10 @@ ImageUploader.DEFAULTS.handler = function (range, files) {
 
 function isBase64(file: any): file is string {
   return typeof file === "string" && /^data:image\/.+;base64/.test(file);
+}
+
+function isBlobUrl(file: any): file is string {
+  return typeof file === "string" && /^blob:/.test(file);
 }
 
 function dataURLtoFile(dataurl: string, filename?: string) {
@@ -150,4 +157,16 @@ function dataURLtoFile(dataurl: string, filename?: string) {
     filename || `base64ToFile-${Date.now()}.${mime.replace(/image\//, "")}`,
     { type: mime }
   );
+}
+
+async function blobURLtoFile(url: string, filename?: string) {
+  return fetch(url)
+    .then(res => res.blob())
+    .then(blob => {
+      return new File(
+        [blob],
+        filename ||
+          "base642image" + Date.now() + "." + blob.type.replace(/image\//, "")
+      );
+    });
 }
