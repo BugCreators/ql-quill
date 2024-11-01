@@ -34,7 +34,12 @@ export default class ImageUploader
 
     if (typeof options === "function") return;
 
-    const { clipboard, base64AutoUpload, drop } = options as ImageObjOptions;
+    const {
+      clipboard,
+      base64AutoUpload,
+      drop,
+      paste = true,
+    } = options as ImageObjOptions;
 
     if (clipboard || base64AutoUpload) {
       this.quill.clipboard.addMatcher("IMG", (node, delta) => {
@@ -48,7 +53,7 @@ export default class ImageUploader
 
           this.uploadImage(
             node.src,
-            (url) => {
+            url => {
               if (node.src === url) return;
 
               const image = this.quill.root.querySelector(`[alt=${alt}]`);
@@ -80,6 +85,8 @@ export default class ImageUploader
     }
 
     drop && this.quill.root.addEventListener("drop", this.handleDrop, false);
+
+    paste && this.quill.root.addEventListener("paste", this.onPaste.bind(this));
   }
 
   uploadImage(
@@ -98,7 +105,7 @@ export default class ImageUploader
 
     if (typeof action === "function") {
       if (isBlobUrl(file)) {
-        blobURLtoFile(file).then((file) => {
+        blobURLtoFile(file).then(file => {
           action(file, successCb, onError);
         });
         return;
@@ -111,7 +118,7 @@ export default class ImageUploader
 
     if (isBase64(file)) return successCb(file);
     const fr = new FileReader();
-    fr.onload = (e) => successCb(fr.result as string);
+    fr.onload = e => successCb(fr.result as string);
     fr.readAsDataURL(file);
   }
 
@@ -179,6 +186,20 @@ export default class ImageUploader
       setTimeout(() => this.uploadImage(file));
     }
   };
+
+  onPaste(e: ClipboardEvent) {
+    const files = Array.from(e.clipboardData?.files || []).filter(file =>
+      file.type.includes("image/")
+    );
+
+    if (files?.length) {
+      const uploader = this.quill.getModule("imageUploader");
+
+      files.forEach(file => {
+        uploader.uploadImage(file);
+      });
+    }
+  }
 }
 
 function isBase64(file: any): file is string {
@@ -210,8 +231,8 @@ function dataURLtoFile(dataurl: string, filename?: string): FileLike {
 
 function blobURLtoFile(url: string, filename?: string): Promise<FileLike> {
   return fetch(url)
-    .then((res) => res.blob())
-    .then((blob) => {
+    .then(res => res.blob())
+    .then(blob => {
       return Object.assign(blob, {
         lastModified: Date.now(),
         name:

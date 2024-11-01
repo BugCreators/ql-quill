@@ -53,15 +53,16 @@
           formData.append("file", file, file.name);
           axios({
             method: "post",
-            url: "http://192.168.4.247/webservice/file/saveOne",
+            url: "https://devr.qljy.com/fileservice/schoolFile/uploadOne",
             headers: {
               "content-type": "application/x-www-form-urlencoded;charset=utf-8",
-              token: "d5179d32132b408d96b65155391ca093",
+              token: "580391feb2f785563c61ed51ca3b9a27",
             },
             data: formData,
           })
             .then(function (res) {
-              resolve(res.data.data.fullUrl);
+              const { fileHostUrl, fileUrl } = res.data.result;
+              resolve(fileHostUrl + fileUrl);
             })
             .catch(reject);
         },

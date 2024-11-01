@@ -64,6 +64,10 @@ qlQuilllocale.locale("custom", { ... });
 
 遍历剪贴板中的图片
 
+#### image.paste `boolean`
+
+是否开启粘贴上传 默认开启
+
 #### image.drop `boolean`
 
 是否开启拖拽上传
