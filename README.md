@@ -70,7 +70,7 @@ qlQuilllocale.locale("custom", { ... });
 
 #### image.drop `boolean`
 
-是否开启拖拽上传
+是否开启拖拽上传 默认开启
 
 #### image.action `(file: File, reslove: (file: string) => void, reject: () => void) => void`
 

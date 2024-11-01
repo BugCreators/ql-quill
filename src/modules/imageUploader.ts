@@ -37,7 +37,7 @@ export default class ImageUploader
     const {
       clipboard,
       base64AutoUpload,
-      drop,
+      drop = true,
       paste = true,
     } = options as ImageObjOptions;
 
