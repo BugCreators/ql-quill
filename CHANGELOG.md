@@ -1,3 +1,9 @@
+## 1.2.0-alpha.16
+
+- editor
+  - 支持复制图片粘贴上传
+  - 不再支持 image.drop 参数 该功能始终开启
+
 ## 1.2.0-alpha.15
 
 - editor
