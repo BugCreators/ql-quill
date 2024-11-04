@@ -64,14 +64,6 @@ qlQuilllocale.locale("custom", { ... });
 
 遍历剪贴板中的图片
 
-#### image.paste `boolean`
-
-是否开启粘贴上传 默认开启
-
-#### image.drop `boolean`
-
-是否开启拖拽上传 默认开启
-
 #### image.action `(file: File, reslove: (file: string) => void, reject: () => void) => void`
 
 文件上传时触发

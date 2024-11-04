@@ -37,8 +37,6 @@ export default class ImageUploader
     const {
       clipboard,
       base64AutoUpload,
-      drop = true,
-      paste = true,
     } = options as ImageObjOptions;
 
     if (clipboard || base64AutoUpload) {
@@ -84,9 +82,8 @@ export default class ImageUploader
       });
     }
 
-    drop && this.quill.root.addEventListener("drop", this.handleDrop, false);
-
-    paste && this.quill.root.addEventListener("paste", this.onPaste.bind(this));
+    this.quill.root.addEventListener("drop", this.handleDrop, false);
+    this.quill.root.addEventListener("paste", this.onPaste.bind(this));
   }
 
   uploadImage(

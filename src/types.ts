@@ -28,10 +28,6 @@ export interface ImageObjOptions {
   base64AutoUpload?: boolean;
   /** 剪贴板中的图片回调 */
   clipboard?(node: HTMLElement, delta: DeltaStatic): DeltaStatic;
-  /** 是否开启粘贴上传  */
-  paste?: boolean;
-  /** 是否开启拖拽上传  */
-  drop?: boolean;
   /** 文件上传时触发 */
   action?(
     file: FileLike,
