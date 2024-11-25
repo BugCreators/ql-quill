@@ -34,10 +34,7 @@ export default class ImageUploader
 
     if (typeof options === "function") return;
 
-    const {
-      clipboard,
-      base64AutoUpload,
-    } = options as ImageObjOptions;
+    const { clipboard, base64AutoUpload } = options as ImageObjOptions;
 
     if (clipboard || base64AutoUpload) {
       this.quill.clipboard.addMatcher("IMG", (node, delta) => {
@@ -195,6 +192,8 @@ export default class ImageUploader
       files.forEach(file => {
         uploader.uploadImage(file);
       });
+
+      e.preventDefault();
     }
   }
 }
