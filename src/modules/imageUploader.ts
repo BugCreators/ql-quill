@@ -151,7 +151,12 @@ export default class ImageUploader
   handleDrop = (e: DragEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    if (e.dataTransfer?.files?.length) {
+
+    const files = Array.from(e.dataTransfer?.files || []).filter(file =>
+      file.type.includes("image/")
+    );
+
+    if (files?.length) {
       const selection = document.getSelection();
       if (document.caretRangeFromPoint) {
         const range = document.caretRangeFromPoint(e.clientX, e.clientY);
@@ -175,9 +180,11 @@ export default class ImageUploader
         }
       }
 
-      const file = e.dataTransfer.files[0];
-
-      setTimeout(() => this.uploadImage(file));
+      setTimeout(() => {
+        files.forEach(file => {
+          this.uploadImage(file);
+        });
+      });
     }
   };
 
@@ -187,10 +194,8 @@ export default class ImageUploader
     );
 
     if (files?.length) {
-      const uploader = this.quill.getModule("imageUploader");
-
       files.forEach(file => {
-        uploader.uploadImage(file);
+        this.uploadImage(file);
       });
 
       e.preventDefault();
