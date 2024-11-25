@@ -1,3 +1,8 @@
+## 1.2.0-alpha.17
+
+- editor
+  - 粘贴图片时阻止默认事件触发
+
 ## 1.2.0-alpha.16
 
 - editor
@@ -12,6 +17,7 @@
 ## 1.2.0-alpha.14
 
 - dialog
+
   - 添加禁用/启用确认按钮方法
 
 - editor
@@ -21,6 +27,7 @@
 ## 1.2.0-alpha.13
 
 - kityformula-plugin
+
   - 处理多层嵌套跨域问题
 
 - editor
