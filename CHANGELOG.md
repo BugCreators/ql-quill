@@ -1,3 +1,8 @@
+## 1.2.0-alpha.19
+
+- editor
+  - color-picker 自动读取默认颜色
+
 ## 1.2.0-alpha.18
 
 - editor
