@@ -46,23 +46,18 @@ const DEFAULTS: Record<string, Array<any>> = {
 const AlignStyle = QlQuill.import("attributors/style/align");
 
 const FontStyle = QlQuill.import(
-  "attributors/style/font"
+  "attributors/style/font",
 ) as typeof BaseFontStyle;
 FontStyle.whitelist = DEFAULTS.font;
 
 const SizeStyle = QlQuill.import(
-  "attributors/style/size"
+  "attributors/style/size",
 ) as typeof BaseSizeStyle;
 SizeStyle.whitelist = DEFAULTS.size;
 
-QlQuill.register(
-  {
-    "formats/align": AlignStyle,
-    "formats/size": SizeStyle,
-    "formats/font": FontStyle,
-  },
-  true
-);
+QlQuill.register("formats/align", AlignStyle);
+QlQuill.register("formats/size", SizeStyle);
+QlQuill.register("formats/font", FontStyle);
 
 class SnowTheme extends Snow {
   colorPicker?: ColorPicker;
@@ -93,13 +88,16 @@ function expandConfig(toolbar: ToolbarProps, options: QlExpandedOptions): void {
   const twoD = Array.isArray(container[0]);
   const toolbarTemp = twoD ? container : [container];
 
-  const custom = options.custom.reduce((obj, key) => {
-    obj[key] = false;
+  const custom = options.custom.reduce(
+    (obj, key) => {
+      obj[key] = false;
 
-    return obj;
-  }, {} as { [key: string]: boolean });
+      return obj;
+    },
+    {} as { [key: string]: boolean },
+  );
 
-  toolbarTemp.forEach((tool) => {
+  toolbarTemp.forEach(tool => {
     tool.forEach((t: string | Record<string, any[]>, index: number) => {
       if (typeof t === "string") {
         if (options.custom.includes(t)) {
@@ -108,8 +106,8 @@ function expandConfig(toolbar: ToolbarProps, options: QlExpandedOptions): void {
 
         if (["font", "size"].includes(t)) {
           tool[index] = {
-            [t]: DEFAULTS[t].map((item) =>
-              ["14px", "Arial"].includes(item) ? false : item
+            [t]: DEFAULTS[t].map(item =>
+              ["14px", "Arial"].includes(item) ? false : item,
             ),
           };
           t = tool[index];

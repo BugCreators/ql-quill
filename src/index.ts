@@ -85,12 +85,12 @@ class QlQuill extends Quill {
 
     // 旧数据处理 类名转成内联
     this.clipboard.addMatcher("SPAN", (node, delta) => {
-      Array.from((node as HTMLSpanElement).classList).forEach((className) => {
+      Array.from((node as HTMLSpanElement).classList).forEach(className => {
         const [, format, value] = className.match(/^ql-(size|font)-(.*)/) || [];
 
         if (!format || !value) return;
 
-        delta.forEach((op) => {
+        delta.forEach(op => {
           if (!op.attributes) op.attributes = {};
 
           op.attributes[format] = value + (format === "size" ? "px" : "");
@@ -103,7 +103,7 @@ class QlQuill extends Quill {
 
   expandConfig(
     options: QlExpandedOptions,
-    qlOptions: QlOptions
+    qlOptions: QlOptions,
   ): QlExpandedOptions {
     const { imageResize, formula, limit, pasteFromWord } = qlOptions;
 
@@ -179,7 +179,7 @@ class QlQuill extends Quill {
         } else if (eventName === "selection-change") {
           this.onEditorChangeSelection(rangeOrDelta, source);
         }
-      }
+      },
     );
   }
 
@@ -221,12 +221,17 @@ class QlQuill extends Quill {
 
   setContents(value: string | Delta | Op[]) {
     const sel = this.prevSelection;
+    let Delta;
     if (typeof value === "string") {
       this.clipboard.dangerouslyPasteHTML(value);
+
+      Delta = this.getContents();
     } else {
-      super.setContents(value);
+      Delta = super.setContents(value);
     }
     postpone(() => this.setEditorSelection(this, sel!));
+
+    return Delta;
   }
 
   getHTML(): string {
@@ -240,7 +245,7 @@ class QlQuill extends Quill {
       range.index = Math.max(0, Math.min(range.index, length - 1));
       range.length = Math.max(
         0,
-        Math.min(range.length, length - 1 - range.index)
+        Math.min(range.length, length - 1 - range.index),
       );
       editor.setSelection(range);
     }
@@ -249,7 +254,7 @@ class QlQuill extends Quill {
   insertImage(
     src: string,
     latex = "",
-    attributes: Record<string, string | number> = {}
+    attributes: Record<string, string | number> = {},
   ) {
     const ImageUploader = this.getModule("uploader");
 
@@ -261,7 +266,7 @@ class QlQuill extends Quill {
   }
 }
 
-function defaultConfig(options: QlQuillOptions, qlOptions: QlOptions): Options {
+function defaultConfig(options: QlQuillOptions, qlOptions: QlOptions) {
   return extend(
     true,
     {
@@ -273,9 +278,9 @@ function defaultConfig(options: QlQuillOptions, qlOptions: QlOptions): Options {
         locale: qlOptions.locale || {},
         dialog: {},
       },
-      custom: QlQuill.CUSTOM_TOOLS.filter((tool) => !!qlOptions[tool]),
+      custom: QlQuill.CUSTOM_TOOLS.filter(tool => !!qlOptions[tool]),
     },
-    options
+    options,
   );
 }
 
@@ -287,7 +292,7 @@ function extractConfig(options: QlQuillOptions): QlOptions {
 
       return memo;
     },
-    {} as any as QlOptions
+    {} as any as QlOptions,
   );
 }
 
