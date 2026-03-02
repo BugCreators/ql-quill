@@ -2,13 +2,18 @@ import QlQuill from "../index";
 
 const Module = QlQuill.import("core/module");
 
+interface FormulaOptions {
+  url: string;
+}
+
 class Formula extends Module {
   iframe: HTMLIFrameElement;
-  declare options: string;
+  declare options: FormulaOptions;
   declare quill: QlQuill;
 
-  constructor(quill: QlQuill, options: string) {
+  constructor(quill: QlQuill, options: FormulaOptions) {
     super(quill, options);
+    this.options = options;
     this.iframe = this.createIframe();
 
     quill.getModule("toolbar").addHandler("formula", this.openFormulaDialog);
@@ -19,7 +24,7 @@ class Formula extends Module {
     iframe.style.border = "none";
     iframe.style.height = "400px";
     iframe.style.width = "100%";
-    iframe.setAttribute("src", this.options);
+    iframe.setAttribute("src", this.options.url);
     iframe.dataset.latex = "";
 
     return iframe;
@@ -42,19 +47,19 @@ class Formula extends Module {
 
     const dialog = this.quill.getModule("dialog");
     const locale = this.quill.getModule("locale");
-    this.setSrc(this.options + "?locale=" + locale.$L);
+    this.setSrc(this.options.url + "?locale=" + locale.$L);
 
     dialog.open({
       width: 980,
       title: locale.$locale("插入公式"),
       content: this.iframe.outerHTML,
-      onOk: (close) => {
+      onOk: close => {
         if (!window.kfe) {
           close();
           return;
         }
 
-        window.kfe.execCommand("get.image.data", async (data) => {
+        window.kfe.execCommand("get.image.data", async data => {
           const sLatex = window.kfe!.execCommand<string>("get.source");
 
           const uploader = this.quill.getModule("uploader");

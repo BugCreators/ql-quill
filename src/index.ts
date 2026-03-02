@@ -274,7 +274,9 @@ function defaultConfig(options: QlQuillOptions, qlOptions: QlOptions) {
       modules: {
         toolbar: { container: qlOptions.toolbar },
         uploader: qlOptions.image || {},
-        formula: qlOptions.formula || "",
+        formula: {
+          url: qlOptions.formula || "",
+        },
         locale: qlOptions.locale || {},
         dialog: {},
       },
