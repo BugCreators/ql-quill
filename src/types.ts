@@ -26,7 +26,7 @@ export interface ImageObjOptions {
   /** 是否自动上传粘贴的base64图片 */
   base64AutoUpload?: boolean;
   /** 剪贴板中的图片回调 */
-  clipboard?(node: HTMLElement, delta: Delta): Delta;
+  clipboard?(node: HTMLElement, delta: DeltaStatic): DeltaStatic;
   /** 文件上传时触发 */
   action?(
     file: File,

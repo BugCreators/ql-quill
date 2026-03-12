@@ -1,3 +1,53 @@
+## 1.2.0-alpha.20
+
+- 发布测试 无改动
+
+## 1.2.0-alpha.19
+
+- editor
+  - color-picker 自动读取默认颜色
+
+## 1.2.0-alpha.18
+
+- editor
+  - 图片拖拽上传 支持多图片 过滤非图片文件
+
+## 1.2.0-alpha.17
+
+- editor
+  - 粘贴图片时阻止默认事件触发
+
+## 1.2.0-alpha.16
+
+- editor
+  - 支持复制图片粘贴上传
+  - 不再支持 image.drop 参数 该功能始终开启
+
+## 1.2.0-alpha.15
+
+- editor
+  - 支持 blob 协议图片自动上传
+
+## 1.2.0-alpha.14
+
+- dialog
+
+  - 添加禁用/启用确认按钮方法
+
+- editor
+  - blotFormatter 清除 click 监听器
+  - import 优化插入性能
+
+## 1.2.0-alpha.13
+
+- kityformula-plugin
+
+  - 处理多层嵌套跨域问题
+
+- editor
+  - 修复 color-picker 在编辑器固定高度时被遮挡问题
+  - FormulaEditAction 清除 dblclick 事件
+
 ## 1.2.0-alpha.12
 
 - editor

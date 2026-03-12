@@ -17,7 +17,6 @@ class ColorPicker extends Tooltip {
   static COLOR_SELECT_HOVER: string;
   static COLOR_SELECT: string;
   static COLOR_INPUT: string;
-  static DEFAULT_COLOR: string;
   static TEMPLATE: string;
 
   block: HTMLElement;
@@ -28,7 +27,9 @@ class ColorPicker extends Tooltip {
   color?: string;
   declare quill: QlQuill;
 
-  constructor(quill: QlQuill, boundsContainer: HTMLElement | undefined) {
+  defaultColor!: string;
+
+  constructor(quill: QlQuill, boundsContainer: HTMLElement | null) {
     super(quill, boundsContainer);
 
     const toolbar = quill.getModule("toolbar");
@@ -63,6 +64,8 @@ class ColorPicker extends Tooltip {
       new RGBInput(this.inputContainer, "b"),
     ];
 
+    this.updateDefaultColor();
+
     this.updateColor();
     this.listen();
   }
@@ -87,6 +90,19 @@ class ColorPicker extends Tooltip {
 
       return html;
     }, "");
+  }
+
+  updateDefaultColor(c?: string) {
+    if (c) {
+      this.defaultColor = c;
+      return;
+    }
+
+    const color = window.getComputedStyle(this.quill.container)["color"];
+
+    const [r, g, b] = color.match(/\d+/g)!.map(Number);
+
+    this.defaultColor = MoColorPicker.rgb2hex(r, g, b);
   }
 
   show() {
@@ -150,7 +166,7 @@ class ColorPicker extends Tooltip {
     );
 
     this.inputContainer.addEventListener("change", () => {
-      const colors = this.inputs.map((input) => input.value) as [
+      const colors = this.inputs.map(input => input.value) as [
         number,
         number,
         number
@@ -204,19 +220,16 @@ class ColorPicker extends Tooltip {
   position() {
     const control = this.quill
       .getModule("toolbar")
-      .container!.querySelector(".ql-color") as HTMLElement;
+      .container.querySelector(".ql-color") as HTMLElement;
 
     this.root.style.left =
       control.offsetLeft - control.parentElement!.offsetLeft + "px";
-
-    return 0;
   }
 
   updateColor(color?: string, from = "") {
-    const { DEFAULT_COLOR, COLOR_INPUT, COLOR_PICK, COLOR_SELECT_HOVER } =
-      ColorPicker;
+    const { COLOR_INPUT, COLOR_PICK, COLOR_SELECT_HOVER } = ColorPicker;
 
-    color = color || DEFAULT_COLOR;
+    color = color || this.defaultColor;
 
     this.block.style.background = color as string;
 
@@ -240,7 +253,7 @@ class ColorPicker extends Tooltip {
   save() {
     this.quill.format(
       "color",
-      this.color === ColorPicker.DEFAULT_COLOR ? false : this.color,
+      this.color === this.defaultColor ? false : this.color,
       QlQuill.sources.USER
     );
     this.hide();
@@ -265,8 +278,6 @@ ColorPicker.STANDARD_COLORS = [
   "#002060",
   "#7030a0",
 ];
-
-ColorPicker.DEFAULT_COLOR = "#333333";
 
 ColorPicker.STANDARD_CLASS_NAME = "ql-color-standard";
 ColorPicker.PICKER_CLASS_NAME = "ql-color-picker";
