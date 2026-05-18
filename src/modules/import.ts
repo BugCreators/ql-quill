@@ -21,7 +21,6 @@ ImportBlot.blotName = "import";
 ImportBlot.tagName = "POINT";
 
 class Import extends Module {
-  input: HTMLInputElement;
   declare quill: QlQuill;
 
   static register() {
@@ -30,70 +29,32 @@ class Import extends Module {
 
   constructor(quill: QlQuill, options: any) {
     super(quill, options);
-    this.input = this.createInput();
 
     quill.getModule("toolbar").addHandler("import", this.insert.bind(this));
   }
 
-  createInput() {
-    const input = document.createElement("input");
-    input.classList.add("ql-quill-input", "ql-import-input");
-
-    input.autofocus = true;
-
-    const dialog = this.quill.getModule("dialog");
-
-    input.addEventListener("input", (e) => {
-      const { value } = e.target as HTMLInputElement;
-
-      if (value.trim()) {
-        dialog.enableConfirmBtn();
-      } else {
-        dialog.disabledConfirmBtn();
-      }
-    });
-
-    return input;
-  }
-
   insert() {
-    const dialog = this.quill.getModule("dialog");
-    const locale = this.quill.getModule("locale");
+    const range = this.quill.getSelection(true);
+    if (!range || range.length === 0) return;
 
-    dialog.disabledConfirmBtn();
+    const text = this.quill.getText(range.index, range.length);
+    if (!text.trim()) return;
 
-    setTimeout(() => {
-      this.input.focus();
+    this.quill.deleteText(range.index, range.length);
+
+    let index = range.index;
+    const Delta = QlQuill.import("delta");
+    const delta = new Delta().retain(index);
+
+    text.split("").forEach((word) => {
+      if (word.match(/^\s$/)) return;
+
+      delta.insert({ import: word });
+      index++;
     });
 
-    dialog.open({
-      width: 640,
-      title: locale.$locale("插入重点"),
-      contentElement: this.input,
-      onOk: (close) => {
-        const range = this.quill.getSelection(true);
-        this.quill.deleteText(range);
-        let index = range.index;
-
-        const Delta = QlQuill.import("delta");
-
-        const delta = new Delta().retain(index);
-
-        this.input.value.split("").forEach((word) => {
-          if (word.match(/^\s$/)) return;
-
-          delta.insert({ import: word });
-          index++;
-        });
-
-        this.quill.updateContents(delta);
-        this.quill.setSelection(index);
-        close();
-      },
-      beforeClose: () => {
-        this.input.value = "";
-      },
-    });
+    this.quill.updateContents(delta);
+    this.quill.setSelection(index);
   }
 }
 
