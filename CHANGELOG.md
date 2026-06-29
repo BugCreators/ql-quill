@@ -1,3 +1,12 @@
+## 2.0.1
+
+- editor
+  - import 由弹窗输入改为选字格式化
+  - 优化聚焦/失焦判断逻辑
+  - 样式调整
+  - 处理使用输入法输入时未隐藏占位符问题
+  - 使用 @enzedonline/quill-blot-formatter2 替代 quill-blot-formatter
+
 ## 2.0.0
 
 - 更新 quill 2.0.0
@@ -37,7 +46,6 @@
 ## 1.2.0-alpha.14
 
 - dialog
-
   - 添加禁用/启用确认按钮方法
 
 - editor
@@ -47,7 +55,6 @@
 ## 1.2.0-alpha.13
 
 - kityformula-plugin
-
   - 处理多层嵌套跨域问题
 
 - editor
