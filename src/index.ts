@@ -13,7 +13,7 @@ import type {
 
 import Dialog from "./modules/dialog";
 
-import { ImageSpec } from "./modules/blotFormatter";
+import BlotFormatter, { ImageSpec } from "./modules/blotFormatter";
 
 import ImageBlot from "./blots/image";
 
@@ -31,6 +31,7 @@ const Icons = Quill.import("ui/icons") as typeof IconType;
 Object.assign(Icons, { clean: cleanIcon });
 
 Quill.register(ImageBlot, true);
+Quill.register("modules/blotFormatter2", BlotFormatter);
 
 interface QlQuill {
   getModule(name: "dialog"): Dialog;
@@ -112,12 +113,39 @@ class QlQuill extends Quill {
 
     // 添加图片缩放模块以及公式再编辑模块
     if (imageResize || formula) {
-      options.modules.blotFormatter = {
+      options.modules.blotFormatter2 = {
+        overlay: {
+          sizeInfoStyle: {
+            top: undefined,
+            transform: undefined,
+            font: "12px/1.0 Arial, Helvetica, sans-serif",
+            padding: "4px 8px",
+            textAlign: "center",
+            backgroundColor: "white",
+            color: "#333",
+            border: "1px solid #777",
+            boxSizing: "border-box",
+            opacity: "0.80",
+            cursor: "default",
+          },
+        },
+        align: {
+          allowAligning: false, // default true
+        },
         specs: [ImageSpec],
-        resizable: imageResize,
+        image: {
+          allowAltTitleEdit: false, // default true
+          allowCompressor: false, // default false, enable with true
+          linkOptions: {
+            allowLinkEdit: false, //default true
+          },
+          resize: {
+            allowResizing: imageResize,
+          },
+        },
       };
 
-      this.theme.addModule("blotFormatter");
+      this.theme.addModule("blotFormatter2");
     }
 
     const toolbar = this.getModule("toolbar");
@@ -172,13 +200,11 @@ class QlQuill extends Quill {
   }
 
   onEditorChange() {
-    this.on("editor-change", (eventName, rangeOrDelta) => {
-      if (eventName === "text-change") {
-        this.onEditorChangeText(rangeOrDelta as Delta);
-      } 
-      
-      if (eventName === "selection-change") {
-        this.onEditorChangeSelection(rangeOrDelta as Range);
+    this.on("editor-change", (...args) => {
+      if (args[0] === "text-change") {
+        this.onEditorChangeText(args[1]);
+      } else if (args[0] === "selection-change") {
+        this.onEditorChangeSelection(args[1]);
       }
     });
   }

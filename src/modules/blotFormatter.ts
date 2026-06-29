@@ -1,4 +1,4 @@
-import BaseBlotFormatter from "quill-blot-formatter/dist/BlotFormatter";
+import BaseBlotFormatter from "@enzedonline/quill-blot-formatter2";
 import {
   Options,
   ImageSpec as BaseImageSpec,
@@ -6,17 +6,17 @@ import {
   ResizeAction as BaseResizeAction,
   DeleteAction,
   BlotSpec,
-} from "quill-blot-formatter";
+} from "@enzedonline/quill-blot-formatter2";
 
 class FormulaEditAction extends Action {
   onFormulaEdit?(target: HTMLElement): void;
 
-  onCreate() {
+  onCreate = () => {
     const formula = this.formatter.quill.getModule("formula");
 
     if (typeof formula?.openFormulaDialog !== "function") {
       console.warn(
-        "[Missing config] modules/formula onFormulaEdit function is required"
+        "[Missing config] modules/formula onFormulaEdit function is required",
       );
       return;
     }
@@ -26,9 +26,9 @@ class FormulaEditAction extends Action {
     // @ts-ignore
     this.formatter.currentSpec.img.addEventListener(
       "dblclick",
-      this.onOverlayDblclick
+      this.onOverlayDblclick,
     );
-  }
+  };
 
   onOverlayDblclick = () => {
     const target = this.formatter.currentSpec?.getTargetElement();
@@ -38,7 +38,7 @@ class FormulaEditAction extends Action {
     // @ts-ignore
     this.formatter.currentSpec.img.removeEventListener(
       "dblclick",
-      this.onOverlayDblclick
+      this.onOverlayDblclick,
     );
   };
 }
@@ -46,95 +46,31 @@ class FormulaEditAction extends Action {
 class ResizeAction extends BaseResizeAction {
   constructor(formatter: BaseBlotFormatter) {
     super(formatter);
-  }
 
-  createHandle(position: string, cursor: string) {
-    const box = super.createHandle(position, cursor);
+    const originalUpdateSizeInfo = (this as any)._updateSizeInfo;
+    // 使用类型断言绕过TypeScript的私有成员访问检查
+    (this as any)._updateSizeInfo = (width: number, height: number) => {
+      originalUpdateSizeInfo(width, height);
 
-    box.addEventListener("touchstart", (e) => this.onTouchStart(e));
-
-    return box;
-  }
-
-  onTouchStart = (e: TouchEvent) => {
-    this.dragHandle = e.target as HTMLElement;
-    this.setCursor(this.dragHandle.style.cursor);
-
-    const target = this.formatter.currentSpec?.getTargetElement();
-    if (!target) return;
-
-    const rect = target.getBoundingClientRect();
-
-    this.dragStartX = e.touches[0].clientX;
-    this.preDragWidth = rect.width;
-    this.targetRatio = rect.height / rect.width;
-
-    document.addEventListener("touchmove", this.onTouchMove);
-    document.addEventListener("touchend", this.onTouchEnd);
-  };
-
-  onTouchMove = (e: TouchEvent) => {
-    // @ts-ignore
-    this.onDrag(e.touches[0]);
-  };
-
-  onTouchEnd = () => {
-    this.setCursor("");
-    document.removeEventListener("touchmove", this.onTouchMove);
-    document.removeEventListener("touchend", this.onTouchEnd);
-  };
-}
-
-class DisplaySizeAction extends Action {
-  display?: HTMLElement;
-
-  onCreate() {
-    this.display = document.createElement("div");
-
-    Object.assign(this.display.style, {
-      position: "absolute",
-      font: "12px/1.0 Arial, Helvetica, sans-serif",
-      padding: "4px 8px",
-      textAlign: "center",
-      backgroundColor: "white",
-      color: "#333",
-      border: "1px solid #777",
-      boxSizing: "border-box",
-      opacity: "0.80",
-      cursor: "default",
-    } as CSSStyleDeclaration);
-
-    this.formatter.overlay.appendChild(this.display);
-    this.position();
-  }
-
-  onUpdate() {
-    const target = this.formatter.currentSpec?.getTargetElement();
-    if (!this.display || !target) return;
-
-    this.position();
-  }
-
-  onDestroy() {
-    this.formatter.overlay.removeChild(this.display!);
+      this.position();
+    };
   }
 
   position() {
-    if (!this.display) return;
+    if (!this.formatter) return;
 
     const size = this.getCurrentSize();
-    this.display.innerHTML = size.join(" &times; ");
     if (size[0] > 120 && size[1] > 30) {
       // position on top of image
-      Object.assign(this.display.style, {
+      Object.assign(this.formatter.sizeInfo.style, {
         right: "4px",
         bottom: "4px",
         left: "auto",
       } as CSSStyleDeclaration);
     } else {
       // position off bottom right
-      const dispRect = this.display.getBoundingClientRect();
-      Object.assign(this.display.style, {
+      const dispRect = this.formatter.sizeInfo.getBoundingClientRect();
+      Object.assign(this.formatter.sizeInfo.style, {
         right: `-${dispRect.width + 4}px`,
         bottom: `-${dispRect.height + 4}px`,
         left: "auto",
@@ -158,23 +94,25 @@ class DisplaySizeAction extends Action {
 }
 
 export class ImageSpec extends BaseImageSpec {
-  init() {
-    super.init();
-  }
+  getActions = () => {
+    const actions: Array<Action> = [];
 
-  getActions() {
-    return [
-      this.formatter.options.resizable && ResizeAction,
-      this.formatter.options.resizable && DisplaySizeAction,
-      DeleteAction,
-      FormulaEditAction,
-    ].filter(Boolean) as Array<typeof Action>;
-  }
+    if (this.formatter.options.resize.allowResizing) {
+      actions.push(new ResizeAction(this.formatter));
+    }
+    if (this.formatter.options.delete.allowKeyboardDelete) {
+      actions.push(new DeleteAction(this.formatter));
+    }
+
+    actions.push(new FormulaEditAction(this.formatter));
+
+    return actions;
+  };
 }
 
 class BlotFormatter extends BaseBlotFormatter {
   scrollTop: number;
-  wrapper: Element;
+  wrapper: HTMLElement;
 
   constructor(quill: any, options: Options) {
     super(quill, options);
@@ -186,46 +124,46 @@ class BlotFormatter extends BaseBlotFormatter {
     this.scrollTop = quill.scroll.domNode.scrollTop;
 
     if (quill.root === quill.scroll.domNode) {
-      quill.root.addEventListener("scroll", () => {
-        this.overlay.style.top =
-          Number(this.overlay.style.top.replace("px", "")) +
-          (this.scrollTop - quill.scroll.domNode.scrollTop) +
-          "px";
-
-        this.scrollTop = quill.scroll.domNode.scrollTop;
-      });
-    }
-  }
-
-  onClickOutSide = (e: MouseEvent) => {
-    if (!this.quill.container.contains(e.target)) {
-      this.hide();
-    }
-  }
-
-  show(spec: BlotSpec) {
-    super.show(spec);
-
-    this.quill.root.parentNode.removeChild(this.overlay);
-    this.wrapper.appendChild(this.overlay);
-
-    window.addEventListener("click", this.onClickOutSide);
-  }
-
-  hide() {
-    if (!this.currentSpec) {
-      return;
+      quill.root.addEventListener("scroll", this.handleScroll);
     }
 
-    this.currentSpec.onHide();
-    this.currentSpec = undefined;
-    this.wrapper.removeChild(this.overlay);
-    this.overlay.style.setProperty("display", "none");
-    this.setUserSelect("");
-    this.destroyActions();
+    const originalShow = this.show;
+    this.show = (spec: BlotSpec) => {
+      originalShow(spec);
 
-    window.removeEventListener("click", this.onClickOutSide);
+      if (this.quill.container.contains(this.overlay)) {
+        this.quill.container.removeChild(this.overlay);
+      }
+      this.wrapper.appendChild(this.overlay);
+      this.handleScroll();
+    };
+
+    const originalHide = this.hide;
+    this.hide = (event?: PointerEvent | null) => {
+      if (this.wrapper.contains(this.overlay)) {
+        this.wrapper.removeChild(this.overlay);
+        this.quill.container.appendChild(this.overlay);
+      }
+      originalHide(event);
+    };
+
+    const originalDestroy = this.destroy;
+    this.destroy = () => {
+      quill.root.removeEventListener("scroll", this.handleScroll);
+      originalDestroy();
+    };
   }
+
+  handleScroll = () => {
+    if (!this.overlay) return;
+
+    this.overlay.style.top =
+      Number(this.overlay.style.top.replace("px", "")) +
+      (this.scrollTop - this.quill.scroll.domNode.scrollTop) +
+      "px";
+
+    this.scrollTop = this.quill.scroll.domNode.scrollTop;
+  };
 }
 
 export default BlotFormatter;
