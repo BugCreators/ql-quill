@@ -1,13 +1,10 @@
 import Quill from "quill";
 import type { Delta, Op } from "quill/core";
-import type { EmitterSource } from "quill/core/emitter";
 import type { Range } from "quill/core/selection";
 import type IconType from "quill/ui/icons";
 import type Toolbar from "quill/modules/toolbar";
-import isEqual from "lodash.isequal";
 import extend from "extend";
 import type {
-  Options,
   CustomToolOptions,
   QlExpandedOptions,
   QlOptions,
@@ -67,7 +64,9 @@ class QlQuill extends Quill {
 
   qlOptions: QlOptions;
   declare options: QlExpandedOptions;
-  prevSelection?: Range;
+  prevSelection?: Range | null;
+  isFocused = false;
+  focusSyncTimer?: number;
 
   constructor(container: string | HTMLElement, options: QlQuillOptions = {}) {
     const qlOptions = extractConfig(options);
@@ -80,6 +79,7 @@ class QlQuill extends Quill {
     this.expandConfig(this.options, qlOptions);
 
     this.onEditorChange();
+    this.registerFocusListener();
 
     qlOptions.value && this.setContents(qlOptions.value);
 
@@ -171,46 +171,79 @@ class QlQuill extends Quill {
   }
 
   onEditorChange() {
-    this.on(
-      "editor-change",
-      (eventName, rangeOrDelta, oldRangeOrDelta, source) => {
-        if (eventName === "text-change") {
-          this.onEditorChangeText(this.root.innerHTML, rangeOrDelta, source);
-        } else if (eventName === "selection-change") {
-          this.onEditorChangeSelection(rangeOrDelta, source);
-        }
-      },
-    );
+    this.on("editor-change", (eventName, rangeOrDelta) => {
+      if (eventName === "text-change") {
+        this.onEditorChangeText(rangeOrDelta as Delta);
+      } 
+      
+      if (eventName === "selection-change") {
+        this.onEditorChangeSelection(rangeOrDelta as Range);
+      }
+    });
   }
 
-  onEditorChangeText(value: string, delta: Delta, source: EmitterSource) {
+  onEditorChangeText(delta: Delta) {
     if (this.getModule("wordCount")) return;
 
-    this.qlOptions.onChange?.(value, delta);
+    this.qlOptions.onChange?.(this.root.innerHTML, delta);
   }
 
-  onEditorChangeSelection(nextSelection: Range, source: EmitterSource) {
-    const currentSelection = this.prevSelection;
-    const hasGainedFocus = !currentSelection && nextSelection;
-    const hasLostFocus = currentSelection && !nextSelection;
-
-    if (isEqual(nextSelection, currentSelection)) return;
-
+  onEditorChangeSelection(nextSelection: Range | null) {
     this.prevSelection = nextSelection;
+    this.requestFocusSync();
+  }
+
+  registerFocusListener() {
+    const toolbar = this.getModule("toolbar");
+    const syncFocusState = () => this.requestFocusSync();
+
+    this.container.addEventListener("focusin", syncFocusState);
+    this.container.addEventListener("focusout", syncFocusState);
+    toolbar.container?.addEventListener("focusin", syncFocusState);
+    toolbar.container?.addEventListener("focusout", syncFocusState);
+  }
+
+  requestFocusSync() {
+    if (typeof this.focusSyncTimer === "number") {
+      window.clearTimeout(this.focusSyncTimer);
+    }
+
+    // 等待浏览器完成焦点切换，再读取 activeElement，避免 toolbar/tooltip 点击误判失焦。
+    this.focusSyncTimer = window.setTimeout(() => {
+      this.focusSyncTimer = undefined;
+      this.syncFocusState();
+    }, 0);
+  }
+
+  syncFocusState() {
+    const nextFocused = this.isFocusWithinEditor();
+
+    if (nextFocused === this.isFocused) return;
+
+    this.isFocused = nextFocused;
 
     const toolbar = this.getModule("toolbar");
 
-    if (hasGainedFocus) {
-      this.container.classList.add("on-focus");
-      toolbar.container!.classList.add("on-focus");
+    this.container.classList.toggle("on-focus", nextFocused);
+    toolbar.container?.classList.toggle("on-focus", nextFocused);
 
+    if (nextFocused) {
       this.qlOptions.onFocus?.();
-    } else if (hasLostFocus) {
-      this.container.classList.remove("on-focus");
-      toolbar.container!.classList.remove("on-focus");
-
+    } else {
       this.qlOptions.onBlur?.();
     }
+  }
+
+  isFocusWithinEditor() {
+    const toolbar = this.getModule("toolbar");
+    const activeElement = document.activeElement;
+
+    if (!(activeElement instanceof Node)) return false;
+
+    return (
+      this.container.contains(activeElement) ||
+      !!toolbar.container?.contains(activeElement)
+    );
   }
 
   locale(preset: string, object?: Record<string, string>) {
@@ -221,33 +254,33 @@ class QlQuill extends Quill {
 
   setContents(value: string | Delta | Op[]) {
     const sel = this.prevSelection;
-    let Delta;
+    let delta;
     if (typeof value === "string") {
       this.clipboard.dangerouslyPasteHTML(value);
 
-      Delta = this.getContents();
+      delta = this.getContents();
     } else {
-      Delta = super.setContents(value);
+      delta = super.setContents(value);
     }
-    postpone(() => this.setEditorSelection(this, sel!));
+    postpone(() => this.setEditorSelection(sel));
 
-    return Delta;
+    return delta;
   }
 
   getHTML(): string {
     return this.root.innerHTML;
   }
 
-  setEditorSelection(editor: this, range: Range) {
+  setEditorSelection(range?: Range | null) {
     this.prevSelection = range;
     if (range) {
-      const length = editor.getLength();
+      const length = this.getLength();
       range.index = Math.max(0, Math.min(range.index, length - 1));
       range.length = Math.max(
         0,
         Math.min(range.length, length - 1 - range.index),
       );
-      editor.setSelection(range);
+      this.setSelection(range);
     }
   }
 
