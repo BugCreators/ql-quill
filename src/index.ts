@@ -80,6 +80,7 @@ class QlQuill extends Quill {
 
     this.onEditorChange();
     this.registerFocusListener();
+    this.registerCompositionListener();
 
     qlOptions.value && this.setContents(qlOptions.value);
 
@@ -202,6 +203,24 @@ class QlQuill extends Quill {
     toolbar.container?.addEventListener("focusin", syncFocusState);
     toolbar.container?.addEventListener("focusout", syncFocusState);
   }
+
+  registerCompositionListener() {
+    this.root.addEventListener("compositionstart", this.handleCompositionStart);
+    this.root.addEventListener("compositionend", this.handleCompositionEnd);
+  }
+
+  handleCompositionStart = () => {
+    this.root.classList.remove("ql-blank");
+  };
+
+  handleCompositionEnd = () => {
+    const delta = this.getContents();
+    const isBlank = delta.ops.length === 1 && delta.ops[0].insert === "\n";
+
+    if (isBlank) {
+      this.root.classList.add("ql-blank");
+    }
+  };
 
   requestFocusSync() {
     if (typeof this.focusSyncTimer === "number") {
