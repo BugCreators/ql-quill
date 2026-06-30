@@ -84,23 +84,6 @@ class QlQuill extends Quill {
     this.registerCompositionListener();
 
     qlOptions.value && this.setContents(qlOptions.value);
-
-    // 旧数据处理 类名转成内联
-    this.clipboard.addMatcher("SPAN", (node, delta) => {
-      Array.from((node as HTMLSpanElement).classList).forEach(className => {
-        const [, format, value] = className.match(/^ql-(size|font)-(.*)/) || [];
-
-        if (!format || !value) return;
-
-        delta.forEach(op => {
-          if (!op.attributes) op.attributes = {};
-
-          op.attributes[format] = value + (format === "size" ? "px" : "");
-        });
-      });
-
-      return delta;
-    });
   }
 
   expandConfig(
