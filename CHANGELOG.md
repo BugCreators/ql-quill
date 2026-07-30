@@ -1,3 +1,9 @@
+## 2.0.3
+
+- editor
+  - ResizeAction 优化图片尺寸初始值、位置获取
+  - ImageBlot 修复公式属性丢失问题
+
 ## 2.0.2
 
 - editor
