@@ -18,14 +18,16 @@ class ImageBlot extends Image {
     return node;
   }
 
-  // static value(node: Element) {
-  //   return ATTRIBUTES.reduce((formats, attribute) => {
-  //     if (node.hasAttribute(attribute)) {
-  //       formats[attribute] = node.getAttribute(attribute);
-  //     }
-  //     return formats;
-  //   }, {} as Record<string, string | null>);
-  // }
+  static value(node: Element): any {
+    const src = super.value(node);
+
+    if (!node.hasAttribute("data-latex")) return src;
+
+    return {
+      src,
+      "data-latex": node.getAttribute("data-latex"),
+    };
+  }
 }
 
 export default ImageBlot;
