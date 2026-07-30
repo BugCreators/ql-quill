@@ -47,12 +47,29 @@ class ResizeAction extends BaseResizeAction {
   constructor(formatter: BaseBlotFormatter) {
     super(formatter);
 
-    const originalUpdateSizeInfo = (this as any)._updateSizeInfo;
+    const that = this as any;
+    const originalUpdateSizeInfo = that._updateSizeInfo;
     // 使用类型断言绕过TypeScript的私有成员访问检查
-    (this as any)._updateSizeInfo = (width: number, height: number) => {
+    const updateSizeInfo = (width: number, height: number) => {
       originalUpdateSizeInfo(width, height);
 
       this.position();
+    };
+    that._updateSizeInfo = updateSizeInfo;
+
+    const originalCreate = this.onCreate;
+    this.onCreate = () => {
+      originalCreate();
+
+      const img = that._target as HTMLImageElement;
+      const width = img.getAttribute("width");
+      const height = img.getAttribute("height");
+
+      if (width && height && width !== "auto" && height !== "auto") {
+        updateSizeInfo(+width, +height);
+      } else {
+        that._showSizeInfo();
+      }
     };
   }
 
