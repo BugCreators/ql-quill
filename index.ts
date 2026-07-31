@@ -15,6 +15,7 @@ import Import from "./src/modules/import";
 import Question from "./src/modules/question";
 import Formula from "./src/modules/formula";
 import Table from "./src/modules/table";
+import Toolbar from "./src/modules/toolbar";
 
 QlQuill.register(
   {
@@ -28,10 +29,11 @@ QlQuill.register(
     "modules/question": Question,
     "modules/import": Import,
     "modules/formula": Formula,
+    "modules/toolbar": Toolbar,
 
     "themes/snow": SnowTheme,
   },
-  true
+  true,
 );
 
 // quill

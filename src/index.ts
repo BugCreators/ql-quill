@@ -24,11 +24,12 @@ import type Locale from "./modules/locale";
 import type WordCount from "./modules/wordCount";
 
 import cleanIcon from "@icons/clean.svg?raw";
+import importIcon from "@icons/spot.svg?raw";
 
 import "../assets/index.styl";
 
 const Icons = Quill.import("ui/icons") as typeof IconType;
-Object.assign(Icons, { clean: cleanIcon });
+Object.assign(Icons, { clean: cleanIcon, import: importIcon });
 
 Quill.register(ImageBlot, true);
 Quill.register("modules/blotFormatter2", BlotFormatter);
