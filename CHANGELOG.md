@@ -1,3 +1,8 @@
+## 2.0.4
+
+- editor
+  - import 替换svg图标、支持取消重点
+
 ## 2.0.3
 
 - editor
