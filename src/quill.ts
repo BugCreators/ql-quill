@@ -4,7 +4,12 @@ import type { Range } from "quill/core/selection";
 import type IconType from "quill/ui/icons";
 import type Toolbar from "quill/modules/toolbar";
 
-import type { QlExpandedOptions, QlOptions, QlQuillOptions } from "./types";
+import type {
+  Locale as LocaleData,
+  QlExpandedOptions,
+  QlOptions,
+  QlQuillOptions,
+} from "./types";
 import {
   CUSTOM_OPTIONS,
   CUSTOM_TOOLS,
@@ -176,7 +181,8 @@ class QlQuill extends Quill {
     );
   }
 
-  locale(preset: string, object?: Record<string, string>) {
+  /** 不传参返回当前语言名，传参切换语言（全局生效） */
+  locale(preset?: string | LocaleData, object?: Record<string, string>) {
     const locale = this.getModule("locale");
 
     return locale.locale(preset, object);

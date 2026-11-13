@@ -19,8 +19,12 @@
 ### 修复
 - `ImageUploader` 不再改写 quill 共享的 `Uploader.DEFAULTS` 对象，避免影响同页使用原生 Uploader 的实例
 
+### 类型
+- `locale(preset?)` 放宽签名：支持无参调用返回当前语言名，并允许传语言包对象（运行时一直如此，此前类型上只接受必填 `string`）
+
 ### 文档与测试
 - README 重写配置说明：补「引入样式」（`dist/ql-quill.snow.css`，已内含 quill / better-table / 颜色选择器样式，无需再引 quill 自身样式）与快速开始，Options 改为分组表格
+- README 重写「实例 API」：补 `setEditorSelection`、`qlOptions` 与每个成员的示例；点明 `setContents` 返回值语义随入参不同（字符串返回完整内容 Delta，`Delta` / `Op[]` 返回变更 Delta）、字符串分支会走剪贴板 matcher、`limit` 下写入超限会被截断、`insertImage` 不传 `latex` 时不写 `data-latex`
 - README 修正与实现不符的描述：设置 `limit` 后 `onChange` 由字数模块接管、超限时只触发 `onLimit` 并截断；`onLimit` 判据是「超出」；`toolbar` 传数组与传选择器字符串是两套逻辑；`locale` 接受语言名或语言包对象
 - README 补齐遗漏项：`toolbar`、`placeholder`、`formula`，`value` 支持 `Delta`
 - `npm run smoke` 新增图片 `mimetypes` 断言（整体替换 / 文件选择框 accept 跟随 / 未传时走默认）

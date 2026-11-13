@@ -219,24 +219,75 @@ image: {
 
 ## 实例 API
 
-### locale `(preset: string | Locale, object?: Record<string, string>) => void`
+`QlQuill` 继承 `Quill`，下面只列**新增或改写**的成员；其余 Quill 原生 API（`getContents`、`getText`、`getLength`、`on`、`getModule`…）行为不变，见 [Quill 文档](https://quilljs.com/docs/api/)。
 
-切换当前语言（全局生效）
+| 成员 | 说明 |
+| --- | --- |
+| `locale(preset?, object?)` | 读取当前语言，或切换语言 |
+| `setContents(value)` | 设置内容，返回值语义随入参类型不同 |
+| `getHTML()` | 取内容 HTML 字符串 |
+| `insertImage(src, latex?, attributes?)` | 在光标处插入图片 |
+| `setEditorSelection(range?)` | 设置选区（按长度裁剪），并记录为「操作前选区」 |
+| `qlOptions` | 构造时摘出的自定义选项 |
 
-### setContents `(value: string | Delta) => Delta`
+### locale
 
-设置内容。字符串按 HTML 解析，返回设置后的 Delta，光标位置会尽量保留
+```js
+editor.locale();                                        // "zh_cn" —— 不传参读当前语言
+editor.locale("en_us");                                 // 切到已注册的语言
+editor.locale(zhTw);                                    // 直接传语言包对象（import 时已注册）
+editor.locale("custom", { 取消: "Cancel", 确定: "OK" }); // 注册并切换
+```
 
-### getHTML `() => string`
+不传参返回当前语言名，传参时返回 `undefined`。语言状态是模块级全局的，切换会影响同页所有实例。
 
-获取内容 HTML 字符串
+### setContents
 
-### insertImage `(src: string, latex?: string, attributes?: Record<string, string | number>) => void`
+```js
+editor.setContents("<p>hello</p>"); // HTML 字符串
+editor.setContents(delta);          // Delta
+editor.setContents(delta.ops);      // Op[]
+```
 
-在当前光标处插入图片。`latex` 会写进 `data-latex`（公式图再编辑时读取），`attributes` 可补 `width` / `height` 等
+- 传字符串时走 `clipboard.dangerouslyPasteHTML`，**剪贴板 matcher 同样生效** —— `pasteFromWord`、`image.base64AutoUpload` 对粘贴内容的处理会作用在这条路径上；传 `Delta` / `Op[]` 走 Quill 原生路径，不经过 matcher
+- **返回值语义随入参类型不同**：字符串分支返回设置后的完整内容 `Delta`，`Delta` / `Op[]` 分支返回本次变更的 `Delta`（Quill 原生行为）。要拿内容请统一用 `getContents()`
+- 会触发 `onChange`；设置了 `limit` 时改由字数模块接管，写入内容超过上限会被截断并触发 `onLimit`
+- 设置后恢复操作前的选区，超出新内容长度的部分自动裁剪
+- 传空字符串清空内容，`ql-blank` 占位态一并恢复
+
+### getHTML
+
+```js
+editor.getHTML(); // "<p>hello</p>"
+```
+
+等价于 `editor.root.innerHTML`，只给 HTML；要结构化内容用 `getContents()`。
+
+### insertImage
+
+```js
+editor.insertImage(url);
+editor.insertImage(url, "\\frac{1}{2}");                // 第二个参数写进 data-latex
+editor.insertImage(url, "", { width: 20, height: 30 }); // 第三个参数作为 img 属性
+```
+
+- 在当前光标处插入，选区里的内容会被替换，插入后光标停在图片之后
+- 编辑器还没聚焦也能用（内部先取一次选区）
+- `latex` 写进 `data-latex`（公式图再编辑时读回），不传就不写这个属性
+- `attributes` 直接作为 `img` 的 HTML 属性（`width` / `height` 是属性，不是 `style`）
+
+### setEditorSelection
+
+```js
+editor.setEditorSelection({ index: 0, length: 5 });
+```
+
+按当前内容长度裁剪后设置选区，并记录为「操作前选区」—— `setContents` 之后恢复的就是它。不传或传 `null` 只清掉记录，不动光标。
 
 ### qlOptions
 
-构造时传入的自定义选项原样保存在实例上，便于外部读取当前配置
+构造时从入参里摘出的自定义选项（`toolbar`、`limit`、`image`、`onChange` 等），未传的键值为 `undefined`。它是运行时回调的取值来源（`onChange`、`onFocus` 等从这里读），但构造时已生效的配置（`toolbar`、`image`、`limit`）改它不会重新应用。
 
-更多配置及方法可见 [Quill](https://quilljs.com/docs/quickstart/)
+### 静态成员
+
+`QlQuill.CUSTOM_TOOLS` 是由 toolbar 决定的自定义按钮名，`QlQuill.CUSTOM_OPTIONS` 是需要从 Quill options 中摘出的键，二次封装时可用来对齐选项处理逻辑。
