@@ -1,6 +1,5 @@
 import Quill from "quill";
-import type { Locale } from "./";
-import type { LocaleInstance } from "../modules/locale";
+import type { Locale, LocaleRegistry } from "./";
 
 const locale: Locale = {
   name: "en_us",
@@ -11,7 +10,7 @@ const locale: Locale = {
   重置: "reset",
 };
 
-const localeModule = Quill.import("modules/locale") as LocaleInstance;
+const localeModule = Quill.import("modules/locale") as LocaleRegistry;
 
 localeModule.locale(locale, undefined, true);
 
