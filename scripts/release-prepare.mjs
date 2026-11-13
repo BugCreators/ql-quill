@@ -13,6 +13,8 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const BUMP_TYPES = ["patch", "minor", "major"];
 const UNRELEASED = /^##\s+Unreleased\s*$/i;
 const ANY_HEADING = /^##\s+\S/;
+// Keep a Changelog 的分类集合，发版前卡住自造分类（如 `### editor`）
+const CATEGORIES = ["Added", "Changed", "Deprecated", "Removed", "Fixed", "Security"];
 
 const argv = process.argv.slice(2);
 const dryRun = argv.includes("--dry-run");
@@ -53,6 +55,13 @@ while (end < lines.length && !ANY_HEADING.test(lines[end])) end += 1;
 
 const body = lines.slice(start + 1, end).join("\n").trim();
 if (!body) fail("`## Unreleased` 段落是空的，没有可发布的内容");
+
+const unknown = [...body.matchAll(/^###\s+(.+)$/gm)]
+  .map((match) => match[1].trim())
+  .filter((title) => !CATEGORIES.includes(title));
+if (unknown.length) {
+  fail(`Unreleased 里有非标准分类：${unknown.join("、")}；只允许 ${CATEGORIES.join(" / ")}`);
+}
 
 const tail = lines.slice(end);
 if (tail[0] === "") tail.shift();
