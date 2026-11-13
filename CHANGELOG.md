@@ -11,6 +11,20 @@
 
 ## Unreleased
 
+### 图片上传
+- `image.mimetypes` 改为整体替换默认值：此前传 `["image/gif"]` 实际得到 `["image/gif", "image/jpeg"]`——Quill 用 lodash 合并模块默认值，数组按下标合并而不是替换
+- 补充 `image.mimetypes` 类型声明，TypeScript 下可直接配置（运行时本就生效）
+- 删除 `image.accept`：从未实现的空声明，控制图片类型请用 `image.mimetypes`
+
+### 修复
+- `ImageUploader` 不再改写 quill 共享的 `Uploader.DEFAULTS` 对象，避免影响同页使用原生 Uploader 的实例
+
+### 文档与测试
+- README 重写配置说明：补「引入样式」（`dist/ql-quill.snow.css`，已内含 quill / better-table / 颜色选择器样式，无需再引 quill 自身样式）与快速开始，Options 改为分组表格
+- README 修正与实现不符的描述：设置 `limit` 后 `onChange` 由字数模块接管、超限时只触发 `onLimit` 并截断；`onLimit` 判据是「超出」；`toolbar` 传数组与传选择器字符串是两套逻辑；`locale` 接受语言名或语言包对象
+- README 补齐遗漏项：`toolbar`、`placeholder`、`formula`，`value` 支持 `Delta`
+- `npm run smoke` 新增图片 `mimetypes` 断言（整体替换 / 文件选择框 accept 跟随 / 未传时走默认）
+
 ## 2.1.0 - 2026-11-13
 
 ### 重构
