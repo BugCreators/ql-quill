@@ -72,8 +72,34 @@ function run(command, args, options = {}) {
 
   return {
     status: result.status ?? 1,
+    stdout: result.stdout || "",
+    stderr: result.stderr || "",
     output: `${result.stdout || ""}${result.stderr || ""}`.trim(),
   };
+}
+
+/**
+ * npm 11 起会把配置弃用等告警混进命令输出（CI 上 setup-node 写的 `always-auth` 就会触发），
+ * 拼在 JSON 后面会让 JSON.parse 直接失败，所以先剔除 npm 自身的日志行再解析。
+ */
+function parseJsonOutput(raw) {
+  const cleaned = raw
+    .split("\n")
+    .filter(line => !/^\s*npm (warn|notice|error|ERR!)\b/.test(line))
+    .join("\n")
+    .trim();
+
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    // 兜底：截取最外层数组，容忍夹在中间的未知文本
+    const start = cleaned.indexOf("[");
+    const end = cleaned.lastIndexOf("]");
+
+    if (start === -1 || end <= start) throw new Error(`输出不是合法 JSON：\n${raw.slice(0, 400)}`);
+
+    return JSON.parse(cleaned.slice(start, end + 1));
+  }
 }
 
 function npx(args) {
@@ -82,13 +108,20 @@ function npx(args) {
 
 function packToTarball() {
   const target = mkdtempSync(join(tmpdir(), "ql-quill-pack-"));
-  const { status, output } = run("npm", ["pack", "--json", "--pack-destination", target]);
+  // --loglevel=error：告警不进输出；解析侧仍做兜底，避免哪天又有新告警冒出来
+  const { status, output, stdout } = run("npm", [
+    "pack",
+    "--json",
+    "--loglevel=error",
+    "--pack-destination",
+    target,
+  ]);
 
   if (status !== 0) {
     throw new Error(`npm pack 失败：\n${output}`);
   }
 
-  const [info] = JSON.parse(output);
+  const [info] = parseJsonOutput(stdout);
 
   return { dir: target, info };
 }
