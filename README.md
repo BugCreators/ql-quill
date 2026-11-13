@@ -12,7 +12,7 @@ npm i ql-quill quill
 
 `quill` 是 `peerDependencies`：需要宿主项目自己安装，避免出现两份 quill、两套 `Quill.import` 注册表。
 
-`engines.node` 声明为 `>=16`，指**安装并使用本包**的环境（含打包链）；本仓库自己开发、构建、跑校验需要 Node `>=20`（`devEngines` 已声明，开发依赖中的 `@arethetypeswrong/cli`、`playwright` 要求 20+）。
+`engines.node` 声明为 `>=16`，指**安装并使用本包**的环境（含打包链）；本仓库自己开发、构建、跑校验需要 Node `^20.19` 或 `>=22.12`（`devEngines` 已声明，`vite`、`@arethetypeswrong/cli`、`playwright` 都要求 20+）。
 
 ### 引入样式
 

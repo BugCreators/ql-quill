@@ -11,6 +11,15 @@
 
 ## Unreleased
 
+### 依赖与构建
+- 构建链升级：`vite` 2.9 → 8.3（内核换成 rolldown）、`vite-plugin-dts` 1.7 → 5.1、`typescript` 4.8 → 5.9、`@babel/core` 7.18 → 7.29、`@rollup/plugin-babel` 5.3 → 7.1、`stylus` 0.54 → 0.64、`@types/node` 18 → 22
+- 产物因此变小：JS 单文件约 700 kB → 315 kB（此前压缩实际未生效）
+- ES 产物顶部注入只认 `quill` 的 `require` 兜底：rolldown 不再把 CJS 依赖（better-table 等）对 external 的 `require` 转成 import，否则浏览器里直接抛 `Calling require for "quill"`
+- `tsconfig` 的 `moduleResolution` 由 `node` 改为 `bundler`（`vite` 8 的类型只提供 exports 式入口）；babel 输出插件补 `modules: false`，避免 ES 产物被转成 CJS 互操作形态
+- `vite-plugin-dts` 开启 `copyDtsFiles`，把 `src/vendor` 下手写的 `.d.ts` 一并拷进 `dist`（否则 attw 报 internal resolution error）
+- 语言包不再依赖 `modules/locale` 的内部类型，改由 `src/locale` 内的 `LocaleRegistry` 描述注册能力
+- 开发环境要求由 Node `>=20` 收紧到 `^20.19 || >=22.12`；CI 的 Node 16 job 改为取回 checks 产物、只做解析校验（vite 8 已无法在 16 上构建）
+
 ### 图片上传
 - `image.mimetypes` 改为整体替换默认值：此前传 `["image/gif"]` 实际得到 `["image/gif", "image/jpeg"]`——Quill 用 lodash 合并模块默认值，数组按下标合并而不是替换
 - 补充 `image.mimetypes` 类型声明，TypeScript 下可直接配置（运行时本就生效）

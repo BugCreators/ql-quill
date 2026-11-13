@@ -51,7 +51,7 @@
   "devEngines": {
     "runtime": {
       "name": "node",
-      "version": ">=20",
+      "version": "^20.19.0 || >=22.12.0",
       "onFail": "error"
     }
   },
@@ -60,23 +60,24 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
-    "@babel/core": "^7.18.2",
-    "@babel/preset-env": "^7.18.2",
+    "@babel/core": "^7.29.13",
+    "@babel/preset-env": "^7.29.14",
     "@enzedonline/quill-blot-formatter2": "^3.2.0",
-    "@rollup/plugin-babel": "^5.3.1",
-    "@types/babel__core": "^7.1.19",
-    "@types/extend": "^3.0.1",
-    "@types/node": "^18.7.13",
+    "@rollup/plugin-babel": "^7.1.0",
+    "@types/babel__core": "^7.20.5",
+    "@types/extend": "^3.0.4",
+    "@types/node": "^22.20.5",
     "extend": "^3.0.2",
     "playwright": "^1.65.0",
     "publint": "^0.3.25",
     "quill": "^2.0.3",
     "quill-better-table": "^1.2.10",
-    "rollup-plugin-typescript2": "^0.33.0",
-    "stylus": "^0.54.8",
-    "typescript": "^4.7.4",
-    "vite": "^2.9.15",
-    "vite-plugin-dts": "^1.7.0"
+    "rollup-plugin-typescript2": "^0.37.0",
+    "stylus": "^0.64.0",
+    "terser": "^5.51.2",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.8",
+    "vite-plugin-dts": "^5.1.2"
   },
   "browserslist": [
     "> 0.5%",

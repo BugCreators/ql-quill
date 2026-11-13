@@ -44,8 +44,18 @@ jobs:
       - name: 包体检
         run: npm run verify
 
+      # 产物要给 node16 job 用：构建链（vite 8）已经要求 Node ≥20，没法在 16 上重建
+      - name: 上传产物
+        if: matrix.node == 22
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+
   node16:
     name: Node 16 产物兼容
+    needs: checks
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -56,15 +66,18 @@ jobs:
           cache: npm
 
       # engines 放宽到 >=16 是面向使用方的承诺，这个 job 负责兑现：
-      # 用 Node 16 自己构建并用它自带的解析器检查产物。开发依赖中 attw/playwright 要求 >=20，
-      # 故跳过浏览器下载；本 job 只跑构建与解析，不跑 verify / smoke。
+      # 在 Node 16 上装依赖 + 用它自带的解析器检查 checks job 产出的产物。
+      # 构建链（vite 8 / @arethetypeswrong）要求 Node ≥20，故本 job 不跑 build / verify / smoke。
       - name: 安装依赖
         run: npm ci
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
 
-      - name: 构建产物
-        run: npm run build
+      - name: 取回产物
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
 
       - name: 校验产物可被 Node 16 解析
         run: npm run check:syntax
