@@ -11,6 +11,8 @@
 
 ## Unreleased
 
+## 2.1.0 - 2026-11-13
+
 ### 重构
 - 目录整理：`assets/`、`plugin/`、`static/`、根 `index.html` 分别归入 `src/assets`、`src/vendor`、`demo/`
 - 拆出 `src/core`（选项解析、模块补全、Quill 注册表代理），`src/quill.ts` 只保留编辑器类本体
