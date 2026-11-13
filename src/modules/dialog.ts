@@ -34,28 +34,36 @@ class Dialog {
   static readonly CANCEL_BTN_CLASS_NAME = CLASS_NAMES.cancelBtn;
   static readonly CONFIRM_BTN_CLASS_NAME = CLASS_NAMES.confirmBtn;
 
-  static readonly TEMPLATE = `
-<div class="${CLASS_NAMES.mask}"></div>
-<div tabindex="-1" class="ql-dialog-wrap">
-  <div class="${CLASS_NAMES.content}">
-    <div tabindex="0" style="width: 0px; height: 0px; overflow: hidden; outline: none;"></div>
-    <div class="ql-dialog-content">
-      <button type="button" class="${CLASS_NAMES.closeBtn}">
-        <span class="ql-dialog-close-x">
-          <span role="img" class="ql-anticon">${closeIcon}</span>
-        </span>
-      </button>
-      <div class="ql-dialog-header">
-        <div class="${CLASS_NAMES.title}"></div>
-      </div>
-      <div class="${CLASS_NAMES.body}" style="padding-top: 0px;"></div>
-      <div class="ql-dialog-footer">
-        <button type="button" class="ql-btn ${CLASS_NAMES.cancelBtn}"></button>
-        <button type="button" class="ql-btn ql-btn-primary ${CLASS_NAMES.confirmBtn}"></button>
-      </div>
-    </div>
-  </div>
-</div>`;
+  /**
+   * 模板逐行定义后 trim 再拼接，标签之间不能留任何空白：
+   * footer 的按钮是行内块，标签间的换行/缩进会被渲染成一个空格，使原本 8px 的间距变成 8px + 一个空格；
+   * 结构里其它位置的内联空白文本节点同样会参与行盒计算，把对话框撑高、挤小。
+   */
+  static readonly TEMPLATE = [
+    `<div class="${CLASS_NAMES.mask}"></div>`,
+    `<div tabindex="-1" class="ql-dialog-wrap">`,
+    `<div class="${CLASS_NAMES.content}">`,
+    `<div tabindex="0" style="width: 0px; height: 0px; overflow: hidden; outline: none;"></div>`,
+    `<div class="ql-dialog-content">`,
+    `<button type="button" class="${CLASS_NAMES.closeBtn}">`,
+    `<span class="ql-dialog-close-x">`,
+    `<span role="img" class="ql-anticon">${closeIcon}</span>`,
+    `</span>`,
+    `</button>`,
+    `<div class="ql-dialog-header">`,
+    `<div class="${CLASS_NAMES.title}"></div>`,
+    `</div>`,
+    `<div class="${CLASS_NAMES.body}" style="padding-top: 0px;"></div>`,
+    `<div class="ql-dialog-footer">`,
+    `<button type="button" class="ql-btn ${CLASS_NAMES.cancelBtn}"></button>`,
+    `<button type="button" class="ql-btn ql-btn-primary ${CLASS_NAMES.confirmBtn}"></button>`,
+    `</div>`,
+    `</div>`,
+    `</div>`,
+    `</div>`,
+  ]
+    .map(line => line.trim())
+    .join("");
 
   quill: QlQuill;
   options: DialogOptions;

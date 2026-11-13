@@ -134,6 +134,43 @@ async function testDist(page, base) {
   check("getHTML 可用", typeof html2 === "string" && html2.length > 0);
 
   await page.screenshot({ path: join(outDir, "dist.png"), fullPage: true });
+
+  await testDialogLayout(page);
+}
+
+/**
+ * 对话框模板必须是「标签之间零空白」拼接：按钮是行内块，
+ * 多一个换行就会让间距变成 8px + 一个空格，并可能把对话框挤出视口。
+ */
+async function testDialogLayout(page) {
+  console.log("\n[3] 对话框布局");
+
+  const result = await page.evaluate(() => {
+    const dialog = window.__editor.getModule("dialog");
+    dialog.setOptions({ title: "标题", content: "<p>正文</p>" });
+    dialog.show();
+
+    const footer = document.querySelector(".ql-dialog-footer");
+    const cancel = footer.querySelector(".ql-dialog-cancel").getBoundingClientRect();
+    const confirm = footer.querySelector(".ql-dialog-confrim").getBoundingClientRect();
+    const box = document.querySelector(".ql-dialog").getBoundingClientRect();
+
+    return {
+      inViewport: box.top >= 0 && box.bottom <= window.innerHeight + 1,
+      width: box.width,
+      whitespaceNodes: [...footer.childNodes].filter(node => node.nodeType === 3 && !node.textContent.trim()).length,
+      sameLine: Math.abs(cancel.y - confirm.y) < 1,
+      gap: confirm.left - cancel.right,
+    };
+  });
+
+  check("对话框完整渲染在视口内", result.inViewport, `width=${result.width}`);
+  check("footer 没有多余空白文本节点", result.whitespaceNodes === 0, `nodes=${result.whitespaceNodes}`);
+  check("确定/取消按钮在同一行", result.sameLine);
+  check("按钮间距为 8px（来自 CSS margin）", Math.abs(result.gap - 8) < 0.5, `gap=${result.gap}`);
+
+  await page.screenshot({ path: join(outDir, "dialog.png") });
+  await page.evaluate(() => window.__editor.getModule("dialog").close());
 }
 
 async function main() {
