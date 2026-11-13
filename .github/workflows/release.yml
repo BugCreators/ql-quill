@@ -1,0 +1,94 @@
+name: Release
+
+# 手动触发：升版本 → 校验/构建 → 打 tag 推回 main → 通过 npm Trusted Publishing (OIDC) 发布。
+# 之所以把升版本放在同一个 workflow 里：npm 的 Trusted Publisher 校验的是「触发它的 workflow 文件名」，
+# 拆成两个 workflow 会因文件名对不上而 ENEEDAUTH。
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 版本递增类型
+        type: choice
+        options: [patch, minor, major]
+        default: minor
+      dist_tag:
+        description: npm dist-tag（预发可填 next / beta）
+        type: string
+        default: latest
+      resume_tag:
+        description: 重试用（如 v2.1.0）：填了这个就跳过升版本与打 tag，直接发布该 tag
+        type: string
+        default: ''
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+# contents: write 推发版 commit 与 tag；id-token: write 用于 OIDC 换取短时发布票据
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    # 只允许从默认分支发版；重试模式会 checkout 指定 tag，不受此限制
+    if: github.ref == 'refs/heads/main' || inputs.resume_tag != ''
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.resume_tag || github.ref }}
+
+      # Trusted Publishing 要求 npm CLI >= 11.5.1（Node 24 自带 npm 11.x，Node 22.14 自带仅 10.x）
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 升版本并固化 CHANGELOG
+        if: inputs.resume_tag == ''
+        run: node scripts/release-prepare.mjs ${{ inputs.bump }}
+
+      - name: 读取待发布版本
+        id: pkg
+        run: echo "version=$(node -p 'require("./package.json").version')" >> "$GITHUB_OUTPUT"
+
+      - name: 类型检查
+        run: npm run typecheck
+
+      - name: 构建产物
+        run: npm run build
+
+      # 包内容断言 + publint + attw，不通过就不打 tag，避免留下发不出去的版本
+      - name: 包体检
+        run: npm run verify
+
+      - name: 提交并打 tag
+        if: inputs.resume_tag == ''
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json CHANGELOG.md
+          git commit -m "chore(release): v${{ steps.pkg.outputs.version }}"
+          git tag -a "v${{ steps.pkg.outputs.version }}" -m "v${{ steps.pkg.outputs.version }}"
+          git push origin "HEAD:${{ github.ref_name }}"
+          git push origin "v${{ steps.pkg.outputs.version }}"
+
+      # 已发布的版本无法覆盖，提前挡住比等 npm 返回 403 更清楚
+      - name: 确认该版本尚未发布
+        run: |
+          if npm view "ql-quill@${{ steps.pkg.outputs.version }}" version >/dev/null 2>&1; then
+            echo "::error::ql-quill@${{ steps.pkg.outputs.version }} 已存在于 npm，不能重复发布"
+            exit 1
+          fi
+
+      # 校验已在上面独立执行，这里跳过 prepublishOnly 避免整套流程再跑一遍
+      - name: 发布到 npm
+        run: npm publish --provenance --access public --tag "${{ inputs.dist_tag }}" --ignore-scripts
+
+      - name: 发布结果
+        run: |
+          echo "ql-quill@${{ steps.pkg.outputs.version }} 已发布，dist-tag: ${{ inputs.dist_tag }}"

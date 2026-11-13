@@ -4,6 +4,7 @@
     "target": "es5",
     "allowJs": true,
     "outDir": "./locale",
+    "rootDir": "./src/locale",
     "declaration": true,
     "declarationDir": "./locale",
     "moduleResolution": "node",

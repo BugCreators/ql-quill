@@ -3,8 +3,20 @@
   "version": "2.0.5",
   "description": "A wrapper for quill",
   "main": "./dist/ql-quill.cjs.js",
-  "module": "./dist/ql-quill.es.js",
+  "module": "./dist/ql-quill.es.mjs",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/ql-quill.es.mjs",
+      "require": "./dist/ql-quill.cjs.js",
+      "default": "./dist/ql-quill.cjs.js"
+    },
+    "./dist/*": "./dist/*",
+    "./locale/*.js": "./locale/*.js",
+    "./locale/*": "./locale/*.js",
+    "./package.json": "./package.json"
+  },
   "files": [
     "dist/",
     "locale/",
@@ -19,11 +31,14 @@
     "build:lib": "vite build",
     "typecheck": "tsc --noEmit",
     "smoke": "node scripts/smoke-test.mjs --dist",
-    "prepublishOnly": "npm run typecheck && npm run build"
+    "check:syntax": "node --experimental-vm-modules scripts/check-artifact-syntax.mjs",
+    "verify": "node scripts/verify-package.mjs",
+    "release:prepare": "node scripts/release-prepare.mjs",
+    "prepublishOnly": "npm run typecheck && npm run build && npm run verify"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/BugCreators/ql-quill"
+    "url": "git+https://github.com/BugCreators/ql-quill.git"
   },
   "keywords": [
     "ql-quill"
@@ -31,12 +46,20 @@
   "license": "MIT",
   "homepage": "https://github.com/BugCreators/ql-quill",
   "engines": {
-    "node": "^14.18.0 || >=16.0.0"
+    "node": ">=16"
   },
-  "dependencies": {
-    "quill": "^2.0.3"
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=20",
+      "onFail": "error"
+    }
+  },
+  "peerDependencies": {
+    "quill": "^2.0.0"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
     "@babel/core": "^7.18.2",
     "@babel/preset-env": "^7.18.2",
     "@enzedonline/quill-blot-formatter2": "^3.2.0",
@@ -46,6 +69,8 @@
     "@types/node": "^18.7.13",
     "extend": "^3.0.2",
     "playwright": "^1.65.0",
+    "publint": "^0.3.25",
+    "quill": "^2.0.3",
     "quill-better-table": "^1.2.10",
     "rollup-plugin-typescript2": "^0.33.0",
     "stylus": "^0.54.8",

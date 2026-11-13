@@ -97,13 +97,13 @@ async function testDemo(page, base) {
 }
 
 async function testDist(page, base) {
-  console.log("\n[2] 构建产物 dist/ql-quill.es.js");
+  console.log("\n[2] 构建产物 dist/ql-quill.es.mjs");
 
   const html = `<!doctype html>
 <html><head><link rel="stylesheet" href="/dist/ql-quill.snow.css"></head>
 <body><div id="editor"></div>
 <script type="module">
-  import QlQuill from "/dist/ql-quill.es.js";
+  import QlQuill from "/dist/ql-quill.es.mjs";
   window.__editor = new QlQuill("#editor", {
     toolbar: ["bold", "italic", "table"],
     limit: 50,

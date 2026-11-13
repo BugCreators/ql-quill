@@ -30,7 +30,8 @@ export default defineConfig({
     lib: {
       entry: pathResolve("src/index.ts"),
       name: "QlQuill",
-      fileName: format => "ql-quill." + format + ".js",
+      // ES 产物用 .mjs：包本身没有 type: module，.js 会被 Node 当作 CJS 解析
+      fileName: format => (format === "es" ? "ql-quill.es.mjs" : `ql-quill.${format}.js`),
       formats: ["umd", "cjs", "es"],
     },
     cssTarget: "chrome61", // 防止vite将rgba颜色转为十六进制

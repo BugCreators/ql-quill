@@ -1,0 +1,107 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# 同一分支的新推送取消上一次未完成的运行
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: 类型检查 / 构建 / 包体检 (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 类型检查
+        run: npm run typecheck
+
+      # dist/ 与 locale/ 都不入库，必须构建后才有产物
+      - name: 构建产物
+        run: npm run build
+
+      # 包内容断言 + publint + attw + 体积预算
+      - name: 包体检
+        run: npm run verify
+
+  node16:
+    name: Node 16 产物兼容
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 16
+          cache: npm
+
+      # engines 放宽到 >=16 是面向使用方的承诺，这个 job 负责兑现：
+      # 用 Node 16 自己构建并用它自带的解析器检查产物。开发依赖中 attw/playwright 要求 >=20，
+      # 故跳过浏览器下载；本 job 只跑构建与解析，不跑 verify / smoke。
+      - name: 安装依赖
+        run: npm ci
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+
+      - name: 构建产物
+        run: npm run build
+
+      - name: 校验产物可被 Node 16 解析
+        run: npm run check:syntax
+
+  smoke:
+    name: 浏览器冒烟测试
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 缓存 Playwright 浏览器
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: 安装 Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: 构建产物
+        run: npm run build
+
+      - name: 冒烟测试（demo 页 + dist 产物）
+        run: npm run smoke
+
+      - name: 上传截图与日志
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-output
+          path: smoke-output/
+          if-no-files-found: ignore

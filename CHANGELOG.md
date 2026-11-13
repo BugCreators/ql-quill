@@ -19,14 +19,14 @@
 - 类型声明只为 `src` 生成，dist 不再混入 node_modules 与第三方 d.ts
 - 新增 `npm run smoke`：Playwright 跑 demo 页与 dist 产物，输出截图与控制台错误
 - 新增 `npm run verify`：包内容断言（必需文件/泄漏目录/体积预算）+ publint + attw
-- 新增 GitHub Actions `ci.yml`：类型检查 + 构建 + 包体检（Node 20/22）+ 浏览器冒烟测试
+- 新增 GitHub Actions `ci.yml`：类型检查 + 构建 + 包体检（Node 20/22）+ Node 16 产物解析校验 + 浏览器冒烟测试
 - 新增 GitHub Actions `release.yml` 与 `scripts/release-prepare.mjs`：手动触发升版本 → 校验构建 → 打 tag → 通过 npm Trusted Publishing（OIDC）发布，仓库不存 npm 密钥
 
 ### 包结构（对使用方有影响）
 - 新增 `exports` map：`ql-quill`、`ql-quill/locale/*`、`ql-quill/dist/*`
 - `quill` 由 `dependencies` 改为 `peerDependencies`，避免宿主出现两份 quill 注册表
 - ES 产物改名 `dist/ql-quill.es.mjs`（原 `.js` 在 Node 里会被当作 CJS 解析）；深度引用旧路径的需同步修改
-- `engines.node` 提升到 `>=20`；语言包声明文件不再多一层 `locale/locale/` 嵌套
+- `engines.node` 定为 `>=16`（在 Node 16 的构建链里也能加载本包），开发侧要求 Node `>=20`，由 `devEngines` 声明；语言包声明文件不再多一层 `locale/locale/` 嵌套
 
 ### 修复
 - 未配置 `image.action` 时上传 base64 图片 Promise 不会 resolve

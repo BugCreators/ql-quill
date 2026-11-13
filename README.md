@@ -1,6 +1,18 @@
 # ql-quill
 
+[![CI](https://github.com/BugCreators/ql-quill/actions/workflows/ci.yml/badge.svg)](https://github.com/BugCreators/ql-quill/actions/workflows/ci.yml)
+
 关于 Quill.js 一些公共配置的封装、支持使用 KityFormula 公式插件，供内部使用
+
+## 安装
+
+```bash
+npm i ql-quill quill
+```
+
+`quill` 是 `peerDependencies`：需要宿主项目自己安装，避免出现两份 quill、两套 `Quill.import` 注册表。
+
+`engines.node` 声明为 `>=16`，指**安装并使用本包**的环境（含打包链）；本仓库自己开发、构建、跑校验需要 Node `>=20`（`devEngines` 已声明，开发依赖中的 `@arethetypeswrong/cli`、`playwright` 要求 20+）。
 
 ## 国际化
 
@@ -33,10 +45,26 @@ npm install
 npm run dev       # 打开 http://localhost:8080/demo/index.html
 npm run build     # 构建 dist/ 与 locale/
 npm run typecheck
+npm run verify    # 包体检：pack 内容断言 + publint + attw + 体积预算
 npm run smoke     # Playwright 冒烟测试：demo 页 + dist 产物，截图在 smoke-output/
 ```
 
 > `npm run smoke` 首次需执行 `npx playwright install chromium` 下载浏览器内核。
+> `npm run verify` 依赖构建产物，需先跑 `npm run build`；`--skip-lint` 可跳过需要联网的 publint / attw。
+
+## 发布
+
+正式发版走 GitHub Actions 的 **Release** 工作流（手动触发），鉴权用 npm Trusted Publishing（OIDC），仓库里不保存任何 npm 密钥：
+
+1. 把本次改动写进 `CHANGELOG.md` 的 `## Unreleased` 段落（该段落为空时发布会直接失败）
+2. Actions → Release → Run workflow，选 `patch` / `minor` / `major`
+3. 工作流依次执行：升版本并同步 `package-lock.json` → `typecheck` → `build` → `verify` → 提交 `chore(release): vX.Y.Z` 并打 tag 推回 main → `npm publish --provenance`
+
+npm 侧需预先绑定 Trusted Publisher：Organization `BugCreators`、Repository `ql-quill`、Workflow filename `release.yml`、Environment 留空。
+
+发布失败（多为 OIDC 绑定字段写错）时**不要重跑整条流程**——tag 已推、`Unreleased` 已空，重跑会卡在升版本那步。改用 `resume_tag` 填已存在的 tag（如 `v2.1.0`）重跑：跳过升版本与打 tag，只重建并发布这个版本。`npm run release:prepare -- minor --dry-run` 可在本地预演版本号与 CHANGELOG 改写结果，不写文件。
+
+本地手动发布仍可直接 `npm publish`（`prepublishOnly` 会跑 `typecheck → build → verify`），但版本号与 tag 需自己维护。
 
 ## 目录结构
 
@@ -56,8 +84,10 @@ src/
 ├─ assets/           # stylus 样式、图标与图片
 └─ vendor/           # 第三方内置代码（颜色选择器）
 
-scripts/build-locale.mjs  # 语言包构建脚本
-scripts/smoke-test.mjs    # Playwright 冒烟测试
+scripts/build-locale.mjs   # 语言包构建脚本
+scripts/release-prepare.mjs # 发版：升版本 + 把 Unreleased 段落固化为版本条目
+scripts/smoke-test.mjs     # Playwright 冒烟测试
+scripts/verify-package.mjs # 包体检（pack 内容 / publint / attw / 体积）
 demo/                     # 调试页面与静态资源
 ```
 
