@@ -3,29 +3,32 @@ import { defineConfig } from "vite";
 import { getBabelOutputPlugin } from "@rollup/plugin-babel";
 import dts from "vite-plugin-dts";
 
-const pathResolve = (dir: string) => {
-  return resolve(__dirname, ".", dir);
-};
+const pathResolve = (dir: string) => resolve(__dirname, ".", dir);
 
 export default defineConfig({
   resolve: {
     alias: {
-      "ql-quill": pathResolve("src/index"),
-      "@icons": pathResolve("assets/icons"),
+      "@icons": pathResolve("src/assets/icons"),
     },
   },
   plugins: [
-    getBabelOutputPlugin({ allowAllFormats: true, presets: [["@babel/preset-env"]] }),
+    getBabelOutputPlugin({
+      allowAllFormats: true,
+      presets: [["@babel/preset-env"]],
+    }),
+    // 只为 src 产出类型声明，避免把 node_modules 里的 d.ts 也抄进 dist
     dts({
-      rollupTypes: true,
+      include: ["src"],
+      entryRoot: "src",
     }),
   ],
   server: {
     port: 8080,
+    open: "/demo/index.html",
   },
   build: {
     lib: {
-      entry: pathResolve("./index.ts"),
+      entry: pathResolve("src/index.ts"),
       name: "QlQuill",
       fileName: format => "ql-quill." + format + ".js",
       formats: ["umd", "cjs", "es"],

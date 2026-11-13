@@ -1,3 +1,4 @@
+import type QlQuill from "../quill";
 import type { Locale } from "../types";
 
 type PartialLocale = Partial<Locale>;
@@ -22,7 +23,7 @@ function parseLocale(
   object?: PartialLocale,
   isLocal?: boolean
 ): string | boolean {
-  let l;
+  let l: string | undefined;
   if (!preset) return L;
   if (typeof preset === "string") {
     const presetLower = preset.toLowerCase();
@@ -52,7 +53,7 @@ class LocaleModule {
   static locale = parseLocale;
   static Ls = Ls;
 
-  constructor(quill: any, options: string | PartialLocale) {
+  constructor(_quill: QlQuill, options: string | PartialLocale) {
     if (typeof options === "object" && !options.name) options = Ls[L];
     parseLocale(options, undefined);
   }
@@ -64,7 +65,7 @@ class LocaleModule {
   $locale(): PartialLocale;
   $locale(key: string): string;
   $locale(key?: string): string | PartialLocale {
-    const locale = Ls[this.$L];
+    const locale = Ls[this.$L] || {};
 
     return key ? locale[key] || key : locale;
   }

@@ -24,7 +24,42 @@ qlQuilllocale.locale(enUs);
 qlQuilllocale.locale("custom", { ... });
 ```
 
-## [配置示例](https://github.com/BugCreators/ql-quill/blob/master/index.html)
+## [配置示例](https://github.com/BugCreators/ql-quill/blob/master/demo/index.html)
+
+本地调试：
+
+```bash
+npm install
+npm run dev       # 打开 http://localhost:8080/demo/index.html
+npm run build     # 构建 dist/ 与 locale/
+npm run typecheck
+npm run smoke     # Playwright 冒烟测试：demo 页 + dist 产物，截图在 smoke-output/
+```
+
+> `npm run smoke` 首次需执行 `npx playwright install chromium` 下载浏览器内核。
+
+## 目录结构
+
+```
+src/
+├─ index.ts          # 入口：注册全部模块与主题，导出 QlQuill
+├─ quill.ts          # QlQuill 类本体（不反向依赖模块，避免循环引用）
+├─ types.ts          # 对外类型
+├─ globals.d.ts      # window.kfe 等全局声明
+├─ core/             # 与具体功能无关的核心：Quill 注册表代理、选项解析、模块补全
+├─ modules/          # 模块：对话框、图片上传、字数、表格、公式、粘贴、小题…
+├─ blots/            # 自定义 blot
+├─ themes/           # snow 主题（工具栏展开、颜色选择器挂载）
+├─ ui/               # 颜色选择器
+├─ locale/           # 语言包源码，构建后输出到根目录 locale/
+├─ worker/           # RTF 解析 worker
+├─ assets/           # stylus 样式、图标与图片
+└─ vendor/           # 第三方内置代码（颜色选择器）
+
+scripts/build-locale.mjs  # 语言包构建脚本
+scripts/smoke-test.mjs    # Playwright 冒烟测试
+demo/                     # 调试页面与静态资源
+```
 
 ## Options
 

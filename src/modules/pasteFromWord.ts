@@ -1,10 +1,9 @@
 import type ClipboardType from "quill/modules/clipboard";
-import QlQuill from "../index";
+import Quill from "../core/quill";
+import type QlQuill from "../quill";
 import RtfExtracter from "../worker/rtf-extracter.worker?worker&inline";
 
-const BaseClipboard = QlQuill.import(
-  "modules/clipboard"
-) as typeof ClipboardType;
+const BaseClipboard = Quill.import("modules/clipboard") as typeof ClipboardType;
 
 export class Clipboard extends BaseClipboard {
   declare quill: QlQuill;
@@ -15,50 +14,60 @@ export class Clipboard extends BaseClipboard {
 
     super.onCapturePaste(e);
 
+    let worker: Worker;
+
     try {
-      const worker = new RtfExtracter();
-      worker.postMessage(e.clipboardData?.getData("text/rtf"));
-      worker.onmessage = (e) => {
-        if (!e.data.length) return;
-
-        const uploader = this.quill.getModule("uploader");
-
-        let index = 0;
-        [...this.quill.container.querySelectorAll("img")].forEach((el) => {
-          const src = el.getAttribute("src");
-
-          if (/^file:\/\/[\s\S]+|^\/\/:0/.test(src!)) {
-            const image = e.data[index];
-
-            uploader
-              .uploadImage(image.base64)
-              .then((url) => {
-                el.setAttribute("src", url);
-              })
-              .catch(() => {
-                el.parentNode!.removeChild(el);
-              });
-
-            index++;
-          }
-        });
-        worker.terminate();
-      };
-      worker.onerror = (e) => {
-        console.log(e);
-        worker.terminate();
-      };
-    } catch (e) {
-      console.log(e);
+      worker = new RtfExtracter();
+    } catch (error) {
+      console.warn("[ql-quill] 无法启动 Word 粘贴解析 worker", error);
+      return;
     }
+
+    // 无论成功失败都要释放 worker
+    const finish = () => worker.terminate();
+
+    worker.onmessage = ({ data }: MessageEvent<Array<{ base64: string }>>) => {
+      finish();
+
+      if (!data?.length) return;
+
+      this.replaceWordImages(data);
+    };
+
+    worker.onerror = error => {
+      console.warn("[ql-quill] Word 粘贴解析失败", error);
+      finish();
+    };
+
+    worker.postMessage(e.clipboardData?.getData("text/rtf") || "");
+  }
+
+  /** Word 粘贴进来的是本地路径图片，按出现顺序换成上传后的地址 */
+  replaceWordImages(images: Array<{ base64: string }>) {
+    const uploader = this.quill.getModule("uploader");
+
+    let index = 0;
+
+    this.quill.container.querySelectorAll("img").forEach(el => {
+      const src = el.getAttribute("src") || "";
+      if (!/^file:\/\/|^\/\/:0/.test(src)) return;
+
+      const image = images[index++];
+      if (!image) return;
+
+      uploader
+        .uploadImage(image.base64)
+        .then(url => el.setAttribute("src", url))
+        .catch(() => el.remove());
+    });
   }
 }
 
-const Module = QlQuill.import("core/module");
+const Module = Quill.import("core/module");
 
 class PasteFromWord extends Module {
   static register() {
-    QlQuill.register({ "modules/clipboard": Clipboard }, true);
+    Quill.register({ "modules/clipboard": Clipboard }, true);
   }
 }
 

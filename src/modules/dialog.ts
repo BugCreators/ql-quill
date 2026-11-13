@@ -1,6 +1,6 @@
-import type QlQuill from "../index";
+import type QlQuill from "../quill";
 import closeIcon from "@icons/close.svg?raw";
-import { LocaleInstance } from "./locale";
+import type { LocaleInstance } from "./locale";
 
 interface DialogOptions {
   content?: string;
@@ -12,28 +12,62 @@ interface DialogOptions {
   onCancel?(): void;
 }
 
+/** 类名集中在这里，模板与查询复用同一份，避免字符串写错 */
+const CLASS_NAMES = {
+  container: "ql-dialog-root",
+  mask: "ql-dialog-mask",
+  content: "ql-dialog",
+  closeBtn: "ql-dialog-close",
+  title: "ql-dialog-title",
+  body: "ql-dialog-body",
+  cancelBtn: "ql-dialog-cancel",
+  confirmBtn: "ql-dialog-confrim",
+} as const;
+
 class Dialog {
-  static CONTAINER_CLASS_NAME: string;
-  static MASK_CLASS_NAME: string;
-  static CONTENT_CLASS_NAME: string;
-  static CLOSE_BTN_CLASS_NAME: string;
-  static TITLE_CLASS_NAME: string;
-  static BODY_CLASS_NAME: string;
-  static CANCEL_BTN_CLASS_NAME: string;
-  static CONFIRM_BTN_CLASS_NAME: string;
-  static TEMPLATE: string;
+  static readonly CONTAINER_CLASS_NAME = CLASS_NAMES.container;
+  static readonly MASK_CLASS_NAME = CLASS_NAMES.mask;
+  static readonly CONTENT_CLASS_NAME = CLASS_NAMES.content;
+  static readonly CLOSE_BTN_CLASS_NAME = CLASS_NAMES.closeBtn;
+  static readonly TITLE_CLASS_NAME = CLASS_NAMES.title;
+  static readonly BODY_CLASS_NAME = CLASS_NAMES.body;
+  static readonly CANCEL_BTN_CLASS_NAME = CLASS_NAMES.cancelBtn;
+  static readonly CONFIRM_BTN_CLASS_NAME = CLASS_NAMES.confirmBtn;
+
+  static readonly TEMPLATE = `
+<div class="${CLASS_NAMES.mask}"></div>
+<div tabindex="-1" class="ql-dialog-wrap">
+  <div class="${CLASS_NAMES.content}">
+    <div tabindex="0" style="width: 0px; height: 0px; overflow: hidden; outline: none;"></div>
+    <div class="ql-dialog-content">
+      <button type="button" class="${CLASS_NAMES.closeBtn}">
+        <span class="ql-dialog-close-x">
+          <span role="img" class="ql-anticon">${closeIcon}</span>
+        </span>
+      </button>
+      <div class="ql-dialog-header">
+        <div class="${CLASS_NAMES.title}"></div>
+      </div>
+      <div class="${CLASS_NAMES.body}" style="padding-top: 0px;"></div>
+      <div class="ql-dialog-footer">
+        <button type="button" class="ql-btn ${CLASS_NAMES.cancelBtn}"></button>
+        <button type="button" class="ql-btn ql-btn-primary ${CLASS_NAMES.confirmBtn}"></button>
+      </div>
+    </div>
+  </div>
+</div>`;
 
   quill: QlQuill;
   options: DialogOptions;
   container: HTMLElement;
-  confrimBtn?: HTMLElement;
+  confirmBtn?: HTMLElement;
 
   constructor(quill: QlQuill) {
     this.quill = quill;
     this.options = {};
 
     const root = this.quill.container.querySelector<HTMLElement>(
-      "." + Dialog.CONTAINER_CLASS_NAME
+      "." + Dialog.CONTAINER_CLASS_NAME,
     );
 
     this.container = root || this.createContainer();
@@ -64,9 +98,7 @@ class Dialog {
     this.options = options;
 
     this.setTitle(options);
-
     this.renderBody(options);
-
     this.setBounds(options);
 
     const locale = this.quill.getModule("locale") as LocaleInstance;
@@ -86,13 +118,11 @@ class Dialog {
     if (options.contentElement && !body.contains(options.contentElement)) {
       body.innerHTML = "";
       body.appendChild(options.contentElement);
-      return;
     }
   }
 
   setTitle(options: DialogOptions) {
-    this.queryComponent(Dialog.TITLE_CLASS_NAME).innerText =
-      options.title || "";
+    this.queryComponent(Dialog.TITLE_CLASS_NAME).innerText = options.title || "";
   }
 
   setBounds(options: DialogOptions) {
@@ -105,11 +135,22 @@ class Dialog {
 
   renderButton(className: string, text: string) {
     const button = this.queryComponent(className);
-    button.innerHTML = `<span>${text}</span>`;
+
+    if (button.textContent === text) return;
+
+    // 样式里有 .ql-btn > span，保留 span 包裹
+    const span =
+      button.querySelector("span") || button.appendChild(document.createElement("span"));
+
+    span.textContent = text;
   }
 
   handleConfirm = () => {
-    this.options.onOk ? this.options.onOk(this.close.bind(this)) : this.close();
+    if (this.options.onOk) {
+      this.options.onOk(this.close.bind(this));
+    } else {
+      this.close();
+    }
   };
 
   handleCancel = () => {
@@ -118,22 +159,26 @@ class Dialog {
   };
 
   registerListener() {
-    this.confrimBtn = this.queryComponent(Dialog.CONFIRM_BTN_CLASS_NAME);
-    this.confrimBtn.addEventListener("click", this.handleConfirm);
+    this.confirmBtn = this.queryComponent(Dialog.CONFIRM_BTN_CLASS_NAME);
+    this.confirmBtn.addEventListener("click", this.handleConfirm);
 
-    const closeBtn = this.queryComponent(Dialog.CLOSE_BTN_CLASS_NAME);
-    closeBtn.addEventListener("click", this.handleCancel);
+    this.queryComponent(Dialog.CLOSE_BTN_CLASS_NAME).addEventListener(
+      "click",
+      this.handleCancel,
+    );
 
-    const cancelBtn = this.queryComponent(Dialog.CANCEL_BTN_CLASS_NAME);
-    cancelBtn.addEventListener("click", this.handleCancel);
+    this.queryComponent(Dialog.CANCEL_BTN_CLASS_NAME).addEventListener(
+      "click",
+      this.handleCancel,
+    );
   }
 
   disabledConfirmBtn() {
-    this.confrimBtn?.setAttribute("disabled", "disabled");
+    this.confirmBtn?.setAttribute("disabled", "disabled");
   }
 
   enableConfirmBtn() {
-    this.confrimBtn?.removeAttribute("disabled");
+    this.confirmBtn?.removeAttribute("disabled");
   }
 
   show() {
@@ -146,46 +191,5 @@ class Dialog {
     this.enableConfirmBtn();
   }
 }
-
-Dialog.CONTAINER_CLASS_NAME = "ql-dialog-root";
-Dialog.MASK_CLASS_NAME = "ql-dialog-mask";
-Dialog.CONTENT_CLASS_NAME = "ql-dialog";
-Dialog.CLOSE_BTN_CLASS_NAME = "ql-dialog-close";
-Dialog.TITLE_CLASS_NAME = "ql-dialog-title";
-Dialog.BODY_CLASS_NAME = "ql-dialog-body";
-Dialog.CANCEL_BTN_CLASS_NAME = "ql-dialog-cancel";
-Dialog.CONFIRM_BTN_CLASS_NAME = "ql-dialog-confrim";
-
-Dialog.TEMPLATE = [
-  '<div class="' + Dialog.MASK_CLASS_NAME + '"></div>',
-  '<div tabindex="-1" class="ql-dialog-wrap">',
-  '  <div class="' + Dialog.CONTENT_CLASS_NAME + '">',
-  '    <div tabindex="0" style="width: 0px; height: 0px; overflow: hidden; outline: none;"></div>',
-  '    <div class="ql-dialog-content">',
-  '      <button type="button" class="' + Dialog.CLOSE_BTN_CLASS_NAME + '">',
-  '        <span class="ql-dialog-close-x">',
-  '          <span role="img" class="ql-anticon">' + closeIcon + "</span>",
-  "        </span>",
-  "      </button>",
-  '      <div class="ql-dialog-header">',
-  '        <div class="' + Dialog.TITLE_CLASS_NAME + '"></div>',
-  "      </div>",
-  '      <div class="' +
-    Dialog.BODY_CLASS_NAME +
-    '" style="padding-top: 0px;"></div>',
-  '      <div class="ql-dialog-footer">',
-  '       <button type="button" class="ql-btn ' +
-    Dialog.CANCEL_BTN_CLASS_NAME +
-    '"></button>',
-  '       <button type="button" class="ql-btn ql-btn-primary ' +
-    Dialog.CONFIRM_BTN_CLASS_NAME +
-    '"></button>',
-  "      </div>",
-  "    </div>",
-  "  </div>",
-  "</div>",
-]
-  .map((i) => i.trim())
-  .join("");
 
 export default Dialog;

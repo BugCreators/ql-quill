@@ -1,4 +1,5 @@
 {
+  "//": "语言包单独构建（build/rollup.config.ts 使用），产出 locale/*.js 与 .d.ts",
   "compilerOptions": {
     "target": "es5",
     "allowJs": true,
@@ -9,5 +10,5 @@
     "types": ["node", "vite/client", "babel__core"],
     "baseUrl": "./"
   },
-  "include": ["./src/locale"],
+  "include": ["./src/locale"]
 }

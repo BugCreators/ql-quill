@@ -64,6 +64,6 @@ export interface QlOptions extends CustomToolOptions {
 
 export type QlQuillOptions = Partial<QlExpandedOptions> & QlOptions;
 
-export * from "../plugin/color-picker/mo.color-picker.es";
+export * from "./vendor/color-picker/mo.color-picker.es";
 
 export * from "./locale";

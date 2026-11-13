@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -19,12 +19,12 @@
 
   <script src="./static/axios/axios.min.js"></script>
   <script type="module">
-    import QlQuill from "./index.ts";
-    import zhTw from "./src/locale/zh_tw";
-    import enUs from "./src/locale/en_us";
-    import "./assets/index.styl";
+    import QlQuill from "../src/index";
+    import zhTw from "../src/locale/zh_tw";
+    import enUs from "../src/locale/en_us";
+    import "../src/assets/index.styl";
 
-    var value = "<p>hello</p>";
+    var value = `<p><img src="/group1/M01/A7/BC/wKgClWppuECAegAxAAAKB7xsP5w202.png" data-latex="\sin {AB}"></p><p><u style="font-size: 14px; color: rgb(62, 178, 150);"><a href="http://baidu.com" rel="noopener noreferrer" target="_blank">baidu</a></u></p><p><img src="/group1/M01/A7/BC/wKgClWppt3aAPavPAAFBBzaOJzc159.gif"></p><p>111111111111111111111</p><p><em><u>斜体测试</u></em></p><p><em><u>a</u></em><sub><em><u>3</u></em></sub><sup><em><u>3</u></em></sup></p><p><point>&#xFEFF;<span contenteditable="false">&#xFEFF;1&#xFEFF;</span>&#xFEFF;</point><point>&#xFEFF;<span contenteditable="false">&#xFEFF;1&#xFEFF;</span>&#xFEFF;</point><point>&#xFEFF;<span contenteditable="false">&#xFEFF;1&#xFEFF;</span>&#xFEFF;</point><point>&#xFEFF;<span contenteditable="false">&#xFEFF;1&#xFEFF;</span>&#xFEFF;</point><point>&#xFEFF;<span contenteditable="false">&#xFEFF;1&#xFEFF;</span>&#xFEFF;</point><point>&#xFEFF;<span contenteditable="false">&#xFEFF;1&#xFEFF;</span>&#xFEFF;</point><point>&#xFEFF;<span contenteditable="false">&#xFEFF;1&#xFEFF;</span>&#xFEFF;</point><point>&#xFEFF;<span contenteditable="false">&#xFEFF;1&#xFEFF;</span>&#xFEFF;</point><point>&#xFEFF;<span contenteditable="false">&#xFEFF;1&#xFEFF;</span>&#xFEFF;</point><point>&#xFEFF;<span contenteditable="false">&#xFEFF;1&#xFEFF;</span>&#xFEFF;</point><point>&#xFEFF;<span contenteditable="false">&#xFEFF;1&#xFEFF;</span>&#xFEFF;</point><point>&#xFEFF;<span contenteditable="false">&#xFEFF;1&#xFEFF;</span>&#xFEFF;</point></p><p><br></p>`;
 
     var editor = new QlQuill("#editor", {
       limit: 1000,
@@ -95,7 +95,7 @@
 
     window.insertImage = () => {
       editor.insertImage(
-        "http://192.168.1.47:8090/group1/M00/01/72/qf5vBGVVzdWAA_ptAACZ2MTqNrQ686.jpg"
+        "https://devs.qljy.com/group1/M01/A7/BC/wKgClWppt3aAPavPAAFBBzaOJzc159.gif",
       );
     };
 
@@ -106,7 +106,7 @@
         {
           width: 20,
           height: 20,
-        }
+        },
       );
     };
 

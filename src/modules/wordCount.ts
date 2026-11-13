@@ -1,4 +1,6 @@
-import QlQuill from "../index";
+import type { Delta } from "quill/core";
+import Quill from "../core/quill";
+import type QlQuill from "../quill";
 import type { QlOptions } from "../types";
 
 interface WordCountOptions extends Pick<QlOptions, "onChange"> {
@@ -14,6 +16,7 @@ class WordCount {
   countTemp?: number;
   container?: HTMLElement;
   counter?: HTMLElement;
+  private listening = false;
 
   constructor(quill: QlQuill, options = {}) {
     this.quill = quill;
@@ -23,61 +26,69 @@ class WordCount {
   setOptions(options: WordCountOptions) {
     this.options = options;
 
-    if (options.limit) {
-      this.initLimiter();
+    if (!options.limit) return;
 
-      this.registerListener();
-    }
+    this.initLimiter();
+    this.registerListener();
   }
 
   registerListener() {
-    this.quill.on("editor-change", (eventName, delta, oldDelta, source) => {
-      if (eventName === "text-change") {
-        const { limit, onLimit, onChange } = this.options;
+    // setOptions 可能被调用多次，监听只挂一次
+    if (this.listening) return;
+    this.listening = true;
 
-        const distance = this.calculate() - limit!;
+    this.quill.on("text-change", delta => {
+      const { limit, onLimit, onChange } = this.options;
 
-        if (distance > 0) {
-          onLimit?.();
+      const distance = this.calculate() - (limit as number);
 
-          if (!this.quill.selection.composing) {
-            const Delta = QlQuill.import("delta");
+      if (distance > 0) {
+        onLimit?.();
 
-            const retainIndex = delta.reduce((length, op) => {
-              if (typeof op.retain === "number") {
-                length += op.retain;
-              } else if (typeof op.insert === "string") {
-                length += op.insert.length;
-              } else if (typeof op.insert === "object") {
-                length += 1;
-              }
-
-              return length;
-            }, -distance);
-
-            this.quill.updateContents(
-              new Delta().retain(retainIndex).delete(distance)
-            );
-
-            setTimeout(() => this.quill.setSelection(retainIndex));
-          }
-        } else {
-          onChange?.(this.quill.root.innerHTML, delta);
+        if (!this.quill.selection.composing) {
+          this.trimOverflow(delta, distance);
         }
-
-        this.update();
+      } else {
+        onChange?.(this.quill.root.innerHTML, delta);
       }
+
+      this.update();
     });
   }
 
+  /** 超出上限的部分从末尾截掉，光标停在截断点 */
+  trimOverflow(delta: Delta, distance: number) {
+    const Delta = Quill.import("delta");
+
+    const retainIndex = delta.reduce((length: number, op: any) => {
+      if (typeof op.retain === "number") {
+        length += op.retain;
+      } else if (typeof op.insert === "string") {
+        length += op.insert.length;
+      } else if (typeof op.insert === "object") {
+        length += 1;
+      }
+
+      return length;
+    }, -distance);
+
+    this.quill.updateContents(
+      new Delta().retain(retainIndex).delete(distance),
+    );
+
+    setTimeout(() => this.quill.setSelection(retainIndex));
+  }
+
   initLimiter() {
+    if (this.container) return;
+
     this.container = this.quill.addContainer("ql-word-count") as HTMLElement;
 
     this.initCounter();
 
     this.container.appendChild(this.counter!);
     this.container.appendChild(
-      document.createTextNode("/" + this.options.limit)
+      document.createTextNode("/" + this.options.limit),
     );
   }
 
@@ -97,7 +108,8 @@ class WordCount {
 
     if (count === this.countTemp) return;
     this.countTemp = count;
-    this.counter!.innerText = String(this.calculate());
+
+    if (this.counter) this.counter.innerText = String(count);
   }
 }
 

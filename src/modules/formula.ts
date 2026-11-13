@@ -1,6 +1,7 @@
-import QlQuill from "../index";
+import Quill from "../core/quill";
+import type QlQuill from "../quill";
 
-const Module = QlQuill.import("core/module");
+const Module = Quill.import("core/module");
 
 interface FormulaOptions {
   url: string;

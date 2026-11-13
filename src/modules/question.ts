@@ -1,9 +1,13 @@
 import type BaseEmbed from "quill/blots/embed";
-import QlQuill from "../index";
+import Quill from "../core/quill";
+import type QlQuill from "../quill";
 
-const Embed = QlQuill.import("blots/embed") as typeof BaseEmbed;
-const Module = QlQuill.import("core/module");
+const Embed = Quill.import("blots/embed") as typeof BaseEmbed;
+const Module = Quill.import("core/module");
 
+type SubjectType = "question" | "option";
+
+/** 小题 / 选项占位：<sub-question>、<sub-option> */
 class SubjectBlot extends Embed {
   static create(value: string) {
     const node = super.create("sub-" + value) as HTMLElement;
@@ -35,19 +39,14 @@ OptionBlot.tagName = "SUB-OPTION";
 
 class Question extends Module {
   static register() {
-    QlQuill.register(QuestionBlot, true);
-    QlQuill.register(OptionBlot, true);
+    Quill.register(QuestionBlot, true);
+    Quill.register(OptionBlot, true);
   }
 
   constructor(quill: QlQuill, options: any) {
     super(quill, options);
 
-    quill.on(
-      "editor-change",
-      (eventName: "text-change" | "selection-change"): void => {
-        if (eventName === "text-change") this.format();
-      }
-    );
+    quill.on("text-change", () => this.format());
 
     const toolbar = quill.getModule("toolbar");
 
@@ -55,20 +54,24 @@ class Question extends Module {
     toolbar.addHandler("option", () => this.insert("option"));
   }
 
-  insert(type: string) {
+  insert(type: SubjectType) {
     const range = this.quill.getSelection(true);
     this.quill.deleteText(range);
     this.quill.insertEmbed(range.index, type, type);
     this.quill.setSelection(range.index + 1);
   }
 
+  /** 占位符按出现顺序重新编号 */
   format() {
-    [QuestionBlot.tagName, OptionBlot.tagName].forEach((tag) => {
-      const elements = this.quill.root.querySelectorAll(tag);
-      elements.forEach(
-        (el, index) =>
-          ((el.children[0] as HTMLElement).innerText = "(" + (index + 1) + ")")
-      );
+    [QuestionBlot.tagName, OptionBlot.tagName].forEach(tagName => {
+      const elements = this.quill.root.querySelectorAll<HTMLElement>(tagName);
+      if (!elements.length) return;
+
+      elements.forEach((el, index) => {
+        const serial = `(${index + 1})`;
+
+        if (el.innerText !== serial) el.innerText = serial;
+      });
     });
   }
 }

@@ -1,8 +1,9 @@
 import type BaseInline from "quill/blots/inline";
-import QlQuill from "../index";
+import Quill from "../core/quill";
+import type QlQuill from "../quill";
 
-const Inline = QlQuill.import("blots/inline") as typeof BaseInline;
-const Module = QlQuill.import("core/module");
+const Inline = Quill.import("blots/inline") as typeof BaseInline;
+const Module = Quill.import("core/module");
 
 class ImportBlot extends Inline {}
 
@@ -11,7 +12,7 @@ ImportBlot.tagName = "POINT";
 
 class Import extends Module {
   static register() {
-    QlQuill.register(ImportBlot, true);
+    Quill.register(ImportBlot, true);
   }
 
   constructor(quill: QlQuill, options: any) {

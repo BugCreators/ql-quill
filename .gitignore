@@ -62,6 +62,16 @@ dist
 lib
 /locale
 
+# build cache
+*.tsbuildinfo
+.vite
+
+# WorkBuddy 工作目录（记忆、会话数据等）
+.workbuddy/
+
+# test output
+smoke-output/
+
 # misc
 .DS_Store
 example/

@@ -1,3 +1,18 @@
+## Unreleased
+
+- 重构
+  - 目录整理：`assets/`、`plugin/`、`static/`、根 `index.html` 分别归入 `src/assets`、`src/vendor`、`demo/`
+  - 拆出 `src/core`（选项解析、模块补全、Quill 注册表代理），`src/quill.ts` 只保留编辑器类本体
+  - 模块层不再引用 `QlQuill` 类，消除 `index ↔ modules` 循环依赖
+  - 语言包构建改为 `scripts/build-locale.mjs`，去掉 tsx（Node 20+ 下 `npm run build` 报 CJS/ESM 循环加载错误）
+  - 类型声明只为 `src` 生成，dist 不再混入 node_modules 与第三方 d.ts
+  - 新增 `npm run smoke`：Playwright 跑 demo 页与 dist 产物，输出截图与控制台错误
+- 修复
+  - 未配置 `image.action` 时上传 base64 图片 Promise 不会 resolve
+  - Word 粘贴解析 worker 在无图片时未释放
+  - 小题序号重排在占位符没有元素子节点时抛错
+  - 语言包 UMD 全局名带 `.ts` 后缀
+
 ## 2.0.5
 
 - editor
