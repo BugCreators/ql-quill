@@ -45,7 +45,7 @@ npm install
 npm run dev       # 打开 http://localhost:8080/demo/index.html
 npm run build     # 构建 dist/ 与 locale/
 npm run typecheck
-npm run verify    # 包体检：pack 内容断言 + publint + attw + 体积预算
+npm run verify    # 包体检：锁文件来源 + pack 内容断言 + publint + attw + 体积预算
 npm run smoke     # Playwright 冒烟测试：demo 页 + dist 产物，截图在 smoke-output/
 ```
 
@@ -87,7 +87,7 @@ src/
 scripts/build-locale.mjs   # 语言包构建脚本
 scripts/release-prepare.mjs # 发版：升版本 + 把 Unreleased 段落固化为版本条目
 scripts/smoke-test.mjs     # Playwright 冒烟测试
-scripts/verify-package.mjs # 包体检（pack 内容 / publint / attw / 体积）
+scripts/verify-package.mjs # 包体检（锁文件来源 / pack 内容 / publint / attw / 体积）
 demo/                     # 调试页面与静态资源
 ```
 

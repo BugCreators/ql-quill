@@ -160,7 +160,35 @@ function checkLint() {
   }
 }
 
+/** 锁文件 resolved 不该指向第三方镜像：CI 机器访问它们会超时或命中过期证书 */
+const MIRROR_HOSTS = ["registry.npm.taobao.org", "registry.npmmirror.com", "cnpmjs.org"];
+
+function checkLockRegistry() {
+  const lockPath = join(rootDir, "package-lock.json");
+  if (!existsSync(lockPath)) return;
+
+  const offenders = [];
+  const walk = (node) => {
+    if (!node || typeof node !== "object") return;
+    const resolved = node.resolved;
+    if (typeof resolved === "string" && MIRROR_HOSTS.some(host => resolved.includes(host))) {
+      offenders.push(resolved);
+    }
+    for (const value of Object.values(node)) walk(value);
+  };
+  walk(JSON.parse(readFileSync(lockPath, "utf8")));
+
+  check(
+    "锁文件未指向第三方镜像",
+    offenders.length === 0,
+    offenders.length ? `${offenders.length} 条，如 ${offenders[0]}` : "",
+  );
+}
+
 function main() {
+  console.log("\n[0] 仓库卫生");
+  checkLockRegistry();
+
   const distReady = existsSync(join(rootDir, "dist/index.d.ts"));
   const localeReady = existsSync(join(rootDir, "locale/en_us.js"));
 
