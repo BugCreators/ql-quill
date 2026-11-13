@@ -8,6 +8,8 @@ import { Delta } from "quill/core";
 import type { Range } from "quill/core/selection";
 import Emitter from "quill/core/emitter";
 
+const DEFAULT_MIMETYPES = ["image/png", "image/jpeg"];
+
 export default class ImageUploader extends Uploader {
   declare options: ImageObjOptions & typeof Uploader.DEFAULTS;
   declare quill: QlQuill;
@@ -32,6 +34,7 @@ export default class ImageUploader extends Uploader {
   ) {
     if (typeof options === "function") {
       super(quill, {});
+      this.options.mimetypes = [...DEFAULT_MIMETYPES];
 
       setTimeout(() => {
         const toolbar = this.quill.getModule("toolbar");
@@ -41,6 +44,8 @@ export default class ImageUploader extends Uploader {
     }
 
     super(quill, options);
+    // 用户传的 mimetypes 整体替换默认值（DEFAULTS 里不放它，见文件末尾说明）
+    this.options.mimetypes = [...(options.mimetypes ?? DEFAULT_MIMETYPES)];
 
     const { clipboard, base64AutoUpload } = options;
 
@@ -121,26 +126,34 @@ export default class ImageUploader extends Uploader {
   }
 }
 
-ImageUploader.DEFAULTS.handler = function (
-  this: { quill: Quill },
-  range: Range,
-  files: File[],
-) {
-  const uploader = this as unknown as ImageUploader;
+/**
+ * 这里刻意不把 mimetypes 写进 DEFAULTS：Quill 用 lodash.merge 把
+ * DEFAULTS 与用户配置合并，而 lodash 对数组是按下标合并的 —— 默认值
+ * 留在 DEFAULTS 里，用户传 ["image/gif"] 只会得到 ["image/gif", "image/jpeg"]。
+ * 默认值改在构造函数里兜底，用户传的数组就能整体替换。
+ */
+ImageUploader.DEFAULTS = {
+  handler: function (
+    this: { quill: Quill },
+    range: Range,
+    files: File[],
+  ) {
+    const uploader = this as unknown as ImageUploader;
 
-  Promise.all(files.map(file => uploader.uploadImage(file))).then(images => {
-    const update = images.reduce(
-      (delta: Delta, image: string) => delta.insert({ image }),
-      new Delta().retain(range.index).delete(range.length),
-    );
+    Promise.all(files.map(file => uploader.uploadImage(file))).then(images => {
+      const update = images.reduce(
+        (delta: Delta, image: string) => delta.insert({ image }),
+        new Delta().retain(range.index).delete(range.length),
+      );
 
-    uploader.quill.updateContents(update, Emitter.sources.USER);
-    uploader.quill.setSelection(
-      range.index + images.length,
-      Emitter.sources.SILENT,
-    );
-  });
-};
+      uploader.quill.updateContents(update, Emitter.sources.USER);
+      uploader.quill.setSelection(
+        range.index + images.length,
+        Emitter.sources.SILENT,
+      );
+    });
+  },
+} as typeof Uploader.DEFAULTS;
 
 function isBase64(file: unknown): file is string {
   return typeof file === "string" && /^data:image\/.+;base64/.test(file);

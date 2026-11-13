@@ -21,8 +21,8 @@ export interface CustomToolOptions {
 }
 
 export interface ImageObjOptions {
-  /** 图片上传accept */
-  accept?: string;
+  /** 接收的图片类型，整体替换默认值，同时决定文件选择框的 accept 与拖拽/选择后的过滤 */
+  mimetypes?: string[];
   /** 是否自动上传粘贴的base64图片 */
   base64AutoUpload?: boolean;
   /** 剪贴板中的图片回调 */
@@ -30,7 +30,7 @@ export interface ImageObjOptions {
   /** 文件上传时触发 */
   action?(
     file: File,
-    resolce: (file: string, atts?: Record<string, any>) => void,
+    resolve: (file: string, atts?: Record<string, any>) => void,
     reject: () => void
   ): void;
 }

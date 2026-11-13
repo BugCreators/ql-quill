@@ -104,6 +104,7 @@ async function testDist(page, base) {
 <body><div id="editor"></div>
 <script type="module">
   import QlQuill from "/dist/ql-quill.es.mjs";
+  window.QlQuill = QlQuill;
   window.__editor = new QlQuill("#editor", {
     toolbar: ["bold", "italic", "table"],
     limit: 50,
@@ -135,7 +136,60 @@ async function testDist(page, base) {
 
   await page.screenshot({ path: join(outDir, "dist.png"), fullPage: true });
 
+  await testImageMimetypes(page);
   await testDialogLayout(page);
+}
+
+/**
+ * 用户传的 mimetypes 必须整体替换默认值。Quill 用 lodash.merge 合并模块
+ * DEFAULTS，数组是按下标合并的，默认值一旦留在 DEFAULTS 里就会变成追加。
+ */
+async function testImageMimetypes(page) {
+  console.log("\n[4] 图片 mimetypes");
+
+  const result = await page.evaluate(() => {
+    const build = imageOptions => {
+      const host = document.createElement("div");
+      document.body.appendChild(host);
+
+      const editor = new window.QlQuill(host, {
+        toolbar: ["image"],
+        image: imageOptions,
+      });
+
+      // 工具栏容器插在 host 之前，不是它的子节点
+      const toolbar = editor.getModule("toolbar").container;
+
+      // 文件选择框在首次点击图片按钮时才创建，accept 取自 uploader.options.mimetypes
+      toolbar.querySelector(".ql-image")?.click();
+
+      const input = toolbar.querySelector("input.ql-image[type=file]");
+      const options = editor.getModule("uploader").options;
+
+      toolbar.remove();
+      host.remove();
+
+      return { mimetypes: options.mimetypes, accept: input?.getAttribute("accept") };
+    };
+
+    return { custom: build({ mimetypes: ["image/gif"] }), byDefault: build({}) };
+  });
+
+  check(
+    "自定义 mimetypes 整体替换默认值",
+    JSON.stringify(result.custom.mimetypes) === '["image/gif"]',
+    `mimetypes=${JSON.stringify(result.custom.mimetypes)}`,
+  );
+  check(
+    "文件选择框 accept 跟随 mimetypes",
+    result.custom.accept === "image/gif",
+    `accept=${result.custom.accept}`,
+  );
+  check(
+    "未传时用默认 mimetypes",
+    JSON.stringify(result.byDefault.mimetypes) === '["image/png","image/jpeg"]',
+    `mimetypes=${JSON.stringify(result.byDefault.mimetypes)}`,
+  );
 }
 
 /**

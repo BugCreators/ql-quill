@@ -48,7 +48,7 @@
         "question",
       ],
       image: {
-        accept: ".jpg, .jpeg, .bmp",
+        mimetypes: ["image/jpeg", "image/gif"],
         base64AutoUpload: true,
         action: function (file, resolve, reject) {
           const formData = new FormData();
