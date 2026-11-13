@@ -14,6 +14,35 @@ npm i ql-quill quill
 
 `engines.node` 声明为 `>=16`，指**安装并使用本包**的环境（含打包链）；本仓库自己开发、构建、跑校验需要 Node `>=20`（`devEngines` 已声明，开发依赖中的 `@arethetypeswrong/cli`、`playwright` 要求 20+）。
 
+### 引入样式
+
+样式没有内联进 JS，必须单独引入一次：
+
+```js
+import "ql-quill/dist/ql-quill.snow.css";
+```
+
+这份 CSS 已经打包了 `quill.snow.css`、`quill-better-table` 与颜色选择器的样式，**不用再引 quill 自己的样式**。走 `<script>` 引入的页面记得同时加载同目录的 `.css`。
+
+## 快速开始
+
+```js
+import QlQuill from "ql-quill";
+import "ql-quill/dist/ql-quill.snow.css";
+
+const editor = new QlQuill("#editor", {
+  placeholder: "请输入内容…",
+  limit: 1000,
+  onLimit: () => console.warn("已达字数上限"),
+  onChange: html => console.log(html),
+});
+
+editor.setContents("<p>Hello</p>");
+console.log(editor.getHTML());
+```
+
+入口 `ql-quill` 注册了全部模块与主题（体积换易用性），下文所有功能开箱可用。
+
 ## 国际化
 
 ```js
@@ -35,6 +64,8 @@ qlQuilllocale.locale(enUs);
 // 创建并切换新的语言
 qlQuilllocale.locale("custom", { ... });
 ```
+
+语言包在 `import` 时就注册进全局语言表（副作用），之后可以用语言名切换。语言状态是**模块级全局**的，切换会影响同一页面上的所有实例。
 
 ## [配置示例](https://github.com/BugCreators/ql-quill/blob/master/demo/index.html)
 
@@ -93,75 +124,108 @@ demo/                     # 调试页面与静态资源
 
 ## Options
 
-### limit `number`
+选项都放在构造函数第二个参数里。下表中没有的（`theme`、`modules`、`bounds` 等 Quill 原生配置）会原样透传给 Quill，见 [Quill 文档](https://quilljs.com/docs/configuration)。
 
-文本字数限制
+### 基础
 
-### onLimit `() => void`
+| 选项 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `toolbar` | `ToolbarConfig` | 见下文 | 工具栏配置，选择器字符串或按钮数组 |
+| `placeholder` | `string` | `""` | 内容为空时的占位文案 |
+| `value` | `string \| Delta` | — | 初始内容，字符串按 HTML 解析 |
+| `locale` | `string \| Locale` | `"zh_cn"` | 默认语言，非默认语言需先 import 语言包 |
+| `limit` | `number` | — | 字数上限，设置后右下角出现计数 |
+| `onChange` | `(html: string, delta: Delta) => void` | — | 内容变化时触发，传出 HTML 与 Delta |
+| `onLimit` | `() => void` | — | 内容超出字数上限时触发 |
+| `onFocus` | `() => void` | — | 焦点进入编辑器或工具栏时触发 |
+| `onBlur` | `() => void` | — | 焦点离开编辑器与工具栏时触发 |
 
-字数达到上限时触发
+### 图片
 
-### value `string`
+| 选项 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `imageResize` | `boolean` | `false` | 图片可拖拽缩放 |
+| `image` | `() => void \| object` | — | 传函数则接管工具栏图片按钮；传对象见下 |
 
-默认文本
+`image` 传对象时：
 
-### onChange `(value: string) => void`
+| 选项 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `mimetypes` | `string[]` | `["image/png", "image/jpeg"]` | 接收的图片类型，**整体替换**默认值；同时决定文件选择框的 `accept` 与拖拽/选择后的过滤 |
+| `base64AutoUpload` | `boolean` | `false` | 粘贴 base64 / blob 图片时自动走上传，先插占位再替换 src |
+| `clipboard` | `(node: HTMLElement, delta: Delta) => Delta` | — | 遍历粘贴内容里的图片节点，可改写 Delta |
+| `action` | `(file, resolve, reject) => void` | — | 真正的上传逻辑，见下 |
 
-富文本值改变时触发
+### 功能模块
 
-### image `() => void | object`
+| 选项 | 类型 | 说明 |
+| --- | --- | --- |
+| `formula` | `string` | KityFormula 弹窗页地址，工具栏需有 `"formula"` 按钮 |
+| `pasteFromWord` | `boolean` | 从 Word 粘贴保留格式 |
+| `import` | `boolean` | 开启「插入重点」，**建议直接写进 `toolbar`** |
+| `option` | `boolean` | 开启「插入小题」，**建议直接写进 `toolbar`** |
+| `question` | `boolean` | 开启「小题」，**建议直接写进 `toolbar`** |
 
-#### () => void
+### 详细说明
 
-自定义上传图片按钮点击事件
+#### `toolbar`
 
-#### object
+不传时用内置默认工具栏：
 
-#### image.accept `string`
+```js
+["bold", "italic", "underline", { script: "sub" }, { script: "super" }, "clean", "table", "image"]
+```
 
-图片上传 accept
+传数组时，几个按钮名有特殊行为：
 
-#### image.base64AutoUpload `boolean`
+- `"font"` / `"size"` —— 展开成白名单下拉（`14px` 与 `Arial` 不在列表里，但仍作为合法格式接受）
+- `"color"` —— 挂载自定义颜色选择器
+- `"table"` —— 用 better-table 替换 Quill 原生表格
+- `"image"` —— 图片按钮，点击走上传流程（`image` 传函数时改由该函数接管）
+- `"formula"` —— 打开公式弹窗（需配 `formula` 选项）
+- `"import"` / `"question"` / `"option"` —— 挂载对应模块，且如果只开了选项没写进数组，会自动追加到末尾
 
-是否自动上传粘贴的 base64 图片
+传选择器字符串（指向页面里已有的工具栏 DOM）时不做上面任何展开：按钮行为由 DOM 上的 class 决定，自定义模块也按 class 挂载（`.ql-table` / `.ql-question` / `.ql-option` / `.ql-import` / `.ql-color`）。
 
-#### image.clipboard `(node: HTMLElement, delta: Delta) => Delta`
+#### `limit` 与 `onChange`
 
-遍历剪贴板中的图片
+设置了 `limit` 之后，字数统计接管内容变化回调，两者行为不同：
 
-#### image.action `(file: File, reslove: (file: string) => void, reject: () => void) => void`
+- 未超限：触发 `onChange`
+- 超限：触发 `onLimit`，并把多出的内容从末尾截掉，**不触发 `onChange`**（中文输入法合成期间先不截断，等合成结束再处理）
 
-文件上传时触发
+没设 `limit` 时，每次内容变化都会触发 `onChange`。
 
-### imageResize `boolean`
+#### `image.action`
 
-图片是否可缩放
+```js
+image: {
+  action(file, resolve, reject) {
+    const form = new FormData();
+    form.append("file", file, file.name);
 
-### locale `"zh_cn" | "en_us" | "zh_tw"`
+    upload(form)
+      .then(res => resolve(res.url, { width: 200 })) // 第二个参数可选，附加属性到 img 上
+      .catch(reject);
+  },
+}
+```
 
-编辑器默认语言（默认中文，设置为其它语言时需提前导入语言包）
+- 必须调用 `resolve(url)`，否则图片不会插入（内部在等这个 Promise）
+- 粘贴进来的 base64 / blob 图片会先转成 `File` 再交给 `action`
+- 不配 `action` 时：base64 直接插入，其它文件读成 dataURL 插入，不会发起上传
 
-### pasteFromWord `boolean`
-
-是否开启从 word 复制文本
-
-### onFocus `() => void`
-
-编辑器聚焦时触发
-
-### onBlur `() => void`
-
-编辑器失焦时触发
+`mimetypes` 是整体替换默认值，不是追加：传 `["image/gif"]` 就只接受 gif。
 
 ## 实例 API
 
-### locale `(preset: string, object?: Record<string, string) => void`
+### locale `(preset: string | Locale, object?: Record<string, string>) => void`
 
-切换当前实例语言
+切换当前语言（全局生效）
 
-### setContents `(value: string | Delta): Delta`
+### setContents `(value: string | Delta) => Delta`
 
-设置内容
+设置内容。字符串按 HTML 解析，返回设置后的 Delta，光标位置会尽量保留
 
 ### getHTML `() => string`
 
@@ -169,6 +233,10 @@ demo/                     # 调试页面与静态资源
 
 ### insertImage `(src: string, latex?: string, attributes?: Record<string, string | number>) => void`
 
-插入图片
+在当前光标处插入图片。`latex` 会写进 `data-latex`（公式图再编辑时读取），`attributes` 可补 `width` / `height` 等
 
-更多配置及方法可见[Quill](https://quilljs.com/docs/quickstart/)
+### qlOptions
+
+构造时传入的自定义选项原样保存在实例上，便于外部读取当前配置
+
+更多配置及方法可见 [Quill](https://quilljs.com/docs/quickstart/)
