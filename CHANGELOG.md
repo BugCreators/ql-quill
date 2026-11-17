@@ -13,6 +13,8 @@
 
 ## Unreleased
 
+## 2.1.1 - 2026-11-17
+
 ### Changed
 - 构建链升级：`vite` 2.9 → 8.3（内核换成 rolldown）、`vite-plugin-dts` 1.7 → 5.1、`typescript` 4.8 → 5.9、`@babel/core` 7.18 → 7.29、`@rollup/plugin-babel` 5.3 → 7.1、`stylus` 0.54 → 0.64、`@types/node` 18 → 22
 - 产物因此变小：JS 单文件约 700 kB → 315 kB（此前压缩实际未生效）
